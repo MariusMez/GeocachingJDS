@@ -18,6 +18,37 @@
 			  res.render('tools', { message: 'Outils application mobile' });
 			});
 
+			app.get('/geocaches', function(req, res) {
+			  res.render('geocaches', { message: 'Les caches à trouver' });
+			});
+
+			app.get('/geocaching', function(req, res) {
+			  res.render('geocaching', { message: 'Régles du jeu Geocaching' });
+			});
+
+			app.get('/geocache', function(req, res) {
+
+				var Geocache = Parse.Object.extend("Geocache");
+				var query = new Parse.Query(Geocache);
+				query.get(req.query.id, {
+			  		success: function(cache) {				 
+					    var geocacheName = cache.get("Nom");
+					   // var geocacheDifficulty = cache.get("Difficulty");
+					   // var geocacheTerrain = cache.get("Terrain");
+					   // var geocacheSize = cache.get("Size");
+					   var geocachePhotoUrl = cache.get("Photo").url();
+					    var geocacheDescription = cache.get("Description");
+					    //var geocacheSpoiler = cache.get("Spoiler");
+					    var geocacheId = cache.id;
+
+				        res.render('geocache', { nom:geocacheName, description:geocacheDescription, photo:geocachePhotoUrl });
+				  	},
+			  		error: function(object, error) {
+			    		res.render('geocaches', { message:"Redirection toutes les caches" });
+			  		}	
+				});
+			});
+
 			app.get('/foundit', function(req, res) {
 				
 				var Geocache = Parse.Object.extend("Geocache");
