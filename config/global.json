@@ -1,0 +1,14 @@
+{
+  "global": {
+    "parseVersion": "1.4.2"
+  },
+  "applications": {
+    "GeocachingJDS": {
+      "applicationId": "7R195LzljhG1KVHbMHm4YweO6gElq1jDPS6hXK5h",
+      "masterKey": "9WQ8RxTCRlLri3dadhehwaa9NCvqKmdhsk3lDJDT"
+    },
+    "_default": {
+      "link": "GeocachingJDS"
+    }
+  }
+}
