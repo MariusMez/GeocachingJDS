@@ -38,10 +38,10 @@
 					   // var geocacheSize = cache.get("Size");
 					   var geocachePhotoUrl = cache.get("Photo").url();
 					    var geocacheDescription = cache.get("Description");
-					    //var geocacheSpoiler = cache.get("Spoiler");
+					    var geocacheSpoiler = cache.get("Spoiler").url();
 					    var geocacheId = cache.id;
 
-				        res.render('geocache', { nom:geocacheName, description:geocacheDescription, photo:geocachePhotoUrl });
+				        res.render('geocache', { nom:geocacheName, description:geocacheDescription, photo:geocachePhotoUrl, spoiler:geocacheSpoiler });
 				  	},
 			  		error: function(object, error) {
 			    		res.render('geocaches', { message:"Redirection toutes les caches" });
