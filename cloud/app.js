@@ -50,6 +50,7 @@
 						   // var geocacheSize = cache.get("Size");
 						   var geocachePhotoUrl = cache.get("Photo").url();
 						    var geocacheDescription = cache.get("Description");
+						    var geocacheIndice = cache.get("Indice");
 						    var geocacheSpoiler = cache.get("Spoiler").url();
 
 
@@ -59,7 +60,7 @@
 							queryLog.find({
 							  		success: function(results) {
 							  		if(results.length > 0) {
-										res.render('geocache', { nom:geocacheName, description:geocacheDescription, photo:geocachePhotoUrl, spoiler:geocacheSpoiler, logs:results });
+										res.render('geocache', { nom:geocacheName, description:geocacheDescription, indice:geocacheIndice, photo:geocachePhotoUrl, spoiler:geocacheSpoiler, logs:results });
 								  	} else {
 								  		res.render('geocaches', { message:"Redirection toutes les caches" });
 								  	}
