@@ -9,6 +9,29 @@
 
 /* Basic */
 
+@media screen and (max-width: 480px){
+	#gridsalv[data-columns]::before {
+		content: '1 .columnsalv.size-1of1';
+	}
+}
+
+@media screen and (min-width: 481px) and (max-width: 768px) {
+	#gridsalv[data-columns]::before {
+		content: '2 .columnsalv.size-1of2';
+	}
+}
+@media screen and (min-width: 769px) {
+	#gridsalv[data-columns]::before {
+		content: '3 .columnsalv.size-1of3';
+	}
+}
+
+/* Again, you’re free to use and define the classes: */
+.columnsalv { float: left; }
+.size-1of1 { width: 100%; }
+.size-1of2 { width: 50%; }
+.size-1of3 { width: 33.333%; }
+
 	body {
 		background: #222222;
 	}
@@ -83,6 +106,17 @@
 		top: 0.5em;
 	}
 
+.border {
+	-moz-box-shadow: 5px 5px 5px 0px #cfcfcf;
+-webkit-box-shadow: 5px 5px 5px 0px #cfcfcf;
+-o-box-shadow: 5px 5px 5px 0px #cfcfcf;
+box-shadow: 5px 5px 5px 0px #cfcfcf;
+filter:progid:DXImageTransform.Microsoft.Shadow(color=#cfcfcf, Direction=134, Strength=5);
+-moz-border-radius: 10px;
+-webkit-border-radius: 10px;
+border-radius: 10px;
+border: solid 1px #efefef;
+}
 	sup {
 		font-size: 0.8em;
 		position: relative;

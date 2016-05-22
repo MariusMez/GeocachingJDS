@@ -3,6 +3,7 @@
 	<head>
 		<title><%= nom %> - Géocaching Jeux de Sophia 2015</title>
 		<% include ./partials/head %>
+
 	</head>
 	<body>
 
@@ -40,7 +41,7 @@
 						<header class="major">
 							<img width="400px;" align="right" src="<%= photo %>" alt="<%= nom %>">
 							<h2><%= nom %></h2>
-							<span class="byline">Coordonnées GPS disponibles auprès des organisateurs</span>
+							<span class="byline"><%= gps.latitude %>, <%= gps.longitude %></span>
 						</header>
 						<p><%= description %></p>
 						
@@ -60,7 +61,7 @@
 						<br>
 						<ul>
 						    <% logs.forEach(function(log) { %>
-						        <li> <b><%= moment(log.get("Date")).format(shortDateFormat) %> </b>- <%= log.get("Pseudo") %> : <i><%= log.get("Message") %></i></li>
+						        <li> <b><%= moment(log.get("Date")).fromNow() %> (<%= moment(log.get("Date")).format("LL LT") %>) </b>- <%= log.get("Pseudo") %> : <i><%= log.get("Message") %></i></li>
 						    <% }); %>
 						</ul>
 
