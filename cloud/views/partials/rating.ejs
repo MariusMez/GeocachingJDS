@@ -1,0 +1,30 @@
+
+<div class="rating">
+	<div id="terrain"></div>
+	<div id="difficulte"></div>
+	<div id="size">Taille de la boite <%= size %></div>
+</div>
+
+<script type="text/javascript">
+	var pas;
+	var chaint = 'Terrain : ';
+	var chaind = 'Difficulté : ';
+
+	for (pas = 0; pas < <%= t %>; pas++) {
+		chaint += '<span>★</span>';
+	}
+	for (pas = 0; pas < <%= d %>; pas++) {
+		chaind += '<span>★</span>';
+	}
+
+	for (pas = 0; pas < 5 - <%= t %> ; pas++) {
+		chaint += '<span>☆</span>';
+	}
+	for (pas = 0; pas < 5-<%= d %> ; pas++) {
+		chaind += '<span>☆</span>';
+	}
+
+	document.getElementById("terrain").innerHTML = chaint;
+	document.getElementById("difficulte").innerHTML = chaind;
+
+</script> 

@@ -18,7 +18,7 @@
 					res.render('tools', { message: 'Outils application mobile' });
 				});
 
-				app.get('/geocaches', function(req, res) {
+				app.get('/geocachesp', function(req, res) {
 					var Geocaches = Parse.Object.extend("Geocache");
 					var query = new Parse.Query(Geocaches).equalTo("Active",true);
 					query.find({ 
@@ -47,22 +47,21 @@
 							var geocacheDifficulty = cache.get("Difficulty");
 							var geocacheTerrain = cache.get("Terrain");
 							var geocacheSize = cache.get("Size");
+							var geocacheCategory = cache.get("Category");
 							var geocachePhotoUrl = cache.get("Photo").url();
 							var geocacheDescription = cache.get("Description");
 							var geocacheIndice = cache.get("Indice");
 							var geocacheSpoiler = cache.get("Spoiler").url();
 							var geocacheGPS = cache.get("GPS");
+							var geocacheCoordString = cache.get("GPSString");
 
 							var Logs = Parse.Object.extend("Log");
 							var queryLog = new Parse.Query(Logs);
 							queryLog.equalTo("Geocache", cache);
 							queryLog.find({
 								success: function(results) {
-									if(results.length > 0) {
-										res.render('geocache', { nom:geocacheName, gps:geocacheGPS, description:geocacheDescription, indice:geocacheIndice, photo:geocachePhotoUrl, spoiler:geocacheSpoiler, logs:results });
-									} else {
-										res.render('geocache', { nom:geocacheName, gps:geocacheGPS, description:geocacheDescription, indice:geocacheIndice, photo:geocachePhotoUrl, spoiler:geocacheSpoiler, logs:results });
-									}
+										res.render('geocache', { nom:geocacheName, d:geocacheDifficulty, t:geocacheTerrain, cat:geocacheCategory, size:geocacheSize, coord:geocacheCoordString, gps:geocacheGPS, description:geocacheDescription, indice:geocacheIndice, photo:geocachePhotoUrl, spoiler:geocacheSpoiler, logs:results });
+									
 								},
 								error: function(object, error) {
 									res.render('geocaches', { message:"Redirection toutes les caches" });

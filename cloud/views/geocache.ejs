@@ -1,77 +1,112 @@
 <!DOCTYPE HTML>
 <html>
-	<head>
-		<title><%= nom %> - Géocaching Jeux de Sophia 2015</title>
-		<% include ./partials/head %>
+<head>
+	<title><%= nom %> - Géocaching Jeux de Sophia 2015</title>
+	<% include ./partials/head %>
+</head>
+<body>
 
-	</head>
-	<body>
+	<!-- Header Wrapper -->
+	<div class="wrapper style1">
 
-		<!-- Header Wrapper -->
-			<div class="wrapper style1">
-			
-			<!-- Header -->
-				<div id="header">
-					<div class="container">
-							
-						<!-- Logo -->
-							<h1><a href="/" id="logo">Géocaching</a></h1>
-						
-						<!-- Nav -->
-							<nav id="nav">
-								<ul>
-									<li><a href="/">Accueil</a></li>
-									<li class="active"><a href="/geocaches">Les Caches à trouver</a></li>
-									<li><a href="/geocaching">Règles du jeu</a></li>
-									<li><a href="/tools">Les Outils</a></li>
-									<li><a href="http://jeuxdesophia.com/jcms/rda_6290">Inscriptions</a></li>
-								</ul>
-							</nav>
-	
-					</div>
-				</div>
+		<!-- Header -->
+		<div id="header">
+			<div class="container">
+
+				<!-- Logo -->
+				<h1><a href="/" id="logo">Géocaching</a></h1>
+
+				<!-- Nav -->
+				<nav id="nav">
+					<ul>
+						<li><a href="/">Accueil</a></li>
+						<li class="active"><a href="/geocaches">Les Caches à trouver</a></li>
+						<li><a href="/geocaching">Règles du jeu</a></li>
+						<li><a href="/tools">Les Outils</a></li>
+						<li><a href="http://jeuxdesophia.com/jcms/rda_6290">Inscriptions</a></li>
+					</ul>
+				</nav>
+
 			</div>
-		
-		<!-- Main -->
-			<div id="main" class="wrapper style4">
+		</div>
+	</div>
 
-				<!-- Content -->
-				<div id="content" class="container">
-					<section>
-						<header class="major">
-							<img width="400px;" align="right" src="<%= photo %>" alt="<%= nom %>">
-							<h2><%= nom %></h2>
-							<span class="byline"><%= gps.latitude %>, <%= gps.longitude %></span>
-						</header>
-						<p><%= description %></p>
-						
-					</section>
-					<section>
-					<h2>Spoiler</h2>
-						<br>
-						<details>
-						   <summary>Cliquez pour voir l'indice et l'image Spoiler</summary>
-						   		<img src="<%= spoiler %>" alt="<%= nom %>"> <br />
-						   		<p><b>Indice : </b><%= indice %></p>
-						</details>
-					</section>
-					<br /><br />
-					<section>
-						<h2>Logbook</h2>
-						<br>
-						<ul>
-						    <% logs.forEach(function(log) { %>
-						        <li> <b><%= moment(log.get("Date")).fromNow() %> (<%= moment(log.get("Date")).format("LL LT") %>) </b>- <%= log.get("Pseudo") %> : <i><%= log.get("Message") %></i></li>
-						    <% }); %>
-						</ul>
+	<!-- Main -->
+	<div id="main" class="wrapper style4">
 
-					</section>
+		<!-- Content -->
+		<div id="content" class="container">
+			<section>
+				<header class="major">
+
+					<img width="400px;" align="right" src="<%= photo %>" alt="<%= nom %>">
+
+					<script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+					<script>
+						locations = [[<%= gps.latitude %>, <%= gps.longitude %>]];
+
+						function initialize() {
+							map = new google.maps.Map(document.getElementById("map"), {
+								mapTypeId: google.maps.MapTypeId.ROADMAP,
+								center: new google.maps.LatLng(locations[0][0], locations[0][1]),
+								zoom: 9
+							});
+							for (var i=0; i<locations.length; i++) {
+								var marker = new google.maps.Marker({
+									position: new google.maps.LatLng(locations[i][0], locations[i][1]),
+									map: map
+								})
+							}
+							setBoundsLeftSidebar(locations, 0.9);
+						}
+
+						google.maps.event.addDomListener(window, 'load', initialize);
+					</script>
+
+					<% include ./partials/geocachecategory %><h2><%= nom %></h2>
+					<span class="byline"><%= coord %></span>
+					<% include ./partials/rating %>
 					
-				</div>
-			</div>
+				</header>
 
-<% include ./partials/footer %>
+				<p><%- description %></p>
+
+			</section>
+			
+			<section>
+				<h2>Emplacement</h2>
+				<br>
+				<div id="map"></div>
+			</section>
+
+<br /><br />
+
+			<section>
+				<h2>Spoiler</h2>
+				<br>
+				<details>
+					<summary>Cliquez pour voir l'indice et l'image Spoiler</summary>
+					<img src="<%= spoiler %>" alt="<%= nom %>"> <br />
+					<p><b>Indice : </b><%= indice %></p>
+				</details>
+			</section>
+			<br /><br />
+			<section>
+				<h2>Logbook</h2>
+				<br>
+				<ul>
+					<% logs.forEach(function(log) { %>
+					<li> <b><%= moment(log.get("Date")).fromNow() %> (<%= moment(log.get("Date")).format("LL LT") %>) </b>- <%= log.get("Pseudo") %> : <i><%= log.get("Message") %></i></li>
+					<% }); %>
+				</ul>
+
+			</section>
+
+		</div>
+	</div>
+
+	<% include ./partials/footer %>
 
 
-	</body>
+</body>
 </html>
