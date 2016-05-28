@@ -89,10 +89,10 @@
 						locations = [
 
 						<% geocaches.forEach(function(geocache) { %>
-							[<%= geocache.get("GPS").latitude %>,<%= geocache.get("GPS").longitude %>],
+							[<%= geocache.get("GPS").latitude %>,<%= geocache.get("GPS").longitude %>, "<%= geocache.get("Nom") %>","<%= geocache.get("Category") %>"],
 							<% }); %>
 
-						[43.6131,7.06354]
+						[43.6131,7.06354, "Mystery", "MYSTERY"]
 						];
 
 						function initialize() {
@@ -101,15 +101,30 @@
 								center: new google.maps.LatLng(locations[0][0], locations[0][1]),
 								zoom: 10
 							});
+
 							for (var i=0; i<locations.length; i++) {
+								
+								var mytext = 'Infowindow contents in HTML'
+								var myinfowindow = new google.maps.InfoWindow({
+    								content: '<h3 style="color:#83B348;">'+locations[i][2]+'</h3>'
+								});
+
 								var marker = new google.maps.Marker({
 									position: new google.maps.LatLng(locations[i][0], locations[i][1]),
-									map: map
-								})
+									map: map,
+									title: locations[i][2],
+									infowindow: myinfowindow,
+									icon: 'images/'+locations[i][3]+'.gif'
+								});
+								
+  								google.maps.event.addListener(marker, 'click', function () {
+   									this.infowindow.open(map, this);
+								});
 							}
 							setBoundsLeftSidebar(locations, 0.9);
 						}
 
+						
 						google.maps.event.addDomListener(window, 'load', initialize);
 					</script>
 				</section>
