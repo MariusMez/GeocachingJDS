@@ -851,11 +851,12 @@
 .TRADI {
 	content:url("http://geocaching.parseapp.com/images/traditional_72.gif");
 }
-
+.SPECIAL {
+	content:url("http://geocaching.parseapp.com/images/LabCache_80.png");
+}
 .MULTI {
 	content:url("http://geocaching.parseapp.com/images/multi_72.gif");
 }
-
 .MYSTERY {
 	content:url("http://geocaching.parseapp.com/images/unknown_72.gif");
 }

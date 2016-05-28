@@ -23,9 +23,9 @@
 					var query = new Parse.Query(Geocaches).equalTo("Active",true);
 					query.find({ 
 						success: function(results) {
-					    res.render('geocaches', { message: 'Les caches à trouver', geocaches:results});
-					}
-				});
+							res.render('geocaches', { message: 'Les caches à trouver', geocaches:results});
+						}
+					});
 				});
 
 				app.get('/geocaching', function(req, res) {
@@ -58,9 +58,10 @@
 							var Logs = Parse.Object.extend("Log");
 							var queryLog = new Parse.Query(Logs);
 							queryLog.equalTo("Geocache", cache);
+							queryLog.descending("createdAt");
 							queryLog.find({
 								success: function(results) {
-										res.render('geocache', { nom:geocacheName, d:geocacheDifficulty, t:geocacheTerrain, cat:geocacheCategory, size:geocacheSize, coord:geocacheCoordString, gps:geocacheGPS, description:geocacheDescription, indice:geocacheIndice, photo:geocachePhotoUrl, spoiler:geocacheSpoiler, logs:results });
+									res.render('geocache', { nom:geocacheName, d:geocacheDifficulty, t:geocacheTerrain, cat:geocacheCategory, size:geocacheSize, coord:geocacheCoordString, gps:geocacheGPS, description:geocacheDescription, indice:geocacheIndice, photo:geocachePhotoUrl, spoiler:geocacheSpoiler, logs:results });
 									
 								},
 								error: function(object, error) {
@@ -110,39 +111,33 @@
 					var logEntry = new Log();
 
 					logEntry.set("Pseudo", req.body.name);
+					logEntry.set("Email", req.body.email);
 					logEntry.set("Message", req.body.message);
 					logEntry.set("Date", new Date());
 					var cache = new Geocache();
 					cache.id = req.body.id;
+
 					logEntry.set("Geocache", cache);
+
+					if(req.body.fav == "true") {
+						logEntry.set("Fav", true);
+						cache.increment("Fav");
+						cache.save();
+					} else {
+						logEntry.set("Fav", false);
+					}
 
 					logEntry.save(null, {
 						success: function(logEntry) {
-					    // Execute any logic that should take place after the object is saved.
-					    //alert('New object created with objectId: ' + logEntry.id);
-					    res.render('found', { message:"Merci pour la visite !" });
-					},
-					error: function(logEntry, error) {
-					    // Execute any logic that should take place if the save fails.
-					    // error is a Parse.Error with an error code and message.
-					    res.render('found', { message: error.message });
-					}
-				});		   
+							res.render('found', { cacheid:cache.id, message:"Bravo " + req.body.name +" !<br><br>N'oubliez pas de signer aussi le logbook ;-)" });
+						},
+						error: function(logEntry, error) {
+							res.render('found', { cacheid:0, message: error.message });
+						}
+					});		   
 
 				});
 
-
-				// // Example reading from the request query string of an HTTP get request.
-				// app.get('/test', function(req, res) {
-				//   // GET http://example.parseapp.com/test?message=hello
-				//   res.send(req.query.message);
-				// });
-
-				// // Example reading from the request body of an HTTP post request.
-				// app.post('/test', function(req, res) {
-				//   // POST http://example.parseapp.com/test (with request body "message=hello")
-				//   res.send(req.body.message);
-				// });
 
 				// Attach the Express app to Cloud Code.
 				app.listen();

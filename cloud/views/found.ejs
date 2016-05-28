@@ -1,50 +1,37 @@
 <!DOCTYPE HTML>
 <html>
-	<head>
-		<title>FOUND - Geocaching Jeux de Sophia 2016</title>
-		<% include ./partials/head %>
-	</head>
-	<body class="homepage">
+<head>
+	<title>FOUND - Geocaching Jeux de Sophia 2016</title>
+	<% include ./partials/head %>
+</head>
+<body class="homepage">
+	<div class="wrapper style1">
+		<div id="header">
+			<div class="container">
+				<h1><a href="/" id="logo">Géocaching</a></h1>
+				<nav id="nav">
+					<ul>
+						<li><a href="/">Accueil</a></li>
+					</ul>
+				</nav>
 
-		<!-- Header Wrapper -->
-			<div class="wrapper style1">
-			
-			<!-- Header -->
-				<div id="header">
-					<div class="container">
-							
-						<!-- Logo -->
-							<h1><a href="/" id="logo">Géocaching</a></h1>
-						
-						<!-- Nav -->
-							<nav id="nav">
-								<ul>
-									<li><a href="/">Accueil</a></li>
-								</ul>
-							</nav>
-	
-					</div>
-				</div>
-				
 			</div>
-		
-		
-		<!-- Section Two -->
-			<div class="wrapper style3">
-				<section class="container">
-					<header class="major">
-						<h2><%= message %></h2>
-					</header>
-					<a href="/" class="button alt">Retour</a>
-   				</section>
-			</div>
-
-		
-
-	<!-- Footer -->
-		<div id="footer">
-					
 		</div>
 
-	</body>
+	</div>
+
+	<div class="wrapper style3">
+		<section class="container">
+			<header class="major">
+			<h2><%- message %></h2>
+			</header>
+			<a href="/geocache?id=<%= cacheid %>" class="button alt">Retour</a>
+		</section>
+	</div>
+
+	<div id="footer">
+
+	</div>
+
+</body>
 </html>
