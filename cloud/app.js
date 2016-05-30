@@ -18,7 +18,7 @@
 					res.render('tools', { message: 'Outils application mobile' });
 				});
 
-				app.get('/geocachesp', function(req, res) {
+				app.get('/geocaches', function(req, res) {
 					var Geocaches = Parse.Object.extend("Geocache");
 					var query = new Parse.Query(Geocaches).equalTo("Active",true);
 					query.find({ 

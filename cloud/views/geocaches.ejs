@@ -18,7 +18,7 @@
 						<ul>
 							<li><a href="/">Accueil</a></li>
 							<li class="active"><a href="/geocaches">Les Caches à trouver</a></li>
-							<li><a href="/geocaching">Règlement</a></li>
+							<li><a href="/geocaching">Règles du jeu</a></li>
 							<li><a href="/tools">Les Outils</a></li>
 							<li><a href="http://jeuxdesophia.com/jcms/rda_6290">Inscriptions</a></li>
 						</ul>
@@ -40,7 +40,10 @@
 					<div id="gridsalv" data-columns>
 
 						<% geocaches.forEach(function(geocache) { %>
+
 						<div>
+							<!-- <div><img width="32px;" class="<%= geocache.get("Category") %>" style="margin-right:10px;"/> - <img width="40px;" class="<%= geocache.get("Size") %>" style="margin-left:10px;"/> - D<%= geocache.get("Difficulty") %>/T<%= geocache.get("Terrain") %></div> -->
+
 							<a href="/geocache?id=<%= geocache.id %>"><img width="220px;" class="border" src="<%= geocache.get("Photo").url() %>" />
 								<p class="medium"><%= geocache.get("Nom") %></p>
 							</a>
