@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-	<title><%= nom %> - Géocaching Jeux de Sophia 2015</title>
+	<title><%= nom %> - Géocaching Jeux de Sophia 2016</title>
 	<% include ./partials/head %>
 </head>
 <body>
@@ -21,7 +21,7 @@
 					<ul>
 						<li><a href="/">Accueil</a></li>
 						<li class="active"><a href="/geocaches">Les Caches à trouver</a></li>
-						<li><a href="/geocaching">Règles du jeu</a></li>
+						<li><a href="/geocaching">Règlement</a></li>
 						<li><a href="/tools">Les Outils</a></li>
 						<li><a href="http://jeuxdesophia.com/jcms/rda_6290">Inscriptions</a></li>
 					</ul>
@@ -39,7 +39,7 @@
 			<section>
 				<header class="major">
 
-					<img width="400px;" align="right" src="<%= photo %>" alt="<%= nom %>">
+					<img width="300px;" align="right" src="<%= photo %>" alt="<%= nom %>" style="margin-bottom:20px;">
 
 					<script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
 					<script>
@@ -73,12 +73,13 @@
 
 			</section>
 			
-			<section>
-				<h2>Emplacement</h2>
-				<br>
-				<div id="map"></div>
-			</section>
-
+			<% if( cat != 'MYSTERY' ) { %>
+				<section>
+					<h2>Emplacement</h2>
+					<br>
+					<div id="map"></div>
+				</section>
+			<% } %>
 <br /><br />
 
 			<section>
@@ -95,6 +96,9 @@
 				<h2>Logbook</h2>
 				<br>
 				<ul>
+				<% if(logs.length == 0)  { %>
+					<li><p class="medium">Soyez le premier à trouver la cache et annoncer votre découverte !!!</p></li>
+				<% } %>
 					<% logs.forEach(function(log) { %>
 					<li> <b><%= moment(log.get("Date")).fromNow() %> (<%= moment(log.get("Date")).format("LL LT") %>) </b>- <%= log.get("Pseudo") %> : <i><%= log.get("Message") %></i></li>
 					<% }); %>

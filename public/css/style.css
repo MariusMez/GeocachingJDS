@@ -56,7 +56,7 @@
 	}
 
 	p.medium {
-		font-size: 1.4em;
+		font-size: 1.3em;
 	}
 
 	h1, h2, h3, h4, h5, h6 {
@@ -839,7 +839,6 @@
 
 	.rating {
 		margin-top: 10px;
-		margin-bottom: 10px;
 	}
 
 .rating > span {
@@ -859,4 +858,19 @@
 }
 .MYSTERY {
 	content:url("http://geocaching.parseapp.com/images/unknown_72.gif");
+}
+.LARGE {
+	content:url("http://geocaching.parseapp.com/images/LARGE.gif");
+}
+.MICRO {
+	content:url("http://geocaching.parseapp.com/images/MICRO.gif");
+}
+.OTHER {
+	content:url("http://geocaching.parseapp.com/images/OTHER.gif");
+}
+.REGULAR {
+	content:url("http://geocaching.parseapp.com/images/REGULAR.gif");
+}
+.SMALL {
+	content:url("http://geocaching.parseapp.com/images/SMALL.gif");
 }
