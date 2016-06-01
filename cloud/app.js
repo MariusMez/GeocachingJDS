@@ -20,7 +20,9 @@
 
 				app.get('/geocaches', function(req, res) {
 					var Geocaches = Parse.Object.extend("Geocache");
-					var query = new Parse.Query(Geocaches).equalTo("Active",true);
+					var query = new Parse.Query(Geocaches)
+					query.equalTo("Active",true);
+					query.descending("updatedAt");
 					query.find({ 
 						success: function(results) {
 							res.render('geocaches', { message: 'Les caches à trouver', geocaches:results});
