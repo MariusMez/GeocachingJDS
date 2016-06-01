@@ -93,7 +93,7 @@
 					<li><p class="medium">Soyez le premier à trouver la cache et annoncer votre découverte !!!</p></li>
 					<% } %>
 					<% logs.forEach(function(log) { %>
-					<li> <b><%= moment(log.get("Date")).fromNow() %> (<%= moment(log.get("Date")).format("LL LT") %>) </b>- <%= log.get("Pseudo") %> : <i><%= log.get("Message") %></i></li>
+					<li> <b><%= moment(log.get("Date")).utcOffset(120).fromNow() %> le <%= moment(log.get("Date")).utcOffset(120).format("LL [à] LT") %> </b>- <%= log.get("Pseudo") %> : <i><%= log.get("Message") %></i></li>
 					<% }); %>
 				</ul>
 

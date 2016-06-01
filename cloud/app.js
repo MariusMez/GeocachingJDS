@@ -34,7 +34,10 @@
 
 				app.get('/geocache', function(req, res) {
 
-					var moment = require('moment');
+					//var moment = require('moment');
+					var moment = require('cloud/moment-with-locales.min.js')
+					moment.locale('fr');
+					
 					var shortDateFormat = "dddd @ HH:mm"; // this is just an example of storing a date format once so you can change it in one place and have it propagate
 					app.locals.moment = moment; // this makes moment available as a variable in every EJS page
 					app.locals.shortDateFormat = shortDateFormat;
