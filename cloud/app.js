@@ -43,8 +43,8 @@
 							user.set("Found", counter);
 							user.save();
 							return;
-					 	},
-					 	error: function(error) {
+						},
+						error: function(error) {
 							alert(error);
 						}	
 					});	
@@ -58,13 +58,25 @@
 				});
 
 				app.get('/geocaches', function(req, res) {
-					var Geocaches = Parse.Object.extend("Geocache");
-					var query = new Parse.Query(Geocaches)
-					query.equalTo("Active",true);
-					query.descending("updatedAt");
-					query.find({ 
-						success: function(results) {
-							res.render('geocaches', { message: 'Les caches à trouver', geocaches:results});
+					var moment = require('cloud/moment-with-locales.min.js');
+					moment.locale('fr');
+					app.locals.moment = moment; // this makes moment available as a variable in every EJS page
+					var Log = Parse.Object.extend("Log");
+					var queryLog = new Parse.Query(Log);
+					queryLog.descending("createdAt");
+					queryLog.limit(5); 
+					queryLog.include("Geocache");
+					queryLog.find({
+						success: function(logs) {
+							var Geocaches = Parse.Object.extend("Geocache");
+							var query = new Parse.Query(Geocaches);
+							query.equalTo("Active",true);
+							query.descending("updatedAt");
+							query.find({ 
+								success: function(caches) {
+									res.render('geocaches', { message: 'Les caches à trouver', geocaches:caches, logs:logs });
+								}
+							});
 						}
 					});
 				});
@@ -76,7 +88,7 @@
 				app.get('/geocache', function(req, res) {
 
 					//var moment = require('moment');
-					var moment = require('cloud/moment-with-locales.min.js')
+					var moment = require('cloud/moment-with-locales.min.js');
 					moment.locale('fr');
 					
 					var shortDateFormat = "dddd @ HH:mm"; // this is just an example of storing a date format once so you can change it in one place and have it propagate

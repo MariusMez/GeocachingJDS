@@ -62,9 +62,25 @@
 
 			<div id="liste" class="container">
 				<section>
+
+					<h2>Les derniers logs</h2>
+					<br>
+					<ul>
+						<% logs.forEach(function(log) { %>
+
+							<% if(log.get("Geocache").get("Active") == true)  { %>
+								<li><b><a href="/geocache?id=<%= log.get("Geocache").id %>"> <%= log.get("Geocache").get("Nom") %> </a> : <%= moment(log.get("Date")).utcOffset(120).fromNow() %> le <%= moment(log.get("Date")).utcOffset(120).format("LL [à] LT") %> </b>- <%= log.get("Pseudo") %> : <i><%= log.get("Message") %></i></li>
+							<% } %>
+						
+						<% }); %>
+						<li>[...]</li>
+					</ul>
+
 					<p class="medium">L'épreuve se déroule du 31 mai au 18 juin, de nouvelles caches seront publiées au fil des 10 premiers jours de juin.</p>
 					<p>Ces caches sont spécifiquement posées pour les Jeux de Sophia et sont donc par conséquent non accessibles, ni même visibles sur le site geocaching.com et les applications officielles Géocaching.com</p>
-					<p><b>Des tickets de tombola seront aléatoirement placés par nos soins dans les différentes caches à découvrir.</b></p>
+					<p>Des tickets de tombola seront aléatoirement placés par nos soins dans les différentes caches à découvrir.</p>
+
+
 				</section>
 			</div>
 		</div>
