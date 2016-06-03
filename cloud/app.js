@@ -18,6 +18,45 @@
 					res.render('tools', { message: 'Outils application mobile' });
 				});
 
+				function compute(email) {
+					var Logs = Parse.Object.extend("Log");
+					var query = new Parse.Query(Logs);
+					query.equalTo("Email", "bourel.julien@wanadoo.fr");
+					query.find({ 
+						success: function(results) {
+							alert(results);
+							return results.length;		
+						},
+						error: function(error) {
+							alert(error);
+							return 0;
+						}	
+					});		
+				};
+
+				function updateRanking(email, counter) {
+					var Ranking = Parse.Object.extend("Ranking");
+					var query = new Parse.Query(Ranking);
+					query.equalTo("Email", email);		
+					query.first({ 
+						success: function(user) {
+							user.set("Found", counter);
+							user.save();
+							return;
+					 	},
+					 	error: function(error) {
+							alert(error);
+						}	
+					});	
+				};
+
+				app.get('/ranking', function(req, res) {
+					var email = req.query.email;
+					var counter = compute(email);
+					updateRanking(email, counter);
+					res.render('ranking', { count: counter });
+				});
+
 				app.get('/geocaches', function(req, res) {
 					var Geocaches = Parse.Object.extend("Geocache");
 					var query = new Parse.Query(Geocaches)
