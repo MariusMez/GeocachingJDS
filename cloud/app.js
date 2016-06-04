@@ -18,43 +18,38 @@
 					res.render('tools', { message: 'Outils application mobile' });
 				});
 
-				function compute(email) {
-					var Logs = Parse.Object.extend("Log");
-					var query = new Parse.Query(Logs);
-					query.equalTo("Email", "bourel.julien@wanadoo.fr");
-					query.find({ 
-						success: function(results) {
-							alert(results);
-							return results.length;		
-						},
-						error: function(error) {
-							alert(error);
-							return 0;
-						}	
-					});		
-				};
-
-				function updateRanking(email, counter) {
-					var Ranking = Parse.Object.extend("Ranking");
-					var query = new Parse.Query(Ranking);
-					query.equalTo("Email", email);		
-					query.first({ 
-						success: function(user) {
-							user.set("Found", counter);
-							user.save();
-							return;
-						},
-						error: function(error) {
-							alert(error);
-						}	
-					});	
-				};
-
+	
 				app.get('/ranking', function(req, res) {
-					var email = req.query.email;
-					var counter = compute(email);
-					updateRanking(email, counter);
-					res.render('ranking', { count: counter });
+					var Ranking = Parse.Object.extend("Ranking");
+					var queryGeocacheurs = new Parse.Query(Ranking);
+					queryGeocacheurs.descending("Found");
+					queryGeocacheurs.find().then(function(rank) {
+						res.render('ranking', { geocacheurs: rank });
+					});
+				});
+
+				app.get('/computeranking', function(req, res) {
+
+					var _ = require('cloud/underscore-min.js');
+
+					var Logs = Parse.Object.extend("Log");
+					var Ranking = Parse.Object.extend("Ranking");
+
+					var queryGeocacheurs = new Parse.Query(Ranking);
+					queryGeocacheurs.find().then(function(geocacheurs) {
+
+						_.each(geocacheurs, function(geocacheur) {
+							var query = new Parse.Query(Logs);
+							query.equalTo("Email", geocacheur.get("Email"));
+							//query.greaterThanOrEqualTo('createdAt', d);
+							query.count().then(function(counter) { 
+								geocacheur.set("Found", counter);
+								geocacheur.save();
+							});
+						});
+					}).then(function() {
+						res.render();
+					});
 				});
 
 				app.get('/geocaches', function(req, res) {
@@ -130,34 +125,31 @@
 						}	
 					});
 				});
-				
+
 
 				app.get('/foundit', function(req, res) {
-					
 					var Geocache = Parse.Object.extend("Geocache");
 					var query = new Parse.Query(Geocache);
 					query.equalTo("codeId", req.query.id);
 					query.find({
 						success: function(results) {
 							if(results.length > 0) {
-					    // The object was retrieved successfully.
-					    for (var i = 0; i < results.length; i++) { 
-					    	var object = results[i];
-					    }
-					    var geocacheName = object.get("Nom");
-					    var geocacheId = object.id;
+					    		// The object was retrieved successfully.
+					    		for (var i = 0; i < results.length; i++) { 
+					    			var object = results[i];
+					    		}
+					    		var geocacheName = object.get("Nom");
+					    		var geocacheId = object.id;
 
-					    res.render('foundit', { nom:geocacheName,id:geocacheId });
-					} else {
-						res.render('foundit', { nom:"Code invalide !", id:0 });
-					}
-				},
-				error: function(object, error) {
-				    	// The object was not retrieved successfully.
-				    	// error is a Parse.Error with an error code and message.
-				    	res.render('foundit', { nom:"Code invalide !", id:0 });
-				    }	
-				});
+					    		res.render('foundit', { nom:geocacheName,id:geocacheId });
+					    	} else {
+					    		res.render('foundit', { nom:"Code invalide !", id:0 });
+					    	}
+					    },
+					    error: function(object, error) {
+					    	res.render('foundit', { nom:"Code invalide !", id:0 });
+					    }	
+					});
 				});
 
 				app.post('/found', function(req, res) {
