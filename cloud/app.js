@@ -22,9 +22,40 @@
 				app.get('/ranking', function(req, res) {
 					var Ranking = Parse.Object.extend("Ranking");
 					var queryGeocacheurs = new Parse.Query(Ranking);
+					var Geocache = Parse.Object.extend("Geocache");
+					var queryGeocaches = new Parse.Query(Geocache);
 					queryGeocacheurs.descending("Score");
 					queryGeocacheurs.find().then(function(rank) {
-						res.render('ranking', { geocacheurs: rank });
+						queryGeocaches.equalTo("Active", true);
+						queryGeocaches.descending("Fav");
+						queryGeocaches.find().then(function(caches) {
+							res.render('ranking', { geocacheurs: rank, geocaches: caches });
+						});
+					});
+				});
+
+				app.get('/computefav', function(req, res) {
+
+					var _ = require('cloud/underscore-min.js');
+
+					var Logs = Parse.Object.extend("Log");
+					var Geocache = Parse.Object.extend("Geocache");
+
+					var queryGeocaches = new Parse.Query(Geocache);
+					queryGeocaches.equalTo("Active", true);
+					queryGeocaches.find().then(function(geocaches) {
+
+						_.each(geocaches, function(geocache) {
+							var query = new Parse.Query(Logs);
+							query.equalTo("Geocache", geocache);
+							query.equalTo("Fav", true);
+							query.count().then(function(counter) { 
+								geocache.set("Fav", counter);
+								geocache.save();
+							});
+						});
+					}).then(function() {
+						//res.render('index', { message: 'Page principale' });
 					});
 				});
 
@@ -112,6 +143,7 @@
 							var geocacheSpoiler = cache.get("Spoiler").url();
 							var geocacheGPS = cache.get("GPS");
 							var geocacheCoordString = cache.get("GPSString");
+							var geocacheFav = cache.get("Fav");
 
 							var Logs = Parse.Object.extend("Log");
 							var queryLog = new Parse.Query(Logs);
@@ -119,7 +151,7 @@
 							queryLog.descending("createdAt");
 							queryLog.find({
 								success: function(results) {
-									res.render('geocache', { nom:geocacheName, d:geocacheDifficulty, t:geocacheTerrain, cat:geocacheCategory, size:geocacheSize, coord:geocacheCoordString, gps:geocacheGPS, description:geocacheDescription, indice:geocacheIndice, photo:geocachePhotoUrl, spoiler:geocacheSpoiler, logs:results });
+									res.render('geocache', { nom:geocacheName, fav: geocacheFav, d:geocacheDifficulty, t:geocacheTerrain, cat:geocacheCategory, size:geocacheSize, coord:geocacheCoordString, gps:geocacheGPS, description:geocacheDescription, indice:geocacheIndice, photo:geocachePhotoUrl, spoiler:geocacheSpoiler, logs:results });
 									
 								},
 								error: function(object, error) {

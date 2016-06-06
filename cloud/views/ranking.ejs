@@ -177,8 +177,14 @@
 				<br>
 
 			<section>
-				<h2>Classement Ratio D/T</h2>
-				Prochainement
+				<h2>Classement des Caches préférées</h2>
+				<br>
+				<ul>
+						<% geocaches.forEach(function(geocache) { %>
+						<li><b><%= geocache.get("Fav") %></b> 👍 pour <b><a href="/geocache?id=<%= geocache.id %>"> <%= geocache.get("Nom") %> </a> </b></li>
+						
+						<% }); %>
+					</ul>
 			</section>
 				<br>
 				<br>
