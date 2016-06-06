@@ -22,7 +22,7 @@
 				app.get('/ranking', function(req, res) {
 					var Ranking = Parse.Object.extend("Ranking");
 					var queryGeocacheurs = new Parse.Query(Ranking);
-					queryGeocacheurs.descending("Found");
+					queryGeocacheurs.descending("Score");
 					queryGeocacheurs.find().then(function(rank) {
 						res.render('ranking', { geocacheurs: rank });
 					});
@@ -31,6 +31,11 @@
 				app.get('/computeranking', function(req, res) {
 
 					var _ = require('cloud/underscore-min.js');
+
+					var scoreFoundIt = 1;
+					var scoreFTF = 3;
+					var scoreSTF = 2;
+					var scoreTTF = 1;
 
 					var Logs = Parse.Object.extend("Log");
 					var Ranking = Parse.Object.extend("Ranking");
@@ -43,7 +48,9 @@
 							query.equalTo("Email", geocacheur.get("Email"));
 							//query.greaterThanOrEqualTo('createdAt', d);
 							query.count().then(function(counter) { 
+								var score = counter * scoreFoundIt + geocacheur.get("FTF") * scoreFTF + geocacheur.get("STF") * scoreSTF + geocacheur.get("TTF") * scoreTTF;
 								geocacheur.set("Found", counter);
+								geocacheur.set("Score", score);
 								geocacheur.save();
 							});
 						});
