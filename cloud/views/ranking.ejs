@@ -181,7 +181,7 @@
 				<br>
 				<ul>
 						<% geocaches.forEach(function(geocache) { %>
-						<li><b><%= geocache.get("Fav") %></b> 👍 pour <b><a href="/geocache?id=<%= geocache.id %>"> <%= geocache.get("Nom") %> </a> </b></li>
+						<li><b><%= geocache.get("Fav") %></b> 👍 (<%= geocache.get("RatioFav") %> % des visites) pour <b><a href="/geocache?id=<%= geocache.id %>"> <%= geocache.get("Nom") %> </a> </b></li>
 						
 						<% }); %>
 					</ul>
@@ -191,7 +191,7 @@
 
 <br>
 <p>Classement "temps réél" pour le fun et succeptible de varier après vérification sur les logbooks ;-)</p>
-<p><i>Page mise à jour le 6 juin.</i></p>
+<p><i>Page mise à jour le 10 juin.</i></p>
 		</div>
 	</div>
 

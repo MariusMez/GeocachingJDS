@@ -27,10 +27,36 @@
 					queryGeocacheurs.descending("Score");
 					queryGeocacheurs.find().then(function(rank) {
 						queryGeocaches.equalTo("Active", true);
-						queryGeocaches.descending("Fav");
+						queryGeocaches.descending("RatioFav");
 						queryGeocaches.find().then(function(caches) {
 							res.render('ranking', { geocacheurs: rank, geocaches: caches });
 						});
+					});
+				});
+
+				app.get('/computefavratio', function(req, res) {
+
+					var _ = require('cloud/underscore-min.js');
+
+					var Logs = Parse.Object.extend("Log");
+					var Geocache = Parse.Object.extend("Geocache");
+
+					var queryGeocaches = new Parse.Query(Geocache);
+					queryGeocaches.equalTo("Active", true);
+					queryGeocaches.find().then(function(geocaches) {
+
+						_.each(geocaches, function(geocache) {
+							var query = new Parse.Query(Logs);
+							query.equalTo("Geocache", geocache);
+							query.count().then(function(counter) {
+								var nbFav = geocache.get("Fav"); 
+								var ratio =  Math.round((nbFav / counter) * 100); 
+								geocache.set("RatioFav", ratio);
+								geocache.save();
+							});
+						});
+					}).then(function() {
+						//res.render('index', { message: 'Page principale' });
 					});
 				});
 
@@ -42,7 +68,7 @@
 					var Geocache = Parse.Object.extend("Geocache");
 
 					var queryGeocaches = new Parse.Query(Geocache);
-					queryGeocaches.equalTo("Active", true);
+					//queryGeocaches.equalTo("Active", true);
 					queryGeocaches.find().then(function(geocaches) {
 
 						_.each(geocaches, function(geocache) {
