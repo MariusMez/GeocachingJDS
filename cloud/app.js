@@ -24,7 +24,7 @@
 					var queryGeocacheurs = new Parse.Query(Ranking);
 					var Geocache = Parse.Object.extend("Geocache");
 					var queryGeocaches = new Parse.Query(Geocache);
-					queryGeocacheurs.descending("Score");
+					queryGeocacheurs.descending("Score,ScoreFTF");
 					queryGeocacheurs.find().then(function(rank) {
 						queryGeocaches.equalTo("Active", true);
 						queryGeocaches.descending("RatioFav");
@@ -105,9 +105,11 @@
 							query.equalTo("Email", geocacheur.get("Email"));
 							//query.greaterThanOrEqualTo('createdAt', d);
 							query.count().then(function(counter) { 
-								var score = counter * scoreFoundIt + geocacheur.get("FTF") * scoreFTF + geocacheur.get("STF") * scoreSTF + geocacheur.get("TTF") * scoreTTF;
+								var scoreFTFSTFTTF = geocacheur.get("FTF") * scoreFTF + geocacheur.get("STF") * scoreSTF + geocacheur.get("TTF") * scoreTTF;
+								var score = counter * scoreFoundIt + scoreFTFSTFTTF;
 								geocacheur.set("Found", counter);
 								geocacheur.set("Score", score);
+								geocacheur.set("ScoreFTF", scoreFTFSTFTTF);
 								geocacheur.save();
 							});
 						});
@@ -130,7 +132,7 @@
 							var Geocaches = Parse.Object.extend("Geocache");
 							var query = new Parse.Query(Geocaches);
 							query.equalTo("Active",true);
-							query.descending("updatedAt");
+							query.descending("RatioFav");
 							query.find({ 
 								success: function(caches) {
 									res.render('geocaches', { message: 'Les caches à trouver', geocaches:caches, logs:logs });
