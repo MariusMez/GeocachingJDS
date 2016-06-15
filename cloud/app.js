@@ -24,12 +24,17 @@
 					var queryGeocacheurs = new Parse.Query(Ranking);
 					var Geocache = Parse.Object.extend("Geocache");
 					var queryGeocaches = new Parse.Query(Geocache);
-					queryGeocacheurs.descending("Score,ScoreFTF");
+					queryGeocacheurs.descending("Score, ScoreFTF");
+					queryGeocacheurs.limit(1000);
 					queryGeocacheurs.find().then(function(rank) {
 						queryGeocaches.equalTo("Active", true);
-						queryGeocaches.descending("RatioFav");
+						queryGeocaches.descending("RatioFav,Ratio");
 						queryGeocaches.find().then(function(caches) {
-							res.render('ranking', { geocacheurs: rank, geocaches: caches });
+							queryGeocacheurs.descending("ScoreFTF");
+							queryGeocacheurs.limit(1000);
+							queryGeocacheurs.find().then(function(rankFTF) {
+								res.render('ranking', { geocacheurs: rank, geocacheursFTF: rankFTF, geocaches: caches });
+							});
 						});
 					});
 				});
@@ -85,11 +90,49 @@
 					});
 				});
 
+
+				app.get('/computeratiodt', function(req, res) {
+
+					var _ = require('cloud/underscore-min.js');
+
+					var Logs = Parse.Object.extend("Log");
+					var Ranking = Parse.Object.extend("Ranking");
+					var scoreD = 0;
+
+					var queryGeocacheurs = new Parse.Query(Ranking);
+					queryGeocacheurs.limit(2);
+					queryGeocacheurs.find().then(function(geocacheurs) {
+
+						_.each(geocacheurs, function(geocacheur) {
+
+							var query = new Parse.Query(Logs);
+							query.equalTo("Email", geocacheur.get("Email"));
+							//query.greaterThanOrEqualTo('createdAt', d);
+							query.find().then(function(geocaches) { 
+
+								_.each(geocaches, function(geocache) {
+									scoreD = scoreD + geocache.get("Difficulty") + geocache.get("Terrain");
+									//var scoreT = geocache.get("Terrain");
+									alert("Score geocache : " + scoreD +  geocache.get("Terrain") +  geocache.get("Nom"));									
+								});
+
+							});
+							alert(scoreD);
+							geocacheur.set("ScoreDT", scoreD );
+							scoreD = 0;
+							geocacheur.save();
+						});
+					}).then(function() {
+						//res.render('OK');
+					});
+				});
+
+
 				app.get('/computeranking', function(req, res) {
 
 					var _ = require('cloud/underscore-min.js');
 
-					var scoreFoundIt = 1;
+					var scoreFoundIt = 20;
 					var scoreFTF = 3;
 					var scoreSTF = 2;
 					var scoreTTF = 1;
@@ -98,12 +141,12 @@
 					var Ranking = Parse.Object.extend("Ranking");
 
 					var queryGeocacheurs = new Parse.Query(Ranking);
+					queryGeocacheurs.limit(1000);
 					queryGeocacheurs.find().then(function(geocacheurs) {
 
 						_.each(geocacheurs, function(geocacheur) {
 							var query = new Parse.Query(Logs);
 							query.equalTo("Email", geocacheur.get("Email"));
-							//query.greaterThanOrEqualTo('createdAt', d);
 							query.count().then(function(counter) { 
 								var scoreFTFSTFTTF = geocacheur.get("FTF") * scoreFTF + geocacheur.get("STF") * scoreSTF + geocacheur.get("TTF") * scoreTTF;
 								var score = counter * scoreFoundIt + scoreFTFSTFTTF;

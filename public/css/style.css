@@ -848,16 +848,16 @@
 }
 
 .TRADI {
-	content:url("http://geocaching.parseapp.com/images/traditional_72.gif");
+	content:url("http://geocaching.parseapp.com/images/TRADIBIG.gif");
 }
 .SPECIAL {
-	content:url("http://geocaching.parseapp.com/images/LabCache_80.png");
+	content:url("http://geocaching.parseapp.com/images/SPECIALBIG.png");
 }
 .MULTI {
-	content:url("http://geocaching.parseapp.com/images/multi_72.gif");
+	content:url("http://geocaching.parseapp.com/images/MULTIBIG.gif");
 }
 .MYSTERY {
-	content:url("http://geocaching.parseapp.com/images/unknown_72.gif");
+	content:url("http://geocaching.parseapp.com/images/MYSTERYBIG.gif");
 }
 .LARGE {
 	content:url("http://geocaching.parseapp.com/images/LARGE.gif");

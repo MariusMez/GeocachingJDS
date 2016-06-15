@@ -124,7 +124,7 @@
 								<b>Points</b>
 							</th>
 							<th>
-								<b>Caches trouvées</b><br><i>(1pt / cache)</i>
+								<b>Caches trouvées</b><br><i>(20pt / cache)</i>
 							</th>
 							<th>
 								<b>FTF</b><br><i>(3pt / cache)</i>
@@ -172,8 +172,8 @@
 				<h2>Classement FTF, STF, TTF</h2>
 				<br>
 				<ul style="list-style-type:decimal; margin-left:30px;">
-					<% geocacheurs.forEach(function(geocacheur, i) {  if(geocacheur.get("ScoreFTF") > 0 ) { %>
-					<li><b><%= geocacheur.get("Pseudo") %></b> avec <%= geocacheur.get("ScoreFTF") %> points</li>
+					<% geocacheursFTF.forEach(function(g, i) {  if(g.get("ScoreFTF") > 0 ) { %>
+					<li><b><%= g.get("Pseudo") %></b> avec <%= g.get("ScoreFTF") %> point<%if(g.get("ScoreFTF")>1) { %>s <% } %></li>
 					<%} }); %>
 				</ul>
 
@@ -184,10 +184,10 @@
 			<section>
 				<h2>Classement des Caches préférées</h2>
 				<br>
-				<ul>
+				<ul style="list-style-type:decimal; margin-left:30px;">
 					<% geocaches.forEach(function(geocache) { %>
 					<li><b><%= geocache.get("Fav") %></b> 👍 (<%= geocache.get("RatioFav") %> % des visites) pour <b><a href="/geocache?id=<%= geocache.id %>"> <%= geocache.get("Nom") %> </a> </b></li>
-					
+
 					<% }); %>
 				</ul>
 			</section>
@@ -196,7 +196,7 @@
 
 			<br>
 			<p>Classement "temps réél" pour le fun et succeptible de varier après vérification sur les logbooks ;-)</p>
-			<p><i>Page mise à jour le 11 juin.</i></p>
+			<p><i>Page mise à jour le 14 juin pour donner plus d'importance au nombre de caches trouvées.</i></p>
 		</div>
 	</div>
 
