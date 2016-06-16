@@ -135,11 +135,15 @@
 							<th>
 								<b>TTF</b><br><i>(1pt / cache)</i>
 							</th>
+							<th>
+								<b>Score D/T</b><br><i>(1pt / etoile)</i>
+							</th>
 						</tr>
 					</thead>
 
 					<tfoot>
 						<tr>
+							<td></td>
 							<td></td>
 							<td></td>
 							<td></td>
@@ -160,6 +164,7 @@
 							<td><%= geocacheur.get("FTF") %></td>
 							<td><%= geocacheur.get("STF") %></td>
 							<td><%= geocacheur.get("TTF") %></td>
+							<td><%= geocacheur.get("ScoreDT") %></td>
 						</tr>
 						<% }); %>
 					</tbody>
@@ -196,7 +201,7 @@
 
 			<br>
 			<p>Classement "temps réél" pour le fun et succeptible de varier après vérification sur les logbooks ;-)</p>
-			<p><i>Page mise à jour le 14 juin pour donner plus d'importance au nombre de caches trouvées.</i></p>
+			<p><i>Page mise à jour le 16 juin pour donner plus d'importance au nombre de caches trouvées et inclure le score D/T (Difficulté/Terrain) pour valoriser les caches trouvées les plus "difficiles".</i></p>
 		</div>
 	</div>
 

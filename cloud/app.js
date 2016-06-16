@@ -24,7 +24,7 @@
 					var queryGeocacheurs = new Parse.Query(Ranking);
 					var Geocache = Parse.Object.extend("Geocache");
 					var queryGeocaches = new Parse.Query(Geocache);
-					queryGeocacheurs.descending("Score, ScoreFTF");
+					queryGeocacheurs.descending("Score, ScoreFTF, ScoreDT");
 					queryGeocacheurs.limit(1000);
 					queryGeocacheurs.find().then(function(rank) {
 						queryGeocaches.equalTo("Active", true);
@@ -153,7 +153,7 @@
 							query.equalTo("Email", geocacheur.get("Email"));
 							query.count().then(function(counter) { 
 								var scoreFTFSTFTTF = geocacheur.get("FTF") * scoreFTF + geocacheur.get("STF") * scoreSTF + geocacheur.get("TTF") * scoreTTF;
-								var score = counter * scoreFoundIt + scoreFTFSTFTTF;
+								var score = counter * scoreFoundIt + scoreFTFSTFTTF + geocacheur.get("ScoreDT");
 								geocacheur.set("Found", counter);
 								geocacheur.set("Score", score);
 								geocacheur.set("ScoreFTF", scoreFTFSTFTTF);
