@@ -18,7 +18,7 @@
 					res.render('tools', { message: 'Outils application mobile' });
 				});
 
-	
+
 				app.get('/ranking', function(req, res) {
 					var Ranking = Parse.Object.extend("Ranking");
 					var queryGeocacheurs = new Parse.Query(Ranking);
@@ -97,30 +97,34 @@
 
 					var Logs = Parse.Object.extend("Log");
 					var Ranking = Parse.Object.extend("Ranking");
-					var scoreD = 0;
+					
 
 					var queryGeocacheurs = new Parse.Query(Ranking);
-					queryGeocacheurs.limit(2);
+					queryGeocacheurs.limit(200);
 					queryGeocacheurs.find().then(function(geocacheurs) {
 
 						_.each(geocacheurs, function(geocacheur) {
-
+							var d = new Date(2016,4,30);
 							var query = new Parse.Query(Logs);
 							query.equalTo("Email", geocacheur.get("Email"));
-							//query.greaterThanOrEqualTo('createdAt', d);
-							query.find().then(function(geocaches) { 
-
-								_.each(geocaches, function(geocache) {
-									scoreD = scoreD + geocache.get("Difficulty") + geocache.get("Terrain");
-									//var scoreT = geocache.get("Terrain");
-									alert("Score geocache : " + scoreD +  geocache.get("Terrain") +  geocache.get("Nom"));									
+							query.greaterThanOrEqualTo('createdAt', d);
+							query.include('Geocache');
+							query.find().then(function(logs) { 
+								
+								var promise = Parse.Promise.as();
+								var scoreDT = 0;
+								_.each(logs, function(log) {
+									promise = promise.then(function() {
+										scoreDT = scoreDT + log.get("Geocache").get("Difficulty") + log.get("Geocache").get("Terrain");
+										return scoreDT;
+									});								
 								});
-
+								return promise;
+								
+							}).then(function(scoreDT) {							    
+								geocacheur.set("ScoreDT", scoreDT);
+								geocacheur.save();
 							});
-							alert(scoreD);
-							geocacheur.set("ScoreDT", scoreD );
-							scoreD = 0;
-							geocacheur.save();
 						});
 					}).then(function() {
 						//res.render('OK');
