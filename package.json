@@ -1,5 +1,5 @@
 {
-  "name": "Geocaching-jds parse-server",
+  "name": "geocaching-jds-parse-server",
   "version": "1.0.0",
   "description": "Parse Server for the JDS Geocaching Website",
   "main": "index.js",
