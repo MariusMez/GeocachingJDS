@@ -485,7 +485,7 @@
 
 	.wrapper.style1 {
 		padding: 0em;
-		background: #222222 url(../public/images/banner.jpg) no-repeat;
+		background: #222222 url(../images/banner.jpg) no-repeat;
 		background-size: cover;
 	}
 

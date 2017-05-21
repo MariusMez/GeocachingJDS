@@ -66,7 +66,7 @@ app.get('/ranking', function(req, res) {
 
 app.get('/computefavratio', function(req, res) {
 
-	var _ = require('cloud/underscore-min.js');
+	var _ = require('./cloud/underscore-min.js');
 
 	var Logs = Parse.Object.extend("Log");
 	var Geocache = Parse.Object.extend("Geocache");
@@ -92,7 +92,7 @@ app.get('/computefavratio', function(req, res) {
 
 app.get('/computefav', function(req, res) {
 
-	var _ = require('cloud/underscore-min.js');
+	var _ = require('./cloud/underscore-min.js');
 
 	var Logs = Parse.Object.extend("Log");
 	var Geocache = Parse.Object.extend("Geocache");
@@ -118,7 +118,7 @@ app.get('/computefav', function(req, res) {
 
 app.get('/computeratiodt', function(req, res) {
 
-	var _ = require('cloud/underscore-min.js');
+	var _ = require('./cloud/underscore-min.js');
 
 	var Logs = Parse.Object.extend("Log");
 	var Ranking = Parse.Object.extend("Ranking");
@@ -159,7 +159,7 @@ app.get('/computeratiodt', function(req, res) {
 
 app.get('/computeranking', function(req, res) {
 
-	var _ = require('cloud/underscore-min.js');
+	var _ = require('./cloud/underscore-min.js');
 
 	var scoreFoundIt = 20;
 	var scoreFTF = 3;
@@ -191,7 +191,7 @@ app.get('/computeranking', function(req, res) {
 });
 
 app.get('/geocaches', function(req, res) {
-	var moment = require('cloud/moment-with-locales.min.js');
+	var moment = require('./cloud/moment-with-locales.min.js');
 	moment.locale('fr');
 	app.locals.moment = moment; // this makes moment available as a variable in every EJS page
 	var Log = Parse.Object.extend("Log");
@@ -221,7 +221,7 @@ app.get('/geocaching', function(req, res) {
 app.get('/geocache', function(req, res) {
 
 	//var moment = require('moment');
-	var moment = require('cloud/moment-with-locales.min.js');
+	var moment = require('./cloud/moment-with-locales.min.js');
 	moment.locale('fr');
 	
 	var shortDateFormat = "dddd @ HH:mm"; // this is just an example of storing a date format once so you can change it in one place and have it propagate
@@ -328,7 +328,7 @@ app.post('/found', function(req, res) {
 var port = process.env.PORT || 1337;
 var httpServer = require('http').createServer(app);
 httpServer.listen(port, function() {
-	console.log('parse-server-example running on port ' + port + '.');
+	console.log('Geocaching-JDS running on port ' + port + '.');
 });
 
 // This will enable the Live Query real-time server

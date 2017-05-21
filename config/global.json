@@ -1,6 +1,6 @@
 {
   "global": {
-    "parseVersion": "1.4.2"
+    "parseVersion": "1.9.2"
   },
   "applications": {
     "GeocachingJDS": {
