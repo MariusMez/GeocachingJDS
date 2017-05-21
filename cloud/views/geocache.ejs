@@ -34,7 +34,10 @@
 
 					<img width="300px;" align="right" src="<%= photo %>" alt="<%= nom %>" style="margin-bottom:20px;">
 
-					<script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+					<!-- <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script> -->
+					<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBfOPPHsPEYs7o8-xdYce1Bdxgmh-4TBAc&callback=initMap"
+  type="text/javascript"></script>
+
 					<script>
 						locations = [[<%= gps.latitude %>, <%= gps.longitude %>]];
 
