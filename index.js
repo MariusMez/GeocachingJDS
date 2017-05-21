@@ -8,7 +8,7 @@ var path = require('path');
 
 var api = new ParseServer({
   databaseURI: process.env.MONGODB_ADDON_URI, // Use the MongoDB URI
-  cloud: process.env.CLOUD_CODE_MAIN || __dirname + '/cloud/app.js',
+  cloud: process.env.CLOUD_CODE_MAIN || __dirname + '/cloud/main.js',
   appId: process.env.PARSE_APPID, // Use environment variable to set the APP_ID
   serverURL: process.env.SERVER_URL || 'http://localhost:1337/parse', // Don't forget to change to https if needed
   masterKey: process.env.PARSE_MASTERKEY // Use environment variable to set the PARSE_MASTERKEY
