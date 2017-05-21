@@ -19,4 +19,4 @@ node_modules
 *.gz
 dump_mongodb
 logs
-
+config
