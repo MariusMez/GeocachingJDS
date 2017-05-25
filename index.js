@@ -5,6 +5,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var ParseServer = require('parse-server').ParseServer;
 var path = require('path');
+var multer  = require('multer');
 
 var api = new ParseServer({
   databaseURI: process.env.MONGODB_ADDON_URI, // Use the MongoDB URI
@@ -18,6 +19,7 @@ var api = new ParseServer({
 // javascriptKey, restAPIKey, dotNetKey, clientKey
 
 var app = express();
+var upload = multer();
 
 // Global app configuration section
 app.set('views', 'cloud/views');  // Specify the folder to find templates
@@ -291,11 +293,27 @@ app.get('/foundit', function(req, res) {
 	});
 });
 
-app.post('/found', function(req, res) {
+app.post('/found', upload.single('pic'), function (req, res, next) {
 
 	var Log = Parse.Object.extend("Log");
 	var Geocache = Parse.Object.extend("Geocache");
 	var logEntry = new Log();
+
+	if(req.file) {
+		var photoFile = req.file
+		var name = photoFile.originalname
+		var parseFile = new Parse.File(name, photoFile)
+		parseFile.save().then(function () {
+			console.log("Photo saved")
+			console.log(parseFile.url())
+			logEntry.set('Photo', parseFile)
+			},
+			function (error) {
+				console.log("Photofile save error " + error.message);
+				res.render('found', { cacheid: 0, message: error.message })
+			}
+		)
+	}
 
 	logEntry.set("Pseudo", req.body.name);
 	logEntry.set("Email", req.body.email);
