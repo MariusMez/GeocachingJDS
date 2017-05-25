@@ -2,8 +2,9 @@
 // These two lines are required to initialize Express in Cloud Code.
 var express = require('express')
 var bodyParser = require('body-parser')
-var multer  = require('multer')
-var upload = multer()
+//var multer  = require('multer')
+var fileUpload = require('express-fileupload');
+//var upload = multer()
 
 var app = express()
 
@@ -14,6 +15,7 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({
 	extended: true
 }))
+app.use(fileUpload())
 
 // This is an example of hooking up a request handler with a specific request
 // path and HTTP verb using the Express routing API.
@@ -255,14 +257,15 @@ app.get('/foundit', function (req, res) {
 	})
 })
 
-app.post('/found', upload.single('pic'), function (req, res, next) {
+//app.post('/found', upload.single('pic'), function (req, res, next) {
+app.post('/found', function (req, res) {
 	var Log = Parse.Object.extend('Log')
 	var Geocache = Parse.Object.extend('Geocache')
 	var logEntry = new Log()
 
 	if (req.file.size > 0) {
-		var photoFile = req.file
-		var name = photoFile.originalname
+		var photoFile = req.files.pic
+		var name = req.files.pic.name//photoFile.originalname
 		var parseFile = new Parse.File(name, photoFile)
 		parseFile.save().then(function () {
 			console.log("Photo saved")
