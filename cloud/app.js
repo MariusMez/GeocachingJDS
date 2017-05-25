@@ -1,11 +1,11 @@
 
 // These two lines are required to initialize Express in Cloud Code.
-const express = require('express')
-const bodyParser = require('body-parser')
+var express = require('express')
+var bodyParser = require('body-parser')
 var multer  = require('multer')
 var upload = multer()
 
-const app = express()
+var app = express()
 
 // Global app configuration section
 app.set('views', 'cloud/views')  // Specify the folder to find templates
@@ -255,12 +255,12 @@ app.get('/foundit', function (req, res) {
 	})
 })
 
-app.post('/found', upload.single('pic'), function (req, res) {
+app.post('/found', upload.single('pic'), function (req, res, next) {
 	var Log = Parse.Object.extend('Log')
 	var Geocache = Parse.Object.extend('Geocache')
 	var logEntry = new Log()
 
-	if (req.file) {
+	if (req.file.size > 0) {
 		var photoFile = req.file
 		var name = photoFile.originalname
 		var parseFile = new Parse.File(name, photoFile)

@@ -28,6 +28,8 @@
 				<h2><%= nom %></h2>
 			</header>
 			<form ref="uploadForm" id="uploadForm" method="post" action="/found" encType="multipart/form-data">
+				<input type="hidden" name="id" id="<%= id %>" value="<%= id %>" />
+
 				Votre Email des Jeux de Sophia - <i>Nécessaire au classement de l'épreuve</i>
 				<input type="email" name="email" id="email" value="" style="border: solid 1px #fff;" placeholder="L'email ne sera pas visible sur le site" required/>
 				<br>
@@ -37,15 +39,12 @@
 				Un petit Message pour partager votre découverte
 				<input type="text" name="message" id="message" value="" style="border: solid 1px #fff;" placeholder="Ce Message sera visible sur le site" maxlength="500" required/>
 				<br>				
-				<br>
 				Une photo souvenir
-				<input type="file" name="pic" id="pic" />
+				<input type="file" name="pic" id="pic" accept="image/*">
 				<br>
 				<br>
 				Si vous avez apprécié découvrir cette cache, attribuez lui point de favori en cochant cette case : 
-				<input type="checkbox" name="fav" value="true" />
-				
-				<input type="hidden" name="id" id="<%= id %>" value="<%= id %>" />
+				<input type="checkbox" name="fav" value="true" />				
 
 				<br><br><input type="submit" value="J'ai trouvé !" name="submit" class="button alt" id="submitButton" title="Clic ici pour envoyer la trouvaille" />
 				
