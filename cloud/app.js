@@ -1,11 +1,10 @@
 
 // These two lines are required to initialize Express in Cloud Code.
-var express = require('express')
-var multer  = require('multer')
-var bodyParser = require('body-parser')
+const express = require('express')
+const fileUpload = require('express-fileupload');
+const bodyParser = require('body-parser')
 
-var app = express()
-var upload = multer()
+const app = express()
 
 // Global app configuration section
 app.set('views', 'cloud/views')  // Specify the folder to find templates
@@ -14,6 +13,7 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({
 	extended: true
 }))
+app.use(fileUpload({ safeFileNames: true }))
 
 // This is an example of hooking up a request handler with a specific request
 // path and HTTP verb using the Express routing API.
@@ -260,17 +260,19 @@ app.post('/found', upload.single('pic'), function (req, res) {
 	var Geocache = Parse.Object.extend('Geocache')
 	var logEntry = new Log()
 
-	var photoFile = req.file
-	if (photoFile.length > 0) {
-		var name = photoFile.name
-		var parseFile = new Parse.File(name, photoFile)
-		parseFile.save().then(function () {
-			logEntry.set('Photo', parseFile)
-		},
-		function (error) {
-			res.render('found', { cacheid: 0, message: error.message })
-		})
-	}	
+	if (!req.files) {
+		res.render('found', { cacheid: 0, message: error.message })
+	}
+	var photoFile = req.files.pic
+	var name = photoFile.name
+	var parseFile = new Parse.File(name, photoFile)
+	parseFile.save().then(function () {
+		logEntry.set('Photo', parseFile)
+	},
+	function (error) {
+		res.render('found', { cacheid: 0, message: error.message })
+	})
+	
 
 	logEntry.set('Pseudo', req.body.name)
 	logEntry.set('Email', req.body.email)
