@@ -263,7 +263,7 @@ app.post('/found', function (req, res) {
 	var Geocache = Parse.Object.extend('Geocache')
 	var logEntry = new Log()
 
-	if (req.file.size > 0) {
+//	if (req.file.size > 0) {
 		var photoFile = req.files.pic
 		var name = req.files.pic.name//photoFile.originalname
 		var parseFile = new Parse.File(name, photoFile)
@@ -277,7 +277,7 @@ app.post('/found', function (req, res) {
 				res.render('found', { cacheid: 0, message: error.message })
 			}
 		)
-	}
+//	}
 
 	logEntry.set('Pseudo', req.body.name)
 	logEntry.set('Email', req.body.email)
