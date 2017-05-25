@@ -265,12 +265,15 @@ app.post('/found', function (req, res) {
 		var name = photoFile.name
 		var parseFile = new Parse.File(name, photoFile)
 		parseFile.save().then(function () {
-			console.log("Saving file :" + parseFile + name)
+			console.log("Photo saved")
+			console.log(parseFile.url())
 			logEntry.set('Photo', parseFile)
-		},
-		function (error) {
-			res.render('found', { cacheid: 0, message: error.message })
-		})
+			},
+			function (error) {
+				console.log("Photofile save error " + error.message);
+				res.render('found', { cacheid: 0, message: error.message })
+			}
+		)
 	}
 
 	logEntry.set('Pseudo', req.body.name)
