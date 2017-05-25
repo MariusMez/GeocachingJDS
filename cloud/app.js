@@ -260,19 +260,18 @@ app.post('/found', function (req, res) {
 	var Geocache = Parse.Object.extend('Geocache')
 	var logEntry = new Log()
 
-	if (!req.files) {
-		res.render('found', { cacheid: 0, message: error.message })
+	if (req.files) {
+		var photoFile = req.files.pic
+		var name = photoFile.name
+		var parseFile = new Parse.File(name, photoFile)
+		parseFile.save().then(function () {
+			console.log("Saving file :" + parseFile + name)
+			logEntry.set('Photo', parseFile)
+		},
+		function (error) {
+			res.render('found', { cacheid: 0, message: error.message })
+		})
 	}
-	var photoFile = req.files.pic
-	var name = photoFile.name
-	var parseFile = new Parse.File(name, photoFile)
-	parseFile.save().then(function () {
-		logEntry.set('Photo', parseFile)
-	},
-	function (error) {
-		res.render('found', { cacheid: 0, message: error.message })
-	})
-	
 
 	logEntry.set('Pseudo', req.body.name)
 	logEntry.set('Email', req.body.email)
