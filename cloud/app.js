@@ -255,7 +255,7 @@ app.get('/foundit', function (req, res) {
 	})
 })
 
-app.post('/found', upload.single('pic'), function (req, res) {
+app.post('/found', function (req, res) {
 	var Log = Parse.Object.extend('Log')
 	var Geocache = Parse.Object.extend('Geocache')
 	var logEntry = new Log()
