@@ -302,7 +302,8 @@ app.post('/found', upload.single('pic'), function (req, res, next) {
 	if(req.file) {
 		var photoFile = req.file
 		var name = photoFile.originalname
-		var parseFile = new Parse.File(name, photoFile)
+		var photoFileBase64 = photoFile.buffer.toString('base64');
+		var parseFile = new Parse.File(name,{ base64: photoFileBase64 })
 		parseFile.save().then(function () {
 			console.log("Photo saved")
 			console.log(parseFile.url())
