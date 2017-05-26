@@ -35,8 +35,6 @@
 					<header class="major">
 						<h2>Liste des caches posées pour les Jeux de Sophia</h2>
 						<span class="byline">A vous de jouer, les caches sont accessibles 7j/7 et 24h/24 !</span>
-						<br><br>
-						<a href="/geocaching#typesgeocaches"><img src="public/images/course_aux_icones.jpg" alt="La Course aux Icones"></a>
 					</header>
 
 					<div id="gridsalv" data-columns>
@@ -44,10 +42,7 @@
 						<% geocaches.forEach(function(geocache) { %>
 
 						<div>
-							<!-- <div><img width="32px;" class="<%= geocache.get("Category") %>" style="margin-right:10px;"/> - <img width="40px;" class="<%= geocache.get("Size") %>" style="margin-left:10px;"/> - D<%= geocache.get("Difficulty") %>/T<%= geocache.get("Terrain") %></div> -->
-
-							<a href="/geocache?id=<%= geocache.id %>"><img width="220px;" class="border" src="<%= geocache.get("Photo").url() %>" />
-								<p class="medium"><%= geocache.get("Nom") %></p>
+							<a href="/geocache?id=<%= geocache.id %>"><img width="220px;" class="border" src="<%= geocache.get("Photo").url() %>" /><p class="medium"><img width="40px;" align="left" src="https://www.geocaching-jds.fr/public/images/<%= geocache.get('Category') %>BIG.gif" style="margin-right:10px;"/><%= geocache.get("Nom") %></p>
 							</a>
 						</div>
 						<% }); %>
@@ -55,6 +50,7 @@
 					</div>
 					<br><br><br><br><br>
 					<p>Cette liste sera mise à jour le 29 mai 2017.</p>
+					<p>Pour en savoir plus sur les différents types de Géocaches : <a href="/geocaching#typesgeocaches">Cliquez ici</a></p>
 					<br><br>
 				</section>
 
