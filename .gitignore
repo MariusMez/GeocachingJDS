@@ -20,3 +20,4 @@ node_modules
 dump_mongodb
 logs
 config
+ecosystem.json

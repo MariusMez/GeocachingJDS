@@ -216,6 +216,30 @@ app.get('/geocaches', function(req, res) {
 	});
 });
 
+app.get('/icones', function(req, res) {
+	var moment = require('./cloud/moment-with-locales.min.js');
+	moment.locale('fr');
+	app.locals.moment = moment; // this makes moment available as a variable in every EJS page
+	var Log = Parse.Object.extend("Log");
+	var queryLog = new Parse.Query(Log);
+	queryLog.descending("createdAt");
+	queryLog.limit(5); 
+	queryLog.include("Geocache");
+	queryLog.find({
+		success: function(logs) {
+			var Geocaches = Parse.Object.extend("Geocache");
+			var query = new Parse.Query(Geocaches);
+			query.equalTo("Active",true);
+			query.descending("RatioFav");
+			query.find({ 
+				success: function(caches) {
+					res.render('icones', { message: 'Les caches à trouver', geocaches:caches, logs:logs });
+				}
+			});
+		}
+	});
+});
+
 app.get('/geocaching', function(req, res) {
 	res.render('geocaching', { message: 'Régles du jeu Geocaching' });
 });
@@ -300,20 +324,19 @@ app.post('/found', upload.single('pic'), function (req, res, next) {
 	var logEntry = new Log();
 
 	if(req.file) {
-		var photoFile = req.file
-		var name = photoFile.originalname
+		var photoFile = req.file;
+		var name = photoFile.originalname;
 		var photoFileBase64 = photoFile.buffer.toString('base64');
 		var parseFile = new Parse.File(name,{ base64: photoFileBase64 })
 		parseFile.save().then(function () {
-			console.log("Photo saved")
-			console.log(parseFile.url())
-			logEntry.set('Photo', parseFile)
+			console.log("Photo saved : " + parseFile.url());
+			logEntry.set("Photo", parseFile);
 			},
 			function (error) {
 				console.log("Photofile save error " + error.message);
 				res.render('found', { cacheid: 0, message: error.message })
 			}
-		)
+		);
 	}
 
 	logEntry.set("Pseudo", req.body.name);
