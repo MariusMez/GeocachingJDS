@@ -5,7 +5,13 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var ParseServer = require('parse-server').ParseServer;
 var path = require('path');
-var multer  = require('multer');
+var multer = require('multer');
+
+var Recaptcha = require('recaptcha-verify');
+var recaptcha = new Recaptcha({
+    secret: process.env.RECAPTCHA_SECRET_KEY,
+    verbose: true
+});
 
 var api = new ParseServer({
   databaseURI: process.env.MONGODB_ADDON_URI, // Use the MongoDB URI
@@ -323,6 +329,26 @@ app.get('/foundit', function(req, res) {
 });
 
 app.post('/found', upload.single('pic'), function (req, res, next) {
+
+	var userResponse = req.query['g-recaptcha-response'];
+	console.log(userResponse);
+	recaptcha.checkResponse(userResponse, function(error, response){
+        if(error) {
+            // an internal error? 
+            res.status(400).render('400', {
+                message: error.toString()
+            });
+            return;
+        }
+        if(response.success) {
+        	console.log("Recaptcha valid, human detected");
+        	continue;
+            // save session.. create user.. save form data.. render page, return json.. etc. 
+        } else {
+            res.render('found', { cacheid:0, message: 'Bot detected...' });
+            return;
+        }
+    });
 
 	var Log = Parse.Object.extend("Log");
 	var Geocache = Parse.Object.extend("Geocache");
