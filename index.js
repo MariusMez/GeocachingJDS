@@ -282,7 +282,7 @@ app.get('/geocache', function(req, res) {
 			queryLog.descending("createdAt");
 			queryLog.find({
 				success: function(results) {
-					res.render('geocache', { nom:geocacheName, id:codeId, fav: geocacheFav, d:geocacheDifficulty, t:geocacheTerrain, cat:geocacheCategory, size:geocacheSize, coord:geocacheCoordString, gps:geocacheGPS, description:geocacheDescription, indice:geocacheIndice, photo:geocachePhotoUrl, spoiler:geocacheSpoiler, logs:results });
+					res.render('geocache', { nom:geocacheName, codeid:codeId, fav: geocacheFav, d:geocacheDifficulty, t:geocacheTerrain, cat:geocacheCategory, size:geocacheSize, coord:geocacheCoordString, gps:geocacheGPS, description:geocacheDescription, indice:geocacheIndice, photo:geocachePhotoUrl, spoiler:geocacheSpoiler, logs:results });
 					
 				},
 				error: function(object, error) {
