@@ -308,15 +308,16 @@ app.get('/foundit', function(req, res) {
 	    			var object = results[i];
 	    		}
 	    		var geocacheName = object.get("Nom");
+	    		var geocacheCat = object.get("Category");
 	    		var geocacheId = object.id;
 
-	    		res.render('foundit', { nom:geocacheName,id:geocacheId });
+	    		res.render('foundit', { nom:geocacheName, id:geocacheId, cat:geocacheCat });
 	    	} else {
-	    		res.render('foundit', { nom:"Code invalide !", id:0 });
+	    		res.render('foundit', { nom:"Code invalide !", id:0, cat:"UNKNOWN" });
 	    	}
 	    },
 	    error: function(object, error) {
-	    	res.render('foundit', { nom:"Code invalide !", id:0 });
+	    	res.render('foundit', { nom:"Code invalide !", id:0, cat:"UNKNOWN" });
 	    }	
 	});
 });
@@ -338,7 +339,7 @@ app.post('/found', upload.single('pic'), function (req, res, next) {
 			},
 			function (error) {
 				console.log("Photofile save error " + error.message);
-				res.render('found', { cacheid: 0, message: error.message })
+				//res.render('found', { cacheid: 0, message: error.message })
 			}
 		);
 	}
