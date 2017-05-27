@@ -342,7 +342,6 @@ app.post('/found', upload.single('pic'), function (req, res, next) {
         }
         if(response.success) {
         	console.log("Recaptcha valid, human detected");
-        	continue;
             // save session.. create user.. save form data.. render page, return json.. etc. 
         } else {
             res.render('found', { cacheid:0, message: 'Bot detected...' });
