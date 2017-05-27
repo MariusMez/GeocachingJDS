@@ -3,6 +3,7 @@
 <head>
 	<title><%= nom %> - Géocaching Jeux de Sophia 2017</title>
 	<% include ./partials/head %>
+	<script src='https://www.google.com/recaptcha/api.js'></script>
 </head>
 <body>
 	<div class="wrapper style1">
@@ -68,6 +69,7 @@
 				<p><%- description %></p>
 
 			</section>
+			<br /><br />
 			
 			<% if( cat=='TRADI' || cat=='MULTI' || cat=='EARTHCACHE' || cat=='EVENT' || cat=='CITO' || cat=='WHERIGO' ) { %>
 			<section>
@@ -75,8 +77,9 @@
 				<br>
 				<div id="map"></div>
 			</section>
-			<% } %>
 			<br /><br />
+			<% } %>
+			
 
 			<% if(cat=='TRADI' || cat=='MULTI' || cat=='EARTHCACHE' || cat=='EVENT' || cat=='CITO' || cat=='WHERIGO' || cat=='MYSTERY') { %>
 			<section>
@@ -88,8 +91,18 @@
 					<p><b>Indice : </b><%= indice %></p>
 				</details>
 			</section>
-			<% } %>
 			<br /><br />
+			<% } %>
+
+			<% if( cat=='VIRTUAL' || cat=='WEBCAM' || cat=='EARTHCACHE' || cat=='EVENT' || cat=='CITO' ) { %>
+			<section>
+				<h2>Envoyer une photo de votre trouvaille</h2>
+				<br>
+				<div class="g-recaptcha" data-sitekey="6LfXHyMUAAAAALaiZRR7GqvCsxQYXUNpPPKAyCmd"></div>
+			</section>
+			<br /><br />
+			<% } %>
+
 			<section>
 				<h2>Logbook</h2>
 				<br>
