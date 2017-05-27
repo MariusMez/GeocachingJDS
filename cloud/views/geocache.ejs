@@ -120,8 +120,7 @@
 				<br>
 				Si vous avez apprécié cette cache, attribuez lui un point favori en cochant cette case : 
 				<input type="checkbox" name="fav" value="true" />	
-				<br><br>
-				<!-- <div class="g-recaptcha" data-sitekey="6LfXHyMUAAAAALaiZRR7GqvCsxQYXUNpPPKAyCmd"></div>	-->
+				<!-- <br><br><div class="g-recaptcha" data-sitekey="6LfXHyMUAAAAALaiZRR7GqvCsxQYXUNpPPKAyCmd"></div>	-->
 
 				<br><br><input type="submit" value="J'ai trouvé !" name="submit" class="button" id="submitButton" title="Clic ici pour envoyer la trouvaille" />
 				
@@ -138,7 +137,7 @@
 					<li><p class="medium">Soyez le premier à trouver la cache et annoncer votre découverte !!!</p></li>
 					<% } %>
 					<% logs.forEach(function(log) { %>
-					<li> <b><%= moment(log.get("Date")).utcOffset(120).fromNow() %> le <%= moment(log.get("Date")).utcOffset(120).format("LL [à] LT") %> </b>- <%= log.get("Pseudo") %> : <i><%= log.get("Message") %></i><img src="<%= log.get("PhotoUrl") %>" width="200" class="image" /></li>
+					<li> <b><%= moment(log.get("Date")).utcOffset(120).fromNow() %> le <%= moment(log.get("Date")).utcOffset(120).format("LL [à] LT") %> </b>- <%= log.get("Pseudo") %> : <i><%= log.get("Message") %></i> - <a href="<%= log.get("PhotoUrl") %>">photo</a></li>
 					<% }); %>
 				</ul>
 

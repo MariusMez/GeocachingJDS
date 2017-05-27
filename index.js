@@ -396,7 +396,7 @@ app.post('/found', upload.single('pic'), function (req, res, next) {
 
 	logEntry.save(null, {
 		success: function(logEntry) {
-			res.render('found', { cacheid:cache.id, message:"Bravo " + req.body.name +" !<br><br>N'oubliez pas de signer aussi le logbook ;-) <br><i>(lorsqu'il y a une boite physique à trouver)</i>" });
+			res.render('found', { cacheid:cache.id, message:"Bravo " + req.body.name +" !<br><br>N'oubliez pas de signer aussi le logbook ;-) <br><br><i>(lorsqu'il y a une boite physique à trouver)</i><br><br>Et attention aux moldus !" });
 		},
 		error: function(logEntry, error) {
 			res.render('found', { cacheid:0, message: error.message });
