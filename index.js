@@ -274,7 +274,7 @@ app.get('/geocache', function(req, res) {
 			var geocacheGPS = cache.get("GPS");
 			var geocacheCoordString = cache.get("GPSString");
 			var geocacheFav = cache.get("Fav");
-			var geocacheFav = cache.get("codeId");
+			var codeId = cache.get("codeId");
 
 			var Logs = Parse.Object.extend("Log");
 			var queryLog = new Parse.Query(Logs);
