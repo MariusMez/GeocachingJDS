@@ -352,7 +352,7 @@ app.post('/found', upload.single('pic'), function (req, res, next) {
 			);
 	}
 
-	var userResponse = req.body.g-recaptcha-response;
+	var userResponse = req.query['g-recaptcha-response'];
 	console.log(userResponse);
 	if(userResponse) {
 		recaptcha.checkResponse(userResponse, function(error, response){
