@@ -330,28 +330,7 @@ app.get('/foundit', function(req, res) {
 
 app.post('/found', upload.single('pic'), function (req, res, next) {
 
-	var Log = Parse.Object.extend("Log");
-	var Geocache = Parse.Object.extend("Geocache");
-	var logEntry = new Log();
-	var parseFile;
-
-	if(req.file) {
-		var photoFile = req.file;
-		var name = photoFile.originalname;
-		var photoFileBase64 = photoFile.buffer.toString('base64');
-		parseFile = new Parse.File(name,{ base64: photoFileBase64 })
-		parseFile.save().then(function () {
-			console.log("Photo saved : " + parseFile.url());
-			logEntry.set("PhotoUrl", parseFile.url());
-			logEntry.set("Photo", parseFile);
-		},
-		function (error) {
-			console.log("Photofile save error " + error.message);
-				//res.render('found', { cacheid: 0, message: error.message })
-			}
-			);
-	}
-
+/**
 	var userResponse = req.query['g-recaptcha-response'];
 	console.log(userResponse);
 	if(userResponse) {
@@ -371,6 +350,29 @@ app.post('/found', upload.single('pic'), function (req, res, next) {
         		return;
         	}
     	});
+	}
+**/
+
+	var Log = Parse.Object.extend("Log");
+	var Geocache = Parse.Object.extend("Geocache");
+	var logEntry = new Log();
+	var parseFile;
+
+	if(req.file) {
+		var photoFile = req.file;
+		var name = photoFile.originalname;
+		var photoFileBase64 = photoFile.buffer.toString('base64');
+		parseFile = new Parse.File(name,{ base64: photoFileBase64 })
+		parseFile.save().then(function () {
+			console.log("Photo saved : " + parseFile.url());
+			logEntry.set("PhotoUrl", parseFile.url());
+			logEntry.set("Photo", parseFile);
+		},
+		function (error) {
+			console.log("Photofile save error " + error.message);
+				//res.render('found', { cacheid: 0, message: error.message })
+			}
+		);
 	}
 
 	logEntry.set("PhotoUrl", parseFile.url());
@@ -394,7 +396,7 @@ app.post('/found', upload.single('pic'), function (req, res, next) {
 
 	logEntry.save(null, {
 		success: function(logEntry) {
-			res.render('found', { cacheid:cache.id, message:"Bravo " + req.body.name +" !<br><br>N'oubliez pas de signer aussi le logbook ;-)" });
+			res.render('found', { cacheid:cache.id, message:"Bravo " + req.body.name +" !<br><br>N'oubliez pas de signer aussi le logbook ;-) <br><i>(lorsqu'il y a une boite physique à trouver)</i>" });
 		},
 		error: function(logEntry, error) {
 			res.render('found', { cacheid:0, message: error.message });
