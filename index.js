@@ -58,6 +58,7 @@ app.get('/ranking', function(req, res) {
 		queryGeocaches.descending("RatioFav,Ratio");
 		queryGeocaches.find().then(function(caches) {
 			queryGeocacheurs.descending("ScoreFTF");
+			queryGeocacheurs.equalTo("Active", true);
 			queryGeocacheurs.limit(1000);
 			queryGeocacheurs.find().then(function(rankFTF) {
 				res.render('ranking', { geocacheurs: rank, geocacheursFTF: rankFTF, geocaches: caches });
@@ -127,7 +128,8 @@ app.get('/computeratiodt', function(req, res) {
 	
 
 	var queryGeocacheurs = new Parse.Query(Ranking);
-	queryGeocacheurs.limit(200);
+	queryGeocacheurs.equalTo("Active", true);
+	queryGeocacheurs.limit(300);
 	queryGeocacheurs.find().then(function(geocacheurs) {
 
 		_.each(geocacheurs, function(geocacheur) {
@@ -172,6 +174,7 @@ app.get('/computeranking', function(req, res) {
 	var Ranking = Parse.Object.extend("Ranking");
 
 	var queryGeocacheurs = new Parse.Query(Ranking);
+	queryGeocacheurs.equalTo("Active", true);
 	queryGeocacheurs.limit(1000);
 	queryGeocacheurs.find().then(function(geocacheurs) {
 
