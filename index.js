@@ -327,12 +327,13 @@ app.post('/found', upload.single('pic'), function (req, res, next) {
 	var Log = Parse.Object.extend("Log");
 	var Geocache = Parse.Object.extend("Geocache");
 	var logEntry = new Log();
+	var parseFile;
 
 	if(req.file) {
 		var photoFile = req.file;
 		var name = photoFile.originalname;
 		var photoFileBase64 = photoFile.buffer.toString('base64');
-		var parseFile = new Parse.File(name,{ base64: photoFileBase64 })
+		parseFile = new Parse.File(name,{ base64: photoFileBase64 })
 		parseFile.save().then(function () {
 			console.log("Photo saved : " + parseFile.url());
 			logEntry.set("PhotoUrl", parseFile.url());
@@ -345,6 +346,8 @@ app.post('/found', upload.single('pic'), function (req, res, next) {
 		);
 	}
 
+	logEntry.set("PhotoUrl", parseFile.url());
+	logEntry.set("Photo", parseFile);
 	logEntry.set("Pseudo", req.body.name);
 	logEntry.set("Email", req.body.email);
 	logEntry.set("Message", req.body.message);
