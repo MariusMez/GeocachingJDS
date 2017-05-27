@@ -274,15 +274,14 @@ app.get('/geocache', function(req, res) {
 			var geocacheGPS = cache.get("GPS");
 			var geocacheCoordString = cache.get("GPSString");
 			var geocacheFav = cache.get("Fav");
-			var codeId = cache.get("codeId");
-
+			var geocacheId = cache.id;
 			var Logs = Parse.Object.extend("Log");
 			var queryLog = new Parse.Query(Logs);
 			queryLog.equalTo("Geocache", cache);
 			queryLog.descending("createdAt");
 			queryLog.find({
 				success: function(results) {
-					res.render('geocache', { nom:geocacheName, codeid:codeId, fav: geocacheFav, d:geocacheDifficulty, t:geocacheTerrain, cat:geocacheCategory, size:geocacheSize, coord:geocacheCoordString, gps:geocacheGPS, description:geocacheDescription, indice:geocacheIndice, photo:geocachePhotoUrl, spoiler:geocacheSpoiler, logs:results });
+					res.render('geocache', { nom:geocacheName, id:geocacheId, fav: geocacheFav, d:geocacheDifficulty, t:geocacheTerrain, cat:geocacheCategory, size:geocacheSize, coord:geocacheCoordString, gps:geocacheGPS, description:geocacheDescription, indice:geocacheIndice, photo:geocachePhotoUrl, spoiler:geocacheSpoiler, logs:results });
 					
 				},
 				error: function(object, error) {

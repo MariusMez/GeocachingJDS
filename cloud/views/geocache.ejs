@@ -96,29 +96,29 @@
 
 			<% if( cat=='VIRTUAL' || cat=='WEBCAM' || cat=='EARTHCACHE' || cat=='EVENT' || cat=='CITO' ) { %>
 			<section>
-				<h2>Envoyer une photo pour valider votre trouvaille</h2>
+				<h2>Formulaire pour valider votre trouvaille</h2>
 				<br>
 				<form ref="uploadForm" id="uploadForm" method="post" action="/found" encType="multipart/form-data">
-				<input type="hidden" name="id" id="<%= codeid %>" value="<%= codeid %>" />
+				<input type="hidden" name="id" id="<%= id %>" value="<%= id %>" />
 
 				Votre Email des Jeux de Sophia - <i>Nécessaire au classement de l'épreuve</i>
-				<input type="email" name="email" id="email" value="" style="border: solid 1px #fafafa;" placeholder="L'email ne sera pas visible sur le site" required/>
+				<input type="email" name="email" id="email" value="" style="border: solid 1px #82b440;" placeholder="L'email ne sera pas visible sur le site" required/>
 				<br>
 				Votre Pseudo pour l'épreuve Géocaching
-				<input type="text" name="name" id="name" value="" style="border: solid 1px #fafafa;" placeholder="Ce pseudo sera visible sur le site" required/>
+				<input type="text" name="name" id="name" value="" style="border: solid 1px #82b440;" placeholder="Ce pseudo sera visible sur le site" required/>
 				<br>
 				Un petit Message pour partager votre découverte
-				<input type="text" name="message" id="message" value="" style="border: solid 1px #fafafa;" placeholder="Ce Message sera visible sur le site" maxlength="500" required/>
+				<input type="text" name="message" id="message" value="" style="border: solid 1px #82b440;" placeholder="Ce Message sera visible sur le site" maxlength="500" required/>
 				<br>		
 
 				<% if(cat!='MYSTERY') { %>
-				Une photo souvenir (sera visible sur le site)
+				Une photo souvenir (sera visible sur le site) pour valider votre trouvaille
 				<input type="file" name="pic" id="pic" accept="image/*" required>
 				<br>
 				<% } %>
 
 				<br>
-				Si vous avez apprécié découvrir cette cache, attribuez lui un point favori en cochant cette case : 
+				Si vous avez apprécié cette cache, attribuez lui un point favori en cochant cette case : 
 				<input type="checkbox" name="fav" value="true" />	
 				<br><br>
 				<div class="g-recaptcha" data-sitekey="6LfXHyMUAAAAALaiZRR7GqvCsxQYXUNpPPKAyCmd"></div>			
