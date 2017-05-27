@@ -95,7 +95,7 @@
 			<% } %>
 
 			<% if( cat=='VIRTUAL' || cat=='WEBCAM' || cat=='EARTHCACHE' || cat=='EVENT' || cat=='CITO' ) { %>
-			<section class="wrapper style5">
+			<section>
 				<h2>Envoyer une photo pour valider votre trouvaille</h2>
 				<br>
 				<form ref="uploadForm" id="uploadForm" method="post" action="/found" encType="multipart/form-data">
@@ -121,7 +121,7 @@
 				Si vous avez apprécié découvrir cette cache, attribuez lui un point favori en cochant cette case : 
 				<input type="checkbox" name="fav" value="true" />				
 
-				<br><br><input type="submit" value="J'ai trouvé !" name="submit" class="button alt" id="submitButton" title="Clic ici pour envoyer la trouvaille" />
+				<br><br><input type="submit" value="J'ai trouvé !" name="submit" class="button" id="submitButton" title="Clic ici pour envoyer la trouvaille" />
 				
 			</form>  	
 				<div class="g-recaptcha" data-sitekey="6LfXHyMUAAAAALaiZRR7GqvCsxQYXUNpPPKAyCmd"></div>
