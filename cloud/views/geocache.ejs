@@ -102,13 +102,13 @@
 				<input type="hidden" name="id" id="<%= codeid %>" value="<%= codeid %>" />
 
 				Votre Email des Jeux de Sophia - <i>Nécessaire au classement de l'épreuve</i>
-				<input type="email" name="email" id="email" value="" style="border: solid 1px #fff;" placeholder="L'email ne sera pas visible sur le site" required/>
+				<input type="email" name="email" id="email" value="" style="border: solid 1px #fafafa;" placeholder="L'email ne sera pas visible sur le site" required/>
 				<br>
 				Votre Pseudo pour l'épreuve Géocaching
-				<input type="text" name="name" id="name" value="" style="border: solid 1px #fff;" placeholder="Ce pseudo sera visible sur le site" required/>
+				<input type="text" name="name" id="name" value="" style="border: solid 1px #fafafa;" placeholder="Ce pseudo sera visible sur le site" required/>
 				<br>
 				Un petit Message pour partager votre découverte
-				<input type="text" name="message" id="message" value="" style="border: solid 1px #fff;" placeholder="Ce Message sera visible sur le site" maxlength="500" required/>
+				<input type="text" name="message" id="message" value="" style="border: solid 1px #fafafa;" placeholder="Ce Message sera visible sur le site" maxlength="500" required/>
 				<br>		
 
 				<% if(cat!='MYSTERY') { %>
@@ -119,12 +119,13 @@
 
 				<br>
 				Si vous avez apprécié découvrir cette cache, attribuez lui un point favori en cochant cette case : 
-				<input type="checkbox" name="fav" value="true" />				
+				<input type="checkbox" name="fav" value="true" />	
+				<br><br>
+				<div class="g-recaptcha" data-sitekey="6LfXHyMUAAAAALaiZRR7GqvCsxQYXUNpPPKAyCmd"></div>			
 
 				<br><br><input type="submit" value="J'ai trouvé !" name="submit" class="button" id="submitButton" title="Clic ici pour envoyer la trouvaille" />
 				
 			</form>  	
-				<div class="g-recaptcha" data-sitekey="6LfXHyMUAAAAALaiZRR7GqvCsxQYXUNpPPKAyCmd"></div>
 			</section>
 			<br /><br />
 			<% } %>
