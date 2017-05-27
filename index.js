@@ -52,6 +52,7 @@ app.get('/ranking', function(req, res) {
 	var Geocache = Parse.Object.extend("Geocache");
 	var queryGeocaches = new Parse.Query(Geocache);
 	queryGeocacheurs.descending("Score, ScoreFTF, ScoreDT");
+	queryGeocacheurs.equalTo("Active", true);
 	queryGeocacheurs.limit(1000);
 	queryGeocacheurs.find().then(function(rank) {
 		queryGeocaches.equalTo("Active", true);
