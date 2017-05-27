@@ -330,27 +330,6 @@ app.get('/foundit', function(req, res) {
 
 app.post('/found', upload.single('pic'), function (req, res, next) {
 
-	var userResponse = req.body.g-recaptcha-response;
-	console.log(userResponse);
-	if(userResponse) {
-		recaptcha.checkResponse(userResponse, function(error, response){
-			if(error) {
-            	// an internal error? 
-            	res.status(400).render('400', {
-            		message: error.toString()
-            	});
-            	return;
-        	}
-       		if(response.success) {
-        		console.log("Recaptcha valid, human detected");
-            	// save session.. create user.. save form data.. render page, return json.. etc. 
-        	} else {
-        		res.render('found', { cacheid:0, message: 'Bot detected...' });
-        		return;
-        	}
-    	});
-	}
-
 	var Log = Parse.Object.extend("Log");
 	var Geocache = Parse.Object.extend("Geocache");
 	var logEntry = new Log();
@@ -371,6 +350,27 @@ app.post('/found', upload.single('pic'), function (req, res, next) {
 				//res.render('found', { cacheid: 0, message: error.message })
 			}
 			);
+	}
+
+	var userResponse = req.body.g-recaptcha-response;
+	console.log(userResponse);
+	if(userResponse) {
+		recaptcha.checkResponse(userResponse, function(error, response){
+			if(error) {
+            	// an internal error? 
+            	res.status(400).render('400', {
+            		message: error.toString()
+            	});
+            	return;
+        	}
+       		if(response.success) {
+        		console.log("Recaptcha valid, human detected");
+            	// save session.. create user.. save form data.. render page, return json.. etc. 
+        	} else {
+        		res.render('found', { cacheid:0, message: 'Bot detected...' });
+        		return;
+        	}
+    	});
 	}
 
 	logEntry.set("PhotoUrl", parseFile.url());
