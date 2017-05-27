@@ -113,7 +113,7 @@
 
 				<% if(cat!='MYSTERY') { %>
 				Une photo souvenir (sera visible sur le site) pour valider votre trouvaille
-				<input type="file" name="pic" id="pic" accept="image/*" required>
+				<input type="file" name="pic" id="pic" accept="image/*" <% if(cat=='VIRTUAL' || cat=='WEBCAM') { %>required<% } %>>
 				<br>
 				<% } %>
 
