@@ -187,7 +187,9 @@ app.get('/computeranking', function(req, res) {
 
 		_.each(geocacheurs, function(geocacheur) {
 			var query = new Parse.Query(Logs);
+			var d = new Date(2017,4,30);
 			query.equalTo("Email", geocacheur.get("Email"));
+			query.greaterThanOrEqualTo('createdAt', d);
 			query.count().then(function(counter) { 
 				var scoreFTFSTFTTF = geocacheur.get("FTF") * scoreFTF + geocacheur.get("STF") * scoreSTF + geocacheur.get("TTF") * scoreTTF;
 				var score = counter * scoreFoundIt + scoreFTFSTFTTF + geocacheur.get("ScoreDT");
