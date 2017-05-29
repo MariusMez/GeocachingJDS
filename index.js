@@ -136,11 +136,11 @@ app.get('/computeratiodt', function(req, res) {
 
 	var queryGeocacheurs = new Parse.Query(Ranking);
 	queryGeocacheurs.equalTo("Active", true);
-	queryGeocacheurs.limit(300);
+	queryGeocacheurs.limit(1000);
 	queryGeocacheurs.find().then(function(geocacheurs) {
 
 		_.each(geocacheurs, function(geocacheur) {
-			var d = new Date(2016,4,30);
+			var d = new Date(2017,4,30);
 			var query = new Parse.Query(Logs);
 			query.equalTo("Email", geocacheur.get("Email"));
 			query.greaterThanOrEqualTo('createdAt', d);
