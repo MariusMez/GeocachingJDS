@@ -375,8 +375,10 @@ app.post('/found', upload.single('pic'), function (req, res, next) {
 		);
 	}
 
+if(parseFile) {
 	logEntry.set("PhotoUrl", parseFile.url());
 	logEntry.set("Photo", parseFile);
+}
 	logEntry.set("Pseudo", req.body.name);
 	logEntry.set("Email", req.body.email);
 	logEntry.set("Message", req.body.message);
