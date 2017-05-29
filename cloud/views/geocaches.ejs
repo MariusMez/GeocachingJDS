@@ -37,7 +37,7 @@
 						<span class="byline">A vous de jouer, les caches sont accessibles 7j/7 et 24h/24 !</span>
 						<br>
 
-						<script language="JavaScript">
+						<!-- <script language="JavaScript">
 							TargetDate = "05/29/2017 06:00 PM";
 							BackColor = "none";
 							ForeColor = "none";
@@ -49,11 +49,11 @@
 						</script>
 						<script language="JavaScript" src="public/js/compteur.js"></script>
 
-						<br><br>
+						-->
 						<img src="public/images/course_aux_icones.jpg" alt="La Course aux Icones">
 					</header>
 
-					<!-- <div id="gridsalv" data-columns>
+					 <div id="gridsalv" data-columns>
 
 						<% geocaches.forEach(function(geocache) { %>
 
@@ -63,9 +63,9 @@
 						</div>
 						<% }); %>
 
-					</div> -->
+					</div> 
 					<br><br><br><br><br>
-					<p>Cette liste sera mise à jour le 29 mai 2017.</p>
+					<p>Dernière mise à jour le 29 mai 2017. D'autres publications à venir très prochainement, préparatifs en cours...</p>
 					<p>Pour en savoir plus sur les différents types de Géocaches : <a href="/geocaching#typesgeocaches">Cliquez ici</a></p>
 					<br><br>
 				</section>
@@ -118,12 +118,12 @@
 					<script>
 						locations = [
 
-						/*<% geocaches.forEach(function(geocache) { %>
+						<% geocaches.forEach(function(geocache) { %>
 							[<%= geocache.get("GPS").latitude %>,<%= geocache.get("GPS").longitude %>, "<%= geocache.get("Nom") %>","<%= geocache.get("Category") %>"],
 							<% }); %>
-							*/
+							
 
-						[43.6131,7.06354, "Mystery", "MYSTERY"]
+						//[43.6131,7.06354, "Mystery", "MYSTERY"]
 						];
 
 						function initialize() {
