@@ -96,7 +96,7 @@ app.get('/computefavratio', function(req, res) {
 			});
 		});
 	}).then(function() {
-		//res.render('index', { message: 'Page principale' });
+		res.render('index', { message: 'Page principale' });
 	});
 });
 
@@ -121,7 +121,7 @@ app.get('/computefav', function(req, res) {
 			});
 		});
 	}).then(function() {
-		//res.render('index', { message: 'Page principale' });
+		res.render('index', { message: 'Page principale' });
 	});
 });
 
@@ -163,7 +163,7 @@ app.get('/computeratiodt', function(req, res) {
 			});
 		});
 	}).then(function() {
-		//res.render('OK');
+		res.render('OK');
 	});
 });
 
@@ -198,7 +198,7 @@ app.get('/computeranking', function(req, res) {
 			});
 		});
 	}).then(function() {
-		//res.render('OK');
+		res.render('OK');
 	});
 });
 
