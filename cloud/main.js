@@ -7,7 +7,7 @@ Parse.Cloud.define("hello", function(request, response) {
 });
 
 
-Parse.Cloud.job("computefav", function(request, status) {
+Parse.Cloud.job("computeratiodt", function(request, status) {
   // the params passed through the start request
   var params = request.params;
   // Headers from the request that triggered the job
