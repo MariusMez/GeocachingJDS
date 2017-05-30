@@ -6,6 +6,64 @@ Parse.Cloud.define("hello", function(request, response) {
   response.success("Hello world!");
 });
 
+
+Parse.Cloud.job("computefav", function(request, status) {
+  // the params passed through the start request
+  var params = request.params;
+  // Headers from the request that triggered the job
+  var headers = request.headers;
+
+  // get the parse-server logger
+  var log = request.log;
+  var _ = require('underscore-min.js');
+
+  // Update the Job status message
+  status.message("I just started");
+
+var Logs = Parse.Object.extend("Log");
+	var Ranking = Parse.Object.extend("Ranking");
+	
+
+	var queryGeocacheurs = new Parse.Query(Ranking);
+	queryGeocacheurs.equalTo("Active", true);
+	queryGeocacheurs.limit(1000);
+	queryGeocacheurs.find().then(function(geocacheurs) {
+
+		_.each(geocacheurs, function(geocacheur) {
+			var d = new Date(2017,4,30);
+			var query = new Parse.Query(Logs);
+			query.greaterThanOrEqualTo('createdAt', d);
+			query.equalTo("Email", geocacheur.get("Email"));
+			query.include('Geocache');
+			query.find().then(function(logs) { 
+				
+				var promise = Parse.Promise.as();
+				var scoreDT = 0;
+				_.each(logs, function(log) {
+					promise = promise.then(function() {
+						scoreDT = scoreDT + log.get("Geocache").get("Difficulty") + log.get("Geocache").get("Terrain");
+						return scoreDT;
+					});								
+				});
+				return promise;
+				
+			}).then(function(scoreDT) {							    
+				geocacheur.set("ScoreDT", scoreDT);
+				geocacheur.save();
+			});
+		});
+	}).then(function(result) {
+    // Mark the job as successful
+    // success and error only support string as parameters
+    status.success("I just finished");
+  }, function(error) {
+    // Mark the job as errored
+    status.error("There was an error");
+  })
+
+});
+
+
 Parse.Cloud.job("computefav", function(request, status) {
   // the params passed through the start request
   var params = request.params;
