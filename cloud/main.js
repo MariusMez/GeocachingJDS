@@ -15,7 +15,7 @@ Parse.Cloud.job("computeratiodt", function(request, status) {
 
   // get the parse-server logger
   var log = request.log;
-  var _ = require('underscore-min.js');
+  var _ = require('./underscore-min.js');
 
   // Update the Job status message
   status.message("I just started");
@@ -69,7 +69,7 @@ Parse.Cloud.job("computefav", function(request, status) {
 
   // get the parse-server logger
   var log = request.log;
-  var _ = require('underscore-min.js');
+  var _ = require('./underscore-min.js');
 
   // Update the Job status message
   status.message("I just started");
@@ -109,7 +109,7 @@ Parse.Cloud.job("computefavratio", function(request, status) {
 
   // get the parse-server logger
   var log = request.log;
-  var _ = require('underscore-min.js');
+  var _ = require('./underscore-min.js');
 
   // Update the Job status message
   status.message("I just started");
@@ -149,7 +149,7 @@ Parse.Cloud.job("computeranking", function(request, status) {
 
   // get the parse-server logger
   var log = request.log;
-  var _ = require('underscore-min.js');
+  var _ = require('./underscore-min.js');
 
   // Update the Job status message
   status.message("I just started");
