@@ -3,7 +3,7 @@
 // Use Parse.Cloud.define to define as many cloud functions as you want.
 // For example:
 Parse.Cloud.define("hello", function(request, response) {
-  response.success("Hello world!");
+	response.success("Hello world!");
 });
 
 
@@ -20,46 +20,43 @@ Parse.Cloud.job("computeratiodt", function(request, status) {
   // Update the Job status message
   status.message("I just started");
 
-var Logs = Parse.Object.extend("Log");
-	var Ranking = Parse.Object.extend("Ranking");
-	
+  var Logs = Parse.Object.extend("Log");
+  var Ranking = Parse.Object.extend("Ranking");
 
-	var queryGeocacheurs = new Parse.Query(Ranking);
-	queryGeocacheurs.equalTo("Active", true);
-	queryGeocacheurs.limit(1000);
-	queryGeocacheurs.find().then(function(geocacheurs) {
+  var queryGeocacheurs = new Parse.Query(Ranking);
+  queryGeocacheurs.equalTo("Active", true);
+  //queryGeocacheurs.limit(1000);
+  queryGeocacheurs.find().then(function(geocacheurs) {
 
-		_.each(geocacheurs, function(geocacheur) {
-			var d = new Date(2017,4,30);
-			var query = new Parse.Query(Logs);
-			query.greaterThanOrEqualTo('createdAt', d);
-			query.equalTo("Email", geocacheur.get("Email"));
-			query.include('Geocache');
-			query.find().then(function(logs) { 
-				
-				var promise = Parse.Promise.as();
-				var scoreDT = 0;
-				_.each(logs, function(log) {
-					promise = promise.then(function() {
-						scoreDT = scoreDT + log.get("Geocache").get("Difficulty") + log.get("Geocache").get("Terrain");
-						return scoreDT;
-					});								
-				});
-				return promise;
-				
-			}).then(function(scoreDT) {							    
-				geocacheur.set("ScoreDT", scoreDT);
-				geocacheur.save();
-			});
-		});
-	}).then(function(result) {
+  	_.each(geocacheurs, function(geocacheur) {
+  		var query = new Parse.Query(Logs);
+  		query.equalTo("Email", geocacheur.get("Email"));
+  		query.include('Geocache');
+  		query.find().then(function(logs) { 
+
+  			var promise = Parse.Promise.as();
+  			var scoreDT = 0;
+  			_.each(logs, function(log) {
+  				promise = promise.then(function() {
+  					scoreDT = scoreDT + log.get("Geocache").get("Difficulty") + log.get("Geocache").get("Terrain");
+  					return scoreDT;
+  				});								
+  			});
+  			return promise;
+
+  		}).then(function(scoreDT) {							    
+  			geocacheur.set("ScoreDT", scoreDT);
+  			geocacheur.save();
+  		});
+  	});
+  }).then(function(result) {
     // Mark the job as successful
     // success and error only support string as parameters
     status.success("I just finished");
-  }, function(error) {
+}, function(error) {
     // Mark the job as errored
     status.error("There was an error");
-  })
+})
 
 });
 
@@ -77,10 +74,10 @@ Parse.Cloud.job("computefav", function(request, status) {
   // Update the Job status message
   status.message("I just started");
 
-	var Logs = Parse.Object.extend("Log");
-	var Geocache = Parse.Object.extend("Geocache");
+  var Logs = Parse.Object.extend("Log");
+  var Geocache = Parse.Object.extend("Geocache");
 
-	var queryGeocaches = new Parse.Query(Geocache);
+  var queryGeocaches = new Parse.Query(Geocache);
 	//queryGeocaches.equalTo("Active", true);
 	queryGeocaches.find().then(function(geocaches) {
 
@@ -97,10 +94,10 @@ Parse.Cloud.job("computefav", function(request, status) {
     // Mark the job as successful
     // success and error only support string as parameters
     status.success("I just finished");
-  }, function(error) {
+}, function(error) {
     // Mark the job as errored
     status.error("There was an error");
-  })
+})
 
 });
 
@@ -117,30 +114,30 @@ Parse.Cloud.job("computefavratio", function(request, status) {
   // Update the Job status message
   status.message("I just started");
   var Logs = Parse.Object.extend("Log");
-	var Geocache = Parse.Object.extend("Geocache");
+  var Geocache = Parse.Object.extend("Geocache");
 
-	var queryGeocaches = new Parse.Query(Geocache);
-	queryGeocaches.equalTo("Active", true);
-	queryGeocaches.find().then(function(geocaches) {
+  var queryGeocaches = new Parse.Query(Geocache);
+  queryGeocaches.equalTo("Active", true);
+  queryGeocaches.find().then(function(geocaches) {
 
-		_.each(geocaches, function(geocache) {
-			var query = new Parse.Query(Logs);
-			query.equalTo("Geocache", geocache);
-			query.count().then(function(counter) {
-				var nbFav = geocache.get("Fav"); 
-				var ratio =  Math.round((nbFav / counter) * 100); 
-				geocache.set("RatioFav", ratio);
-				geocache.save();
-			});
-		});
-	}).then(function(result) {
+  	_.each(geocaches, function(geocache) {
+  		var query = new Parse.Query(Logs);
+  		query.equalTo("Geocache", geocache);
+  		query.count().then(function(counter) {
+  			var nbFav = geocache.get("Fav"); 
+  			var ratio =  Math.round((nbFav / counter) * 100); 
+  			geocache.set("RatioFav", ratio);
+  			geocache.save();
+  		});
+  	});
+  }).then(function(result) {
     // Mark the job as successful
     // success and error only support string as parameters
     status.success("I just finished");
-  }, function(error) {
+}, function(error) {
     // Mark the job as errored
     status.error("There was an error");
-  })
+})
 
 });
 
