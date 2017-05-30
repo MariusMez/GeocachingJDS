@@ -141,3 +141,50 @@ Parse.Cloud.job("computefavratio", function(request, status) {
 
 });
 
+Parse.Cloud.job("computeranking", function(request, status) {
+  // the params passed through the start request
+  var params = request.params;
+  // Headers from the request that triggered the job
+  var headers = request.headers;
+
+  // get the parse-server logger
+  var log = request.log;
+  var _ = require('underscore-min.js');
+
+  // Update the Job status message
+  status.message("I just started");
+  var scoreFoundIt = 20;
+	var scoreFTF = 3;
+	var scoreSTF = 2;
+	var scoreTTF = 1;
+
+	var Logs = Parse.Object.extend("Log");
+	var Ranking = Parse.Object.extend("Ranking");
+
+	var queryGeocacheurs = new Parse.Query(Ranking);
+	queryGeocacheurs.equalTo("Active", true);
+	queryGeocacheurs.limit(1000);
+	queryGeocacheurs.find().then(function(geocacheurs) {
+
+		_.each(geocacheurs, function(geocacheur) {
+			var query = new Parse.Query(Logs);
+			query.equalTo("Email", geocacheur.get("Email"));
+			query.count().then(function(counter) { 
+				var scoreFTFSTFTTF = geocacheur.get("FTF") * scoreFTF + geocacheur.get("STF") * scoreSTF + geocacheur.get("TTF") * scoreTTF;
+				var score = counter * scoreFoundIt + scoreFTFSTFTTF + geocacheur.get("ScoreDT");
+				geocacheur.set("Found", counter);
+				geocacheur.set("Score", score);
+				geocacheur.set("ScoreFTF", scoreFTFSTFTTF);
+				geocacheur.save();
+			});
+		});
+	}).then(function(result) {
+    // Mark the job as successful
+    // success and error only support string as parameters
+    status.success("I just finished");
+}, function(error) {
+    // Mark the job as errored
+    status.error("There was an error");
+})
+
+});
