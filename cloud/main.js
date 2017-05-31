@@ -31,6 +31,7 @@ Parse.Cloud.job("computeratiodt", function(request, status) {
   	_.each(geocacheurs, function(geocacheur) {
   		var query = new Parse.Query(Logs);
   		query.equalTo("Email", geocacheur.get("Email"));
+  		query.equalTo("Active", true);
   		query.include('Geocache');
   		query.find().then(function(logs) { 
 
@@ -83,6 +84,7 @@ Parse.Cloud.job("computefav", function(request, status) {
 
 		_.each(geocaches, function(geocache) {
 			var query = new Parse.Query(Logs);
+			query.equalTo("Active", true);
 			query.equalTo("Geocache", geocache);
 			query.equalTo("Fav", true);
 			query.count().then(function(counter) { 
@@ -122,6 +124,7 @@ Parse.Cloud.job("computefavratio", function(request, status) {
 
   	_.each(geocaches, function(geocache) {
   		var query = new Parse.Query(Logs);
+  		query.equalTo("Active", true);
   		query.equalTo("Geocache", geocache);
   		query.count().then(function(counter) {
   			var nbFav = geocache.get("Fav"); 
@@ -168,6 +171,7 @@ Parse.Cloud.job("computeranking", function(request, status) {
 
   	_.each(geocacheurs, function(geocacheur) {
   		var query = new Parse.Query(Logs);
+  		query.equalTo("Active", true);
   		query.equalTo("Email", geocacheur.get("Email"));
   		query.count().then(function(counter) { 
   			var scoreFTFSTFTTF = geocacheur.get("FTF") * scoreFTF + geocacheur.get("STF") * scoreSTF + geocacheur.get("TTF") * scoreTTF;

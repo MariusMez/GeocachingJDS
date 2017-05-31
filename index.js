@@ -81,6 +81,7 @@ app.get('/geocaches', function(req, res) {
 	var Log = Parse.Object.extend("Log");
 	var queryLog = new Parse.Query(Log);
 	queryLog.descending("createdAt");
+	queryLog.equalTo("Active", true);
 	queryLog.limit(5); 
 	queryLog.include("Geocache");
 	queryLog.find({
@@ -105,6 +106,7 @@ app.get('/icones', function(req, res) {
 	var Log = Parse.Object.extend("Log");
 	var queryLog = new Parse.Query(Log);
 	queryLog.descending("createdAt");
+	queryLog.equalTo("Active", true);
 	queryLog.limit(5); 
 	queryLog.include("Geocache");
 	queryLog.find({
@@ -156,6 +158,7 @@ app.get('/geocache', function(req, res) {
 			var Logs = Parse.Object.extend("Log");
 			var queryLog = new Parse.Query(Logs);
 			queryLog.equalTo("Geocache", cache);
+			queryLog.equalTo("Active", true);
 			queryLog.descending("createdAt");
 			queryLog.find({
 				success: function(results) {
@@ -259,6 +262,7 @@ if(parseFile) {
 	cache.id = req.body.id;
 
 	logEntry.set("Geocache", cache);
+	logEntry.set("Active", true);
 
 	if(req.body.fav == "true") {
 		logEntry.set("Fav", true);
