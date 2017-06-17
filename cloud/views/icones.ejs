@@ -1,7 +1,7 @@
 	<!DOCTYPE HTML>
 	<html>
 	<head>
-		<title>LA COURSE AUX ICONES - Géocaching Jeux de Sophia 2017</title>
+		<title>PHOTOS DE LA COURSE AUX ICONES - Géocaching Jeux de Sophia 2017</title>
 		<% include ./partials/head %>
 		<link rel="stylesheet" href="css/grid.css" />
 	</head>
@@ -33,16 +33,16 @@
 			<div id="intro" class="container">
 				<section>
 					<header class="major">
-						<h2>Liste des caches posées pour les Jeux de Sophia</h2>
+						<h2>Toutes les photos de l'épreuve</h2>
 						<span class="byline">A vous de jouer, les caches sont accessibles 7j/7 et 24h/24 !</span>				
 					</header>
 
 					<div id="gridsalv" data-columns>
 
-						<% geocaches.forEach(function(geocache) { %>
+						<% logs.forEach(function(log) { %>
 
 						<div>
-							<a href="/geocache?id=<%= geocache.id %>"><img width="220px;" class="border" src="<%= geocache.get("Photo").url() %>" /><p class="medium"><img width="40px;" align="left" src="https://www.geocaching-jds.fr/public/images/<%= geocache.get('Category') %>BIG.gif" style="margin-right:10px;"/><%= geocache.get("Nom") %></p>
+							<a href="/geocache?id=<%= log.get("Geocache").get("id") %>"><img width="220px;" class="border" src="<%= log.get("Geocache").get("Photo").url() %>" /><p class="medium"><img width="40px;" align="left" src="https://www.geocaching-jds.fr/public/images/<%= log.get("Geocache").get('Category') %>BIG.gif" style="margin-right:10px;"/><%= log.get("Geocache").get("Nom") %></p>
 							</a>
 						</div>
 						<% }); %>
