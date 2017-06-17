@@ -26,6 +26,7 @@
 
 				</div>
 			</div>
+		</div>
 
 		<div id="main" class="wrapper style4">
 
@@ -33,10 +34,9 @@
 				<section>
 					<header class="major">
 						<h2>Toutes les photos de l'épreuve</h2>
-						<span class="byline">A vous de jouer, les caches sont accessibles 7j/7 et 24h/24 !</span>				
-					</header>
+						<span class="byline">A vous de jouer, les caches sont accessibles 7j/7 et 24h/24 !</span>
 
-					<div id="gridsalv" data-columns>
+						<div id="gridsalv" data-columns>
 
 						<% logs.forEach(function(log) { %>
 
@@ -46,12 +46,13 @@
 						</div>
 						<% }); %>
 
-					</div>
+					</div>			
+					</header>
+
+					
 				</section>
 			</div>
 		</div>
-				</div>
-
 
 		<% include ./partials/footer %>
 		<script src="public/js/salvattore.min.js"></script>
