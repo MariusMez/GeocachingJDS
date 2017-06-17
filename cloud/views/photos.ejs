@@ -42,18 +42,13 @@
 						<% logs.forEach(function(log) { %>
 
 						<div>
-							<a href="/geocache?id=<%= log.get("Geocache").get("id") %>"><img width="250px;" class="border" src="<%= log.get("PhotoUrl") %>" /><p class="medium"><img width="40px;" align="left" src="log.get("Geocache").get("Photo").url()" width="100px" style="margin-right:10px;"/><%= log.get("Geocache").get("Nom") %> - <%= log.get("Pseudo") %></p>
+							<a href="<%= log.get("PhotoUrl") %>"><img width="250px;" class="border" src="<%= log.get("PhotoUrl") %>" /><p class="medium"><%= log.get("Geocache").get("Nom") %> - <b><%= log.get("Pseudo") %></b></p>
 							</a>
 						</div>
 						<% }); %>
 
 					</div>
-
-					<br><br><br><br><br>
-					<p>Cette liste sera mise à jour le 29 mai 2017.</p>
-					<br><br>
 				</section>
-
 			</div>
 		</div>
 
@@ -71,59 +66,7 @@
 			<div id="carte" class="container">
 
 				<section>
-					<header class="major">
-						<h2>Carte des emplacements</h2>
-						<span class="byline">Les coordonnées des caches de type "Mystery - ?" sont fictives, à vous de les trouver ;-) Pour certains type de géocaches "virtuelle", il n'y a aucune boite physique à trouver, seulement une "action particulière" à réaliser pour valider votre trouvaille.</span>
-					</header>
-
-
-					<div id="map"></div>
-
-					<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBfOPPHsPEYs7o8-xdYce1Bdxgmh-4TBAc&callback=initialize"
-					type="text/javascript"></script>
-
-					<script>
-						locations = [
-
-						<% geocaches.forEach(function(geocache) { %>
-							[<%= geocache.get("GPS").latitude %>,<%= geocache.get("GPS").longitude %>, "<%= geocache.get("Nom") %>","<%= geocache.get("Category") %>"],
-							<% }); %>
-
-						[43.6131,7.06354, "Mystery", "MYSTERY"]
-						];
-
-						function initialize() {
-							map = new google.maps.Map(document.getElementById("map"), {
-								mapTypeId: google.maps.MapTypeId.ROADMAP,
-								center: new google.maps.LatLng(locations[0][0], locations[0][1]),
-								zoom: 10
-							});
-
-							for (var i=0; i<locations.length; i++) {
-								
-								var mytext = 'Infowindow contents in HTML'
-								var myinfowindow = new google.maps.InfoWindow({
-									content: '<h3 style="color:#83B348;">'+locations[i][2]+'</h3>'
-								});
-
-								var marker = new google.maps.Marker({
-									position: new google.maps.LatLng(locations[i][0], locations[i][1]),
-									map: map,
-									title: locations[i][2],
-									infowindow: myinfowindow,
-									icon: 'images/'+locations[i][3]+'.gif'
-								});
-								
-								google.maps.event.addListener(marker, 'click', function () {
-									this.infowindow.open(map, this);
-								});
-							}
-							setBoundsLeftSidebar(locations, 0.9);
-						}
-
-					</script>
-					<br>
-					<br>
+					
 					<a href="/ranking" class="button alt">Voir le classement</a>
 
 				</section>
