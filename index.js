@@ -99,7 +99,7 @@ app.get('/geocaches', function(req, res) {
 	});
 });
 
-app.get('/icones', function(req, res) {
+app.get('/photos', function(req, res) {
 	var moment = require('./cloud/moment-with-locales.min.js');
 	moment.locale('fr');
 	app.locals.moment = moment; // this makes moment available as a variable in every EJS page
@@ -107,7 +107,7 @@ app.get('/icones', function(req, res) {
 	var queryLog = new Parse.Query(Log);
 	queryLog.descending("createdAt");
 	queryLog.equalTo("Active", true);
-	queryLog.limit(5); 
+	queryLog.limit(1000); 
 	queryLog.include("Geocache");
 	queryLog.find({
 		success: function(logs) {
@@ -117,7 +117,7 @@ app.get('/icones', function(req, res) {
 			query.descending("RatioFav");
 			query.find({ 
 				success: function(caches) {
-					res.render('icones', { message: 'Les caches à trouver', geocaches:caches, logs:logs });
+					res.render('photos', { message: 'Les caches à trouver', geocaches:caches, logs:logs });
 				}
 			});
 		}

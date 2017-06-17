@@ -42,7 +42,7 @@
 						<% logs.forEach(function(log) { %>
 
 						<div>
-							<a href="/geocache?id=<%= log.get("Geocache").get("id") %>"><img width="220px;" class="border" src="<%= log.get("Geocache").get("Photo").url() %>" /><p class="medium"><img width="40px;" align="left" src="https://www.geocaching-jds.fr/public/images/<%= log.get("Geocache").get('Category') %>BIG.gif" style="margin-right:10px;"/><%= log.get("Geocache").get("Nom") %></p>
+							<a href="/geocache?id=<%= log.get("Geocache").get("id") %>"><img width="250px;" class="border" src="<%= log.get("PhotoUrl") %>" /><p class="medium"><img width="40px;" align="left" src="log.get("Geocache").get("Photo").url()" width="100px" style="margin-right:10px;"/><%= log.get("Geocache").get("Nom") %> - <%= log.get("Pseudo") %></p>
 							</a>
 						</div>
 						<% }); %>
@@ -61,23 +61,6 @@
 
 			<div id="liste" class="container">
 				<section>
-
-					<h2>Les derniers logs</h2>
-					<br>
-					<ul>
-						<% logs.forEach(function(log) { %>
-
-						<% if(log.get("Geocache").get("Active") == true)  { %>
-						<li><b><a href="/geocache?id=<%= log.get("Geocache").id %>"> <%= log.get("Geocache").get("Nom") %> </a> : <%= moment(log.get("Date")).utcOffset(120).fromNow() %> le <%= moment(log.get("Date")).utcOffset(120).format("LL [à] LT") %> </b>- <%= log.get("Pseudo") %> : <i><%= log.get("Message") %></i></li>
-						<% } %>
-						
-						<% }); %>
-						<li>[...]</li>
-					</ul>
-
-					<p class="medium">L'épreuve se déroule du 29 mai au 22 juin, de nouvelles caches seront publiées au fil des 15 premiers jours de juin.</p>
-					<p class="medium">La plupart de ces caches sont spécifiquement posées pour les Jeux de Sophia et sont donc par conséquent non accessibles, ni même visibles sur le site geocaching.com et les applications officielles Géocaching.com.</p>
-					<p>Des tickets de tombola seront aléatoirement placés par nos soins dans les différentes caches à découvrir.</p>
 
 				</section>
 			</div>
