@@ -108,6 +108,7 @@ app.get('/photos', function(req, res) {
 	queryLog.descending("createdAt");
 	queryLog.equalTo("Active", true);
 	queryLog.exists("PhotoUrl");
+	queryLog.limit(1000);
 	queryLog.include("Geocache");
 	queryLog.find({
 		success: function(logs) {
