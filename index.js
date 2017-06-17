@@ -107,7 +107,7 @@ app.get('/photos', function(req, res) {
 	var queryLog = new Parse.Query(Log);
 	queryLog.descending("createdAt");
 	queryLog.equalTo("Active", true);
-	queryLog.limit(1000); 
+	query.exists("PhotoUrl");
 	queryLog.include("Geocache");
 	queryLog.find({
 		success: function(logs) {
