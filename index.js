@@ -91,7 +91,7 @@ app.get('/ranking2', function(req, res) {
 			queryGeocacheurs.equalTo("Active", true);
 			queryGeocacheurs.limit(1000);
 			queryGeocacheurs.find().then(function(rankFTF) {
-				res.render('ranking', { geocacheurs: rank, geocacheursFTF: rankFTF, geocaches: caches });
+				res.render('ranking2', { geocacheurs: rank, geocacheursFTF: rankFTF, geocaches: caches });
 			});
 		});
 	});
