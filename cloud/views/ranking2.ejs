@@ -1,0 +1,216 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>Classement - Géocaching Jeux de Sophia 2017</title>
+	<% include ./partials/head %>
+	<style type="text/css">
+		
+		table {
+			*border-collapse: collapse; /* IE7 and lower */
+			border-spacing: 0;
+			width: 100%;    
+		}
+		/*----------------------*/
+
+		.zebra td, .zebra th {
+			padding: 10px;
+			border-bottom: 1px solid #f2f2f2;    
+		}
+
+		.zebra tbody tr:nth-child(even) {
+			background: #f5f5f5;
+			-webkit-box-shadow: 0 1px 0 rgba(255,255,255,.8) inset; 
+			-moz-box-shadow:0 1px 0 rgba(255,255,255,.8) inset;  
+			box-shadow: 0 1px 0 rgba(255,255,255,.8) inset;        
+		}
+
+		.zebra th {
+			text-align: left;
+			text-shadow: 0 1px 0 rgba(255,255,255,.5); 
+			border-bottom: 1px solid #ccc;
+			background-color: #eee;
+			background-image: -webkit-gradient(linear, left top, left bottom, from(#f5f5f5), to(#eee));
+			background-image: -webkit-linear-gradient(top, #f5f5f5, #eee);
+			background-image:    -moz-linear-gradient(top, #f5f5f5, #eee);
+			background-image:     -ms-linear-gradient(top, #f5f5f5, #eee);
+			background-image:      -o-linear-gradient(top, #f5f5f5, #eee); 
+			background-image:         linear-gradient(top, #f5f5f5, #eee);
+		}
+
+		.zebra th:first-child {
+			-moz-border-radius: 6px 0 0 0;
+			-webkit-border-radius: 6px 0 0 0;
+			border-radius: 6px 0 0 0;  
+		}
+
+		.zebra th:last-child {
+			-moz-border-radius: 0 6px 0 0;
+			-webkit-border-radius: 0 6px 0 0;
+			border-radius: 0 6px 0 0;
+		}
+
+		.zebra th:only-child{
+			-moz-border-radius: 6px 6px 0 0;
+			-webkit-border-radius: 6px 6px 0 0;
+			border-radius: 6px 6px 0 0;
+		}
+
+		.zebra tfoot td {
+			border-bottom: 0;
+			border-top: 1px solid #fff;
+			background-color: #f1f1f1;  
+		}
+
+		.zebra tfoot td:first-child {
+			-moz-border-radius: 0 0 0 6px;
+			-webkit-border-radius: 0 0 0 6px;
+			border-radius: 0 0 0 6px;
+		}
+
+		.zebra tfoot td:last-child {
+			-moz-border-radius: 0 0 6px 0;
+			-webkit-border-radius: 0 0 6px 0;
+			border-radius: 0 0 6px 0;
+		}
+
+		.zebra tfoot td:only-child{
+			-moz-border-radius: 0 0 6px 6px;
+			-webkit-border-radius: 0 0 6px 6px
+			border-radius: 0 0 6px 6px
+		}
+	</style>
+</head>
+<body>
+	<div class="wrapper style1">
+
+		<div id="header">
+			<div class="container">
+
+				<h1><a href="/" id="logo">Géocaching</a></h1>
+
+				<nav id="nav">
+					<ul>
+						<li><a href="/">Accueil</a></li>
+						<li><a href="/geocaches">Les Caches à trouver</a></li>
+						<li><a href="/geocaching">Règles du jeu</a></li>
+						<li><a href="/tools">Les Outils</a></li>
+						<li class="active"><a href="/ranking">Classement</a></li>
+					</ul>
+				</nav>
+
+			</div>
+		</div>
+	</div>
+
+	<div id="main" class="wrapper style4">
+
+		<div id="content" class="container">
+			<section>
+				<header class="major">
+
+					<h2>Classement Général</h2>
+				</header>
+
+				<table class="zebra">
+					<thead>
+						<tr>
+							<th>
+								<b>N°</b>
+							</th>
+							<th>
+								<b>Pseudo</b>
+							</th>
+							<th>
+								<b>Email</b>
+							</th>
+							<th>
+								<b>Points</b>
+							</th>
+							<th>
+								<b>Caches trouvées</b><br><i>(20pt / cache)</i>
+							</th>
+							<th>
+								<b>FTF</b><br><i>(3pt / cache)</i>
+							</th>
+							<th>
+								<b>STF</b><br><i>(2pt / cache)</i>
+							</th>
+							<th>
+								<b>TTF</b><br><i>(1pt / cache)</i>
+							</th>
+							<th>
+								<b>Score D/T</b><br><i>(1pt / etoile)</i>
+							</th>
+						</tr>
+					</thead>
+
+					<tfoot>
+						<tr>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+						</tr>
+					</tfoot>
+					
+					<tbody>
+						<% geocacheurs.forEach(function(geocacheur, i) { %>
+						<tr>
+							<td><%= i+1 %></td>
+							<td><%= geocacheur.get("Pseudo") %></td>
+							<td><%= geocacheur.get("Email") %></td>
+							<td><%= geocacheur.get("Score") %></td>
+							<td><%= geocacheur.get("Found") %></td>
+							<td><%= geocacheur.get("FTF") %></td>
+							<td><%= geocacheur.get("STF") %></td>
+							<td><%= geocacheur.get("TTF") %></td>
+							<td><%= geocacheur.get("ScoreDT") %></td>
+						</tr>
+						<% }); %>
+					</tbody>
+					
+				</table>
+
+			</section>
+
+			<section>
+				<h2>Classement FTF, STF, TTF</h2>
+				<br>
+				<ul style="list-style-type:decimal; margin-left:30px;">
+					<% geocacheursFTF.forEach(function(g, i) {  if(g.get("ScoreFTF") > 0 ) { %>
+					<li><b><%= g.get("Pseudo") %></b> avec <%= g.get("ScoreFTF") %> point<%if(g.get("ScoreFTF")>1) { %>s <% } %></li>
+					<%} }); %>
+				</ul>
+
+			</section>
+			<br>
+			<br>
+
+			<section>
+				<h2>Classement des Caches préférées</h2>
+				<br>
+				<ul style="list-style-type:decimal; margin-left:30px;">
+					<% geocaches.forEach(function(geocache) { %>
+					<li><b><%= geocache.get("Fav") %></b> 👍 (<%= geocache.get("RatioFav") %> % des visites) pour <b><a href="/geocache?id=<%= geocache.id %>"> <%= geocache.get("Nom") %> </a> </b></li>
+
+					<% }); %>
+				</ul>
+			</section>
+			<br>
+			<br>
+			<br>
+			<p>Classement "temps réél" pour le fun et succeptible de varier après vérification sur les logbooks ;-)</p>
+			<p><i>Page mise à jour le 16 juin 2016 pour donner plus d'importance au nombre de caches trouvées et inclure le score D/T (Difficulté/Terrain) pour valoriser les caches trouvées les plus "difficiles".</i></p>
+		</div>
+	</div>
+
+	<% include ./partials/footer %>
+
+
+</body>
+</html>
