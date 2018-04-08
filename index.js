@@ -1,5 +1,5 @@
-// Example express application adding the parse-server module to expose Parse
-// compatible API routes.
+// Since Node 8, have errors
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 var express = require('express');
 var bodyParser = require('body-parser');
