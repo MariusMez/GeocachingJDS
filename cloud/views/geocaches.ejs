@@ -63,7 +63,7 @@
 						<% geocaches.forEach(function(geocache) { %>
 
 						<div>
-							<a href="/geocache?id=<%= geocache.id %>"><img width="220px;" class="border" src="<%= geocache.get("Photo").url() %>" /><p class="medium"><img width="40px;" align="left" src="https://www.geocaching-jds.fr/public/images/<%= geocache.get('Category') %>BIG.gif" style="margin-right:10px;"/><%= geocache.get("Nom") %></p>
+							<a href="/geocache?id=<%= geocache.id %>"><img width="220px;" class="border" src="<%= geocache.get("Photo").url().replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, ''); %>" /><p class="medium"><img width="40px;" align="left" src="https://www.geocaching-jds.fr/public/images/<%= geocache.get('Category') %>BIG.gif" style="margin-right:10px;"/><%= geocache.get("Nom") %></p>
 							</a>
 						</div>
 						<% }); %>
