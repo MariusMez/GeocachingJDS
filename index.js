@@ -22,8 +22,7 @@ var api = new ParseServer({
       ssl: true,
       checkServerIdentity: false,
       sslValidate: true,
-      sslCA: ca,
-      ca: ca
+      sslCA: ca
   },
   cloud: process.env.CLOUD_CODE_MAIN || __dirname + '/cloud/main.js',
   appId: process.env.PARSE_APPID, // Use environment variable to set the APP_ID
