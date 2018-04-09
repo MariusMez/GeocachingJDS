@@ -181,10 +181,10 @@ app.get('/geocache', function(req, res) {
 			var geocacheTerrain = cache.get("Terrain");
 			var geocacheSize = cache.get("Size");
 			var geocacheCategory = cache.get("Category");
-			var geocachePhotoUrl = cache.get("Photo").url(options: { forceSecure: true });
+			var geocachePhotoUrl = cache.get("Photo").url({forceSecure: true});
 			var geocacheDescription = cache.get("Description");
 			var geocacheIndice = cache.get("Indice");
-			var geocacheSpoiler = cache.get("Spoiler").url(options: { forceSecure: true });
+			var geocacheSpoiler = cache.get("Spoiler").url({forceSecure: true});
 			var geocacheGPS = cache.get("GPS");
 			var geocacheCoordString = cache.get("GPSString");
 			var geocacheFav = cache.get("Fav");
@@ -273,8 +273,8 @@ app.post('/found', upload.single('pic'), function (req, res, next) {
 		var photoFileBase64 = photoFile.buffer.toString('base64');
 		parseFile = new Parse.File(name,{ base64: photoFileBase64 })
 		parseFile.save().then(function () {
-			console.log("Photo saved : " + parseFile.url(options: { forceSecure: true }));
-			logEntry.set("PhotoUrl", parseFile.url(options: { forceSecure: true }));
+			console.log("Photo saved : " + parseFile.url({forceSecure: true}));
+			logEntry.set("PhotoUrl", parseFile.url({forceSecure: true}));
 			logEntry.set("Photo", parseFile);
 		},
 		function (error) {
