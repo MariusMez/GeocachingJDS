@@ -13,8 +13,18 @@ var recaptcha = new Recaptcha({
 	verbose: true
 });
 
+var fs = require('fs');
+var ca = [fs.readFileSync("/etc/letsencrypt/live/geocaching-jds.fr/fullchain.pem")];
+
 var api = new ParseServer({
   databaseURI: process.env.MONGODB_ADDON_URI, // Use the MongoDB URI
+  databaseOptions: {
+      ssl: true,
+      checkServerIdentity: false,
+      sslValidate: true,
+      sslCA: ca,
+      ca: ca
+  },
   cloud: process.env.CLOUD_CODE_MAIN || __dirname + '/cloud/main.js',
   appId: process.env.PARSE_APPID, // Use environment variable to set the APP_ID
   serverURL: process.env.SERVER_URL || 'http://localhost:1337/parse', // Don't forget to change to https if needed
@@ -171,10 +181,10 @@ app.get('/geocache', function(req, res) {
 			var geocacheTerrain = cache.get("Terrain");
 			var geocacheSize = cache.get("Size");
 			var geocacheCategory = cache.get("Category");
-			var geocachePhotoUrl = cache.get("Photo").url();
+			var geocachePhotoUrl = cache.get("Photo").url(options: { forceSecure: true });
 			var geocacheDescription = cache.get("Description");
 			var geocacheIndice = cache.get("Indice");
-			var geocacheSpoiler = cache.get("Spoiler").url();
+			var geocacheSpoiler = cache.get("Spoiler").url(options: { forceSecure: true });
 			var geocacheGPS = cache.get("GPS");
 			var geocacheCoordString = cache.get("GPSString");
 			var geocacheFav = cache.get("Fav");
@@ -263,8 +273,8 @@ app.post('/found', upload.single('pic'), function (req, res, next) {
 		var photoFileBase64 = photoFile.buffer.toString('base64');
 		parseFile = new Parse.File(name,{ base64: photoFileBase64 })
 		parseFile.save().then(function () {
-			console.log("Photo saved : " + parseFile.url());
-			logEntry.set("PhotoUrl", parseFile.url());
+			console.log("Photo saved : " + parseFile.url(options: { forceSecure: true }));
+			logEntry.set("PhotoUrl", parseFile.url(options: { forceSecure: true }));
 			logEntry.set("Photo", parseFile);
 		},
 		function (error) {
@@ -274,38 +284,38 @@ app.post('/found', upload.single('pic'), function (req, res, next) {
 		);
 	}
 
-if(parseFile) {
-	logEntry.set("PhotoUrl", parseFile.url());
-	logEntry.set("Photo", parseFile);
-}
-	logEntry.set("Pseudo", req.body.name);
-	logEntry.set("Email", req.body.email);
-	logEntry.set("Message", req.body.message);
-	logEntry.set("Date", new Date());
-	var cache = new Geocache();
-	cache.id = req.body.id;
-
-	logEntry.set("Geocache", cache);
-	logEntry.set("Active", true);
-
-	if(req.body.fav == "true") {
-		logEntry.set("Fav", true);
-		cache.increment("Fav");
-		cache.save();
-	} else {
-		logEntry.set("Fav", false);
+	if(parseFile) {
+		logEntry.set("PhotoUrl", parseFile.url());
+		logEntry.set("Photo", parseFile);
 	}
+		logEntry.set("Pseudo", req.body.name);
+		logEntry.set("Email", req.body.email);
+		logEntry.set("Message", req.body.message);
+		logEntry.set("Date", new Date());
+		var cache = new Geocache();
+		cache.id = req.body.id;
 
-	logEntry.save(null, {
-		success: function(logEntry) {
-			res.render('found', { cacheid:cache.id, message:"Bravo " + req.body.name +" !<br><br>N'oubliez pas de signer aussi le logbook ;-) <br><br><i>(lorsqu'il y a une boite physique à trouver)</i><br><br>Et attention aux moldus !" });
-		},
-		error: function(logEntry, error) {
-			res.render('found', { cacheid:0, message: error.message });
+		logEntry.set("Geocache", cache);
+		logEntry.set("Active", true);
+
+		if(req.body.fav == "true") {
+			logEntry.set("Fav", true);
+			cache.increment("Fav");
+			cache.save();
+		} else {
+			logEntry.set("Fav", false);
 		}
-	});		   
 
-});
+		logEntry.save(null, {
+			success: function(logEntry) {
+				res.render('found', { cacheid:cache.id, message:"Bravo " + req.body.name +" !<br><br>N'oubliez pas de signer aussi le logbook ;-) <br><br><i>(lorsqu'il y a une boite physique à trouver)</i><br><br>Et attention aux moldus !" });
+			},
+			error: function(logEntry, error) {
+				res.render('found', { cacheid:0, message: error.message });
+			}
+		});		   
+
+	});
 
 var port = process.env.PORT || 1337;
 var httpServer = require('http').createServer(app);
