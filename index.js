@@ -180,10 +180,10 @@ app.get('/geocache', function(req, res) {
 			var geocacheTerrain = cache.get("Terrain");
 			var geocacheSize = cache.get("Size");
 			var geocacheCategory = cache.get("Category");
-			var geocachePhotoUrl = cache.get("Photo").url({forceSecure: true}).replace(/^[a-z]{4}\:\/{2}[a-z]{1,}\:[0-9]{1,4}.(.*)/, '$1');
+			var geocachePhotoUrl = cache.get("Photo").url({forceSecure: true}).replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, '');
 			var geocacheDescription = cache.get("Description");
 			var geocacheIndice = cache.get("Indice");
-			var geocacheSpoiler = cache.get("Spoiler").url({forceSecure: true}).replace(/^[a-z]{4}\:\/{2}[a-z]{1,}\:[0-9]{1,4}.(.*)/, '$1');
+			var geocacheSpoiler = cache.get("Spoiler").url({forceSecure: true}).replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, '');
 			var geocacheGPS = cache.get("GPS");
 			var geocacheCoordString = cache.get("GPSString");
 			var geocacheFav = cache.get("Fav");
