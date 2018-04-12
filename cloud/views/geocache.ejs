@@ -143,6 +143,26 @@
 
 			</section>
 
+			<section>
+				<h2>Discussions</h2>
+				<br>
+				<div id="disqus_thread"></div>
+				<script>
+				var disqus_config = function () {
+				// this.page.url = PAGE_URL; 
+					this.page.identifier = <%= id %>;
+				};
+
+				(function() {
+				var d = document, s = d.createElement('script');
+				s.src = 'https://geocaching-jds.disqus.com/embed.js';
+				s.setAttribute('data-timestamp', +new Date());
+				(d.head || d.body).appendChild(s);
+				})();
+				</script>
+				<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+			</section>
+
 		</div>
 	</div>
 
