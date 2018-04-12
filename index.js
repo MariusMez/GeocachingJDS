@@ -14,7 +14,7 @@ var recaptcha = new Recaptcha({
 });
 
 var fs = require('fs');
-var ca = [fs.readFileSync("/etc/letsencrypt/live/geocaching-jds.fr/fullchain.pem")];
+// var ca = [fs.readFileSync("/etc/letsencrypt/live/geocaching-jds.fr/fullchain.pem")];
 
 var api = new ParseServer({
   databaseURI: process.env.MONGODB_ADDON_URI, // Use the MongoDB URI
