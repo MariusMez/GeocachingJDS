@@ -60,6 +60,63 @@ app.get('/tools', function(req, res) {
 	res.render('tools', { message: 'Outils application mobile' });
 });
 
+app.get('/register', function(req, res) {
+	res.render('register');
+});
+
+app.post('/registerTb', upload.single('pic'), function (req, res, next) {
+
+	var Travelbug = Parse.Object.extend("Travelbug");
+	
+	var travelbug = new Travelbug();
+	var parseFile;
+
+	if(req.file) {
+		var photoFile = req.file;
+		var name = photoFile.originalname;
+		var photoFileBase64 = photoFile.buffer.toString('base64');
+		parseFile = new Parse.File(name,{ base64: photoFileBase64 })
+		parseFile.save().then(function () {
+			console.log("Photo saved : " + parseFile.url({forceSecure: true}));
+			logEntry.set("PhotoUrl", parseFile.url({forceSecure: true}));
+			logEntry.set("Photo", parseFile);
+		},
+		function (error) {
+			console.log("Photofile save error " + error.message);
+				//res.render('found', { cacheid: 0, message: error.message })
+			}
+		);
+	}
+
+	if(parseFile) {
+		travelbug.set("PhotoUrl", parseFile.url());
+		travelbug.set("Photo", parseFile);
+	}
+		travelbug.set("Name", req.body.name);
+		travelbug.set("Code", req.body.code);
+		travelbug.set("Description", req.body.description);
+		travelbug.set("Owner", req.body.pseudo);
+		
+		travelbug.set("Email", req.body.email);
+		travelbug.set("Mission", req.body.mission);
+		travelbug.set("CreatedAt", new Date());
+		
+		travelbug.set("cacheId", null); //id de la cache qui le contient . null si holder n'est pas null et reciproquement. 
+		travelbug.set("cacheName", null);
+		travelbug.set("Holder", req.body.pseudo);
+		travelbug.set("Active", true);
+
+		travelbug.save(null, {
+			success: function(logEntry) {
+				res.render('tbregistered', { tbid:travelbug.id, message:"Bravo " + req.body.pseudo +" !<br><br>Votre objet voyageur " + req.body.name + " est bien enregistré. <br><br><br>Il est temps d'aller le poser dans une boite et de vous amuser à déplacer les objets voyageurs des autres !" });
+			},
+			error: function(logEntry, error) {
+				res.render('tbregistered', { travelbug:0, message: error.message });
+			}
+		});		   
+
+	});
+
 
 app.get('/ranking', function(req, res) {
 	var Ranking = Parse.Object.extend("Ranking");
@@ -160,6 +217,53 @@ app.get('/photos', function(req, res) {
 app.get('/geocaching', function(req, res) {
 	res.render('geocaching', { message: 'Régles du jeu Geocaching' });
 });
+
+app.get('/tb', function(req, res) {
+
+	//var moment = require('moment');
+	var moment = require('./cloud/moment-with-locales.min.js');
+	moment.locale('fr');
+	
+	var shortDateFormat = "dddd @ HH:mm"; // this is just an example of storing a date format once so you can change it in one place and have it propagate
+	app.locals.moment = moment; // this makes moment available as a variable in every EJS page
+	app.locals.shortDateFormat = shortDateFormat;
+
+	var Travelbug = Parse.Object.extend("Travelbug");
+	var query = new Parse.Query(Travelbug);
+	query.get(req.query.id, {
+		success: function(tb) {				 
+			var tbName = tb.get("Name");
+			var tbDescription = tb.get("Description");
+			var tbOwner = tb.get("Owner");
+			var photoUrl = tb.get("Photo").url({forceSecure: true}).replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, '');
+			var mission =  tb.get("Mission");
+			var holder = tb.get("Holder");
+			var cacheId = tb.get("cacheId");
+			var cacheName = tb.get("cacheName");			
+			
+			res.render('tb', { nom:tbName, id:req.query.id, description: tbDescription, owner:tbOwner, photo: photoUrl, holder: holder, mission: mission, cacheId:cacheId, cacheName: cacheName});
+		},
+		error: function(object, error) {
+			res.render('tbs', { message:"Redirection tous les TB" });
+		}	
+	});
+});
+
+app.get('/tbs', function(req, res) {
+	var moment = require('./cloud/moment-with-locales.min.js');
+	moment.locale('fr');
+	app.locals.moment = moment; // this makes moment available as a variable in every EJS page
+	var Travelbug = Parse.Object.extend("Travelbug");
+	var queryTbs = new Parse.Query(Travelbug);
+	queryTbs.descending("createdAt");
+	queryTbs.equalTo("Active", true);
+	queryTbs.find({
+		success: function(tbs) {
+			res.render('tbs', { message: 'Les objets à trouver', tbs:tbs });
+		}
+	});
+});
+
 
 app.get('/geocache', function(req, res) {
 

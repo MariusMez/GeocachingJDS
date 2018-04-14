@@ -1,0 +1,53 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>REGISTER TB - Geocaching Jeux de Sophia 2018</title>
+	<% include ./partials/head %>
+</head>
+<body class="homepage">
+	<% include ./partials/menu %>
+
+	<div class="wrapper style3">
+		<section class="container">
+			<header class="major">
+				<h2>Enregistrement de votre Objet Voyageur</h2>
+			</header>
+			<form ref="uploadForm" id="uploadForm" method="post" action="/registerTb" encType="multipart/form-data">
+				
+				<label for="name">Nom de votre Objet</label>
+				<input type="text" size="50" name="name" id="name" value="" style="border: solid 1px #fff;" placeholder="Le nom sera visible sur le site" required/>
+				<br>
+				<label for="code">Code de votre Tag</label>
+				<input type="text" size="6" name="code" id="code" value="" style="border: solid 1px #fff;" placeholder="Le code ne sera visible sur le site mais il permet d'identifier uniquement l'objet au moment des voyages" required/>
+				<br>
+				
+				<label for="description">Description de votre Objet</label>
+				<input type="text" name="description" id="description" value="" style="border: solid 1px #fff; " placeholder="La description sera visible sur le site" required/>
+				<br>
+				
+				<label for="email" >Votre Email des Jeux de Sophia - <i>Nécessaire au classement de l'épreuve</i></label>
+				<input type="email" name="email" id="email" value="" style="border: solid 1px #fff;" placeholder="L'email ne sera pas visible sur le site" required/>
+				<br>
+				<label for="pseudo">Votre Pseudo pour l'épreuve Géocaching - <i>Attention a bien utiliser le meme pendant toute l'épreuve</i></label>
+				<input type="text" name="pseudo" id="pseudo" value="" style="border: solid 1px #fff;" placeholder="Ce pseudo sera visible sur le site" required/>
+				<br>
+				<label for="mission">La mission de votre Objet Voyageur</label>
+				<input type="text" name="mission" id="mission" value="" style="border: solid 1px #fff;" placeholder="Ce Message sera visible sur le site" maxlength="500" required/>
+				<br>		
+
+				<label for="pic">Une photo de votre objet (sera visible sur le site)</label>
+				<input type="file" name="pic" id="pic" accept="image/*">
+				<br>
+				
+				<br><input type="submit" value="Enregistrer" name="submit" class="button alt" id="submitButton" title="Clic ici pour envoyer votre objet" />
+				
+			</form>  				 
+		</section>
+	</div>
+	<div id="footer">
+		<ul class="icons">
+			Un problème avec l'enregistement de votre objet ? <br> Contactez-nous : <li><a href="mailto:geocaching@jeuxdesophia.com" class="fa fa-envelope"><span>Email</span></a></li>
+		</ul>
+	</div>
+</body>
+</html>
