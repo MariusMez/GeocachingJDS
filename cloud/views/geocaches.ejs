@@ -17,10 +17,10 @@
 					<nav id="nav">
 						<ul>
 							<li><a href="/">Accueil</a></li>
-							<li class="active"><a href="/geocaches">Les Caches à trouver</a></li>
-							<li><a href="/tbs">Les objets</a></li>
+							<li class="active"><a href="/geocaches">Géocaches</a></li>
+							<li><a href="/tbs">Objets Voyageurs</a></li>
 							<li><a href="/geocaching">Règles du jeu</a></li>
-							<li><a href="/tools">Les Outils</a></li>
+							<li><a href="/tools">Outils</a></li>
 							<li><a href="/ranking">Classement</a></li>
 						</ul>
 					</nav>
@@ -39,99 +39,99 @@
 						<br>
 					-->
 
-						<script language="JavaScript">
-							TargetDate = "05/19/2018 08:00 AM";
-							BackColor = "none";
-							ForeColor = "none";
-							CountActive = true;
-							CountStepper = -1;
-							LeadingZero = true;
-							DisplayFormat = "Lancement de la Course aux Objets Voyageurs dans %%D%% Jours, %%H%% Heures, %%M%% Minutes, %%S%% Secondes";
-							FinishMessage = "C'est parti !";
-						</script>
-						<script language="JavaScript" src="public/js/compteur.js"></script>
-						<br><br>
-						<img src="public/images/course_aux_objets_voyageurs.jpg" alt="La Course aux Objets Voyageurs">
+					<script language="JavaScript">
+						TargetDate = "05/19/2018 08:00 AM";
+						BackColor = "none";
+						ForeColor = "none";
+						CountActive = true;
+						CountStepper = -1;
+						LeadingZero = true;
+						DisplayFormat = "Lancement de la Course aux Objets Voyageurs dans %%D%% Jours, %%H%% Heures, %%M%% Minutes, %%S%% Secondes";
+						FinishMessage = "C'est parti !";
+					</script>
+					<script language="JavaScript" src="public/js/compteur.js"></script>
+					<br><br>
+					<img src="public/images/course_aux_objets_voyageurs.jpg" alt="La Course aux Objets Voyageurs">
 						<!--<br>
 						<h2>Prochaine publication le 7 juin à 22h, soyez prêt ;-)</h2>
 					<div style="position:relative;height:0;padding-bottom:56.25%"><iframe src="https://www.youtube.com/embed/CCql9JInTBc?rel=0&amp;controls=0?ecver=2" width="640" height="360" frameborder="0" style="position:absolute;width:100%;height:100%;left:0" allowfullscreen></iframe></div>
 					<br><br>
--->
-					</header>
+				-->
+			</header>
 
-					 <div id="gridsalv" data-columns>
+			<div id="gridsalv" data-columns>
 
-						<% geocaches.forEach(function(geocache) { %>
+				<% geocaches.forEach(function(geocache) { %>
 
-						<div>
-							<a href="/geocache?id=<%= geocache.id %>"><img width="220px;" class="border" src="<%= geocache.get("Photo").url().replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, ''); %>" /><p class="medium"><img width="40px;" align="left" src="https://www.geocaching-jds.fr/public/images/<%= geocache.get('Category') %>BIG.gif" style="margin-right:10px;"/><%= geocache.get("Nom") %></p>
-							</a>
-						</div>
-						<% }); %>
+				<div>
+					<a href="/geocache?id=<%= geocache.id %>"><img width="220px;" class="border" src="<%= geocache.get("Photo").url().replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, ''); %>" /><p class="medium"><img width="40px;" align="left" src="https://www.geocaching-jds.fr/public/images/<%= geocache.get('Category') %>BIG.gif" style="margin-right:10px;"/><%= geocache.get("Nom") %></p>
+					</a>
+				</div>
+				<% }); %>
 
-					</div> 
-					
-				</section>
-				
+			</div> 
+			
+		</section>
+		
 				<!--
 				<div>
 					<p>Dernière publication pour l'épreuve : le 16 juin 2017. <br>Une Wherigo D5 vous attend : STAR. <br>Bon courage pour cette ultime et dernière étape avant la cache Challenge.</p>
 				</div>
-				-->
-				<div><p>Pour en savoir plus sur les différents types de Géocaches : <a href="/geocaching#typesgeocaches">Cliquez ici</a></p></div>
+			-->
+			<div><p>Pour en savoir plus sur les différents types de Géocaches : <a href="/geocaching#typesgeocaches">Cliquez ici</a></p></div>
 
-			</div>
 		</div>
+	</div>
 
-		<div class="wrapper style2">
+	<div class="wrapper style2">
 
-			<div id="liste" class="container">
-				<section>
+		<div id="liste" class="container">
+			<section>
 
-					<h2>Les derniers logs</h2>
-					<br>
-					<ul>
-						<% logs.forEach(function(log) { %>
+				<h2>Les derniers logs</h2>
+				<br>
+				<ul>
+					<% logs.forEach(function(log) { %>
 
-						<% if(log.get("Geocache").get("Active") == true)  { %>
-						<li><b><a href="/geocache?id=<%= log.get("Geocache").id %>"> <%= log.get("Geocache").get("Nom") %> </a> : <%= moment(log.get("Date")).utcOffset(120).fromNow() %> le <%= moment(log.get("Date")).utcOffset(120).format("LL [à] LT") %> </b>- <%= log.get("Pseudo") %> : <i><%= log.get("Message") %></i></li>
-						<% } %>
-						
+					<% if(log.get("Geocache").get("Active") == true)  { %>
+					<li><b><a href="/geocache?id=<%= log.get("Geocache").id %>"> <%= log.get("Geocache").get("Nom") %> </a> : <%= moment(log.get("Date")).utcOffset(120).fromNow() %> le <%= moment(log.get("Date")).utcOffset(120).format("LL [à] LT") %> </b>- <%= log.get("Pseudo") %> : <i><%= log.get("Message") %></i></li>
+					<% } %>
+					
+					<% }); %>
+					<li>[...]</li>
+				</ul>
+
+				<p class="medium">L'épreuve se déroule du 19 mai au 8 juin, de nouvelles caches seront publiées au fil des jours.</p>
+				<p class="medium">La plupart de ces caches sont spécifiquement posées pour les Jeux de Sophia et sont donc par conséquent non accessibles, ni même visibles sur le site geocaching.com et les applications officielles Géocaching.com.</p>
+				<p>Des tickets de tombola seront aléatoirement placés par nos soins dans les différentes caches à découvrir.</p>
+
+			</section>
+		</div>
+	</div>
+
+	<div class="wrapper style5">
+
+		<div id="carte" class="container">
+
+			<section>
+				<header class="major">
+					<h2>Carte des emplacements</h2>
+					<span class="byline">Les coordonnées des caches de type "Mystery - ?" sont fictives, à vous de les trouver ;-) Pour certains types de géocaches "virtuelles", il n'y a aucune boite physique à trouver, seulement une "action particulière" à réaliser pour valider votre trouvaille.</span>
+				</header>
+
+
+				<div id="map"></div>
+
+				<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBfOPPHsPEYs7o8-xdYce1Bdxgmh-4TBAc&callback=initialize"
+				type="text/javascript"></script>
+
+				<script>
+					locations = [
+
+					<% geocaches.forEach(function(geocache) { %>
+						[<%= geocache.get("GPS").latitude %>,<%= geocache.get("GPS").longitude %>, "<%= geocache.get("Nom") %>","<%= geocache.get("Category") %>"],
 						<% }); %>
-						<li>[...]</li>
-					</ul>
-
-					<p class="medium">L'épreuve se déroule du 19 mai au 8 juin, de nouvelles caches seront publiées au fil des jours.</p>
-					<p class="medium">La plupart de ces caches sont spécifiquement posées pour les Jeux de Sophia et sont donc par conséquent non accessibles, ni même visibles sur le site geocaching.com et les applications officielles Géocaching.com.</p>
-					<p>Des tickets de tombola seront aléatoirement placés par nos soins dans les différentes caches à découvrir.</p>
-
-				</section>
-			</div>
-		</div>
-
-		<div class="wrapper style5">
-
-			<div id="carte" class="container">
-
-				<section>
-					<header class="major">
-						<h2>Carte des emplacements</h2>
-						<span class="byline">Les coordonnées des caches de type "Mystery - ?" sont fictives, à vous de les trouver ;-) Pour certains types de géocaches "virtuelles", il n'y a aucune boite physique à trouver, seulement une "action particulière" à réaliser pour valider votre trouvaille.</span>
-					</header>
-
-
-					<div id="map"></div>
-
-					<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBfOPPHsPEYs7o8-xdYce1Bdxgmh-4TBAc&callback=initialize"
-					type="text/javascript"></script>
-
-					<script>
-						locations = [
-
-						<% geocaches.forEach(function(geocache) { %>
-							[<%= geocache.get("GPS").latitude %>,<%= geocache.get("GPS").longitude %>, "<%= geocache.get("Nom") %>","<%= geocache.get("Category") %>"],
-							<% }); %>
-							
+					
 
 						//[43.6131,7.06354, "Mystery", "MYSTERY"]
 						];

@@ -1,119 +1,60 @@
-	<!DOCTYPE HTML>
-	<html>
-	<head>
-		<title>LISTE DES OBJETS - Géocaching Jeux de Sophia 2018</title>
-		<% include ./partials/head %>
-		<link rel="stylesheet" href="css/grid.css" />
-		<style type="text/css">
-table.blueTable {
-  border: 1px solid #1C6EA4;
-  background-color: #EEEEEE;
-  width: 100%;
-  text-align: left;
-  border-collapse: collapse;
-}
-table.blueTable td, table.blueTable th {
-  border: 1px solid #AAAAAA;
-  padding: 3px 2px;
-}
-table.blueTable tbody td {
-  font-size: 13px;
-}
-table.blueTable tr:nth-child(even) {
-  background: #D0E4F5;
-}
-table.blueTable thead {
-  background: #1C6EA4;
-  background: -moz-linear-gradient(top, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
-  background: -webkit-linear-gradient(top, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
-  background: linear-gradient(to bottom, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
-  border-bottom: 2px solid #444444;
-}
-table.blueTable thead th {
-  font-size: 15px;
-  font-weight: bold;
-  color: #FFFFFF;
-  border-left: 2px solid #D0E4F5;
-}
-table.blueTable thead th:first-child {
-  border-left: none;
-}
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>LISTE DES OBJETS - Géocaching Jeux de Sophia 2018</title>
+	<% include ./partials/head %>
+	<link rel="stylesheet" href="public/css/style-table.css" />
+</head>
+<body>
 
-table.blueTable tfoot {
-  font-size: 14px;
-  font-weight: bold;
-  color: #FFFFFF;
-  background: #D0E4F5;
-  background: -moz-linear-gradient(top, #dcebf7 0%, #d4e6f6 66%, #D0E4F5 100%);
-  background: -webkit-linear-gradient(top, #dcebf7 0%, #d4e6f6 66%, #D0E4F5 100%);
-  background: linear-gradient(to bottom, #dcebf7 0%, #d4e6f6 66%, #D0E4F5 100%);
-  border-top: 2px solid #444444;
-}
-table.blueTable tfoot td {
-  font-size: 14px;
-}
-table.blueTable tfoot .links {
-  text-align: right;
-}
-table.blueTable tfoot .links a{
-  display: inline-block;
-  background: #1C6EA4;
-  color: #FFFFFF;
-  padding: 2px 8px;
-  border-radius: 5px;
-}
-		</style>
-	</head>
-	<body>
-
-		<div class="wrapper style1">
-
-			<div id="header">
-				<div class="container">
-
-					<h1><a href="/" id="logo">Géocaching</a></h1>
-
-					<nav id="nav">
-						<ul>
-							<li><a href="/">Accueil</a></li>
-							<li><a href="/geocaches">Les Caches à trouver</a></li>
-							<li class="active"><a href="/tbs">Les objets</a></li>
-							<li><a href="/geocaching">Règles du jeu</a></li>
-							<li><a href="/tools">Les Outils</a></li>
-							<li><a href="/ranking">Classement</a></li>
-						</ul>
-					</nav>
-
-				</div>
+	<div class="wrapper style1">
+		<div id="header">
+			<div class="container">
+				<h1><a href="/" id="logo">Géocaching</a></h1>
+				<nav id="nav">
+					<ul>
+						<li><a href="/">Accueil</a></li>
+						<li><a href="/geocaches">Les Caches à trouver</a></li>
+						<li class="active"><a href="/tbs">Les objets</a></li>
+						<li><a href="/geocaching">Règles du jeu</a></li>
+						<li><a href="/tools">Les Outils</a></li>
+						<li><a href="/ranking">Classement</a></li>
+					</ul>
+				</nav>
 			</div>
 		</div>
+	</div>
 
-		<div id="main" class="wrapper style4">
-
-			<div id="intro" class="container">
-				<section>
-
-						<h2>Voici la liste des objets Voyageurs !</h2>
-						<br>
-					
-					<table class="blueTable">
-						<thead><tr><th colspan=5>Objet</th><th colspan=1>Propriétaire</th><th>Localisation</th></tr></thead>
+	<div id="main" class="wrapper style4">
+		<div id="intro" class="container">
+			<section>
+				<img width="120px;" align="left" src="public/images/dwarf-racing.png" style="margin-right:60px;"/>
+				<h2>Les Objets Voyageurs dans la course !</h2>
+				<br>
+				<p><a href="/register" alt="Enregistrer son objet" style="float:right;" class="button small">&raquo; Enregister son objet voyageur</a></p>
+				
+				<table class="zebra">
+					<thead>
+						<tr>
+							<th colspan=5><b>Objet</b></th>
+							<th colspan=1><b>Propriétaire</b></th>
+							<th><b>Localisation</b></th>
+						</tr>
+					</thead>
+					<tbody>
 						<% tbs.forEach(function(tb) { %>
 						<tr>
-						<td colspan=5><a href="/tb?id=<%= tb.id %>"> <%= tb.get("Name") %></a></td>
-						<td colspan=1><%= tb.get("Owner") %></td>
-						<td><% if (tb.get("Holder") != null) { %> Dans les mains de <%= tb.get("Holder") %> <% } %></td>
+							<td colspan=5><a href="/tb?id=<%= tb.id %>"> <%= tb.get("Name") %></a></td>
+							<td colspan=1><%= tb.get("Owner") %></td>
+							<td><% if (tb.get("Holder") != null) { %> Dans les mains de <%= tb.get("Holder") %> <% } %></td>
 						</tr>
 						<% }); %>
-					</table>
-					
-				</section>
-				
-			</div>
+					</tbody>
+				</table>
+			</section>
 		</div>
+	</div>
 
-
-		<% include ./partials/footer %>
-		<script src="public/js/salvattore.min.js"></script>
-	</body>
-	</html>
+	<% include ./partials/footer %>
+</body>
+</html>

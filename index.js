@@ -141,28 +141,6 @@ app.get('/ranking', function(req, res) {
 });
 
 
-app.get('/ranking2', function(req, res) {
-	var Ranking = Parse.Object.extend("Ranking");
-	var queryGeocacheurs = new Parse.Query(Ranking);
-	var Geocache = Parse.Object.extend("Geocache");
-	var queryGeocaches = new Parse.Query(Geocache);
-	queryGeocacheurs.descending("Score, ScoreFTF, ScoreDT");
-	queryGeocacheurs.equalTo("Active", true);
-	queryGeocacheurs.limit(1000);
-	queryGeocacheurs.find().then(function(rank) {
-		queryGeocaches.equalTo("Active", true);
-		queryGeocaches.descending("RatioFav,Ratio");
-		queryGeocaches.find().then(function(caches) {
-			queryGeocacheurs.descending("ScoreFTF");
-			queryGeocacheurs.equalTo("Active", true);
-			queryGeocacheurs.limit(1000);
-			queryGeocacheurs.find().then(function(rankFTF) {
-				res.render('ranking2', { geocacheurs: rank, geocacheursFTF: rankFTF, geocaches: caches });
-			});
-		});
-	});
-});
-
 app.get('/geocaches', function(req, res) {
 	var moment = require('./cloud/moment-with-locales.min.js');
 	moment.locale('fr');
