@@ -130,6 +130,18 @@
 			<br /><br />
 			<% } %>
 
+			<% if(cat=='TRADI' || cat=='MULTI' || cat=='LETTERBOX' || cat=='EVENT' || cat=='CITO' || cat=='WHERIGO' || cat=='MYSTERY' || cat=='SPECIAL') { %>
+			<section>
+				<h2>Liste des Objets Voyageurs</h2>
+				<ul>
+				<% objets.forEach(function(obj) { %>
+					<li><%= obj.get("id") %> <%= obj.get("Name") %> </li>
+				<% }); %>
+				</ul>
+			</section>
+			<br /><br />
+			<% } %>
+
 			<section>
 				<h2>Logbook</h2>
 				<br>
@@ -141,7 +153,6 @@
 					<li> <b><%= moment(log.get("Date")).utcOffset(120).fromNow() %> le <%= moment(log.get("Date")).utcOffset(120).format("LL [à] LT") %> </b>- <%= log.get("Pseudo") %> : <i><%= log.get("Message") %></i><% if(log.get("PhotoUrl"))  { %> - <a href="<%= log.get("PhotoUrl") %>">photo</a><% } %></li>
 					<% }); %>
 				</ul>
-
 			</section>
 
 			<section>
