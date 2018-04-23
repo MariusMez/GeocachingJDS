@@ -44,9 +44,12 @@
 					<tbody>
 						<% tbs.forEach(function(tb) { %>
 						<tr>
-							<td colspan=5><a href="/tb?id=<%= tb.id %>"> <%= tb.get("Name") %></a></td>
+							<td colspan=5><a href="/tb?id=<%= tb.id %>"><b> <%= tb.get("Name") %></b></a></td>
 							<td colspan=1><%= tb.get("Owner") %></td>
-							<td><% if (tb.get("Holder") != null) { %> Dans les mains de <%= tb.get("Holder") %> <% } %></td>
+							<td>
+								<% if (tb.get("Holder") != null) { %> Dans les mains de <%= tb.get("Holder") %> <% } %>
+								<% if (tb.get("Holder") == null) { %> <a href="/geocache?id=<%= tb.get('cacheId') %>"><%= tb.get("cacheName") %></a> <% } %>
+							</td>
 						</tr>
 						<% }); %>
 					</tbody>

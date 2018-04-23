@@ -346,6 +346,10 @@ app.get('/foundit', function(req, res) {
 	});
 });
 
+
+// TODO : gérer le cas ou le TB est présent dans une cache
+// Ajouter l'option Récupérer dans la cache : nom de la cache
+// Gérer les cas d'erreur Grab depuis une autre cache que celui dans lequel il est affecté dans la BDD
 app.get('/logtb', function(req, res) {
 	var Travelbug = Parse.Object.extend("Travelbug");
 	var query = new Parse.Query(Travelbug);
