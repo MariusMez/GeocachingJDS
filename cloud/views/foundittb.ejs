@@ -25,15 +25,14 @@
 	<div class="wrapper style3">
 		<section class="container">
 			<header class="major">
-				<h2><%= nom %></h2>
+				<h2><%= action %> de l'objet <a href="/tb?id=<%= id %>"> <%= nom %></a></h2>
 			</header>
 			<form ref="uploadForm" id="uploadForm" method="post" action="/foundtb" encType="multipart/form-data">
 				<input type="hidden" name="id" id="<%= id %>" value="<%= id %>" />
-				Votre action : 
-				<select name="action">
-				    <option value="drop">Déposer dans une géocache</option>
+				<select name="action" hidden>
+					<option value="drop" <% if(action=='drop') { %> selected <% } %> >Déposer dans une géocache</option>
 				   <!-- <option value="dropholder">Déposé dans les mains d'un autre géocacheur</option> -->
-				   <option value="grab">Récupérer dans une géocache</option>
+				   <option value="grab" <% if(action=='grab') { %> selected <% } %> >Prendre d'une géocache</option>
    				   <!-- <option value="grabholder">Récupérer des mains d'un autre géocacheur</option> -->
 				</select>
 				<br>

@@ -17,11 +17,14 @@
 					<img width="60px;" align="left" src="public/images/tb.jpg" style="margin-right:60px;"/><h2><%= nom %></h2>
 					<span class="byline"><%= fav %> 👍</span>
 					<% if (holder != null) { %>
-						<span class="byline">Dans les mains de <%= holder %> <% } %></span>
+						<span class="byline">Dans les mains de <%= holder %> 
+						<p><a href="/logtb?action=drop&id=<%= id %>" alt=" Déposez le dans une cache !" style="float:left;" class="button small">&raquo;  Déposez le dans une cache !</a></p>
+					<% } %></span>
 					<% if (holder==null && cacheId != null) { %>
-						<span class="byline">Dans la cache <%= cacheName %> <% } %></span>
+						<span class="byline">Dans la cache <%= cacheName %> 
+						<p><a href="/logtb?action=grab&id=<%= id %>&cacheId=<%= cacheId %>" alt=" Vous l’avez trouvé ? Récupérez le !" style="float:left;" class="button small">&raquo;  Vous l’avez trouvé ? Récuperez le !</a></p>
+					<% } %></span>
 					<br>
-					<p><a href="/logtb?id=<%= id %>" alt=" Vous l’avez trouvé ? Enregistrez un log !" style="float:left;" class="button small">&raquo;  Vous l’avez trouvé ? Enregistrez un log !</a></p>
 				</header>
 
 				<p><h3>Objet Voyageur de <i><%= owner %></i></h3></p>
@@ -35,6 +38,12 @@
 			<br /><br />
 			<section>
 				<h3>Historique des déplacements</h3>
+				<ul>
+				<% objetsLogged.forEach(function(obj) { %>
+					<li> <b><%= moment(obj.get("Date")).utcOffset(120).fromNow() %> le <%= moment(obj.get("Date")).utcOffset(120).format("LL [à] LT") %> </b>- <%= obj.get("Pseudo") %> <%= obj.get("Action") %> relatif à <a href="/tb?id=<%= obj.get("cacheId") %>"><b> <%= obj.get("cacheName") %></b> </a> : <i><%= obj.get("Message") %></i><% if(obj.get("PhotoUrl"))  { %> - <a href="<%= obj.get("PhotoUrl") %>">photo</a><% } %></li>
+				<% }); %>
+				</ul>
+				
 			</section>
 			<br /><br />
 			<section>
