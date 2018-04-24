@@ -109,16 +109,43 @@ app.post('/registerTb', upload.single('pic'), function (req, res, next) {
 
 	travelbug.save(null, {
 		success: function(logEntry) {
-			res.render('tbregistered', { tbid:travelbug.id, message:"Bravo " 
-										 + req.body.pseudo + " !<br><br>Votre objet voyageur " 
-										 + req.body.name + " est bien enregistré. <br><br><br>"
-										 + "Il est temps d'aller le poser dans une boite et de vous amuser"
-										 + " à déplacer les objets voyageurs des autres !" });
+			
+			console.log("Successfull TB created");
+			
+			
+			// creation d'un log entry
+			var TravelbugLog = Parse.Object.extend("TravelbugLog");
+			var logEntry = new TravelbugLog();   
+			logEntry.set("Travelbug", travelbug);
+			logEntry.set("Pseudo", req.body.pseudo);
+			logEntry.set("Email", req.body.email);
+			logEntry.set("Message", req.body.message);
+			logEntry.set("Date", new Date());
+			logEntry.set("Action", "Created");
+			logEntry.set("Active", true);
+			logEntry.set("TravelbugId", travelbug.id);
+			logEntry.set("TravelbugName", travelbug.get("Name"));
+			logEntry.save(null, {
+				success: function(logEntry) {
+					res.render('tbregistered', { tbid:travelbug.id, message:"Bravo " 
+									 + req.body.pseudo + " !<br><br>Votre objet voyageur " 
+									 + req.body.name + " est bien enregistré. <br><br><br>"
+									 + "Il est temps d'aller le poser dans une boite et de vous amuser"
+									 + " à déplacer les objets voyageurs des autres !" });
+					 console.log("Successfull TB log created");
+									 
+				},
+				error: function(logEntry, error) {
+					console.log("Error TBlogEntry : " + error.message);
+					res.render('tbregistered', { travelbug:0, message: error.message });
+				}
+			});	
+			
 		},
 		error: function(logEntry, error) {
 			res.render('tbregistered', { travelbug:0, message: error.message });
 		}
-	});		   
+	});		
 
 });
 
@@ -636,13 +663,43 @@ app.post('/found', upload.single('pic'), function (req, res, next) {
 	} else {
 		logEntry.set("Fav", false);
 	}
+	
 
 	logEntry.save(null, {
 		success: function(logEntry) {
-			res.render('found', { cacheid:cache.id, message:"Bravo " + req.body.name 
+			var Travelbug = Parse.Object.extend("Travelbug");
+			var queryTbs = new Parse.Query(Travelbug);
+			queryTbs.descending("createdAt");
+			queryTbs.equalTo("Active", true);
+			queryTbs.equalTo("cacheId", req.body.id);
+			queryTbs.find({
+				success: function(travelbugsInCache) {
+					
+					
+					var queryTbsHands = new Parse.Query(Travelbug);
+					queryTbsHands.descending("createdAt");
+					queryTbsHands.equalTo("Active", true);
+					queryTbsHands.equalTo("Holder", req.body.name);
+					queryTbsHands.find({
+						success: function(travelbugsInHands) {
+			
+						res.render('found', { cacheid:cache.id, tbsout: travelbugsInCache, tbsin: travelbugsInHands, cacheid:req.body.id, message:"Bravo " + req.body.name 
 								  + " !<br><br>N'oubliez pas de signer aussi le logbook ;-) <br><br>"
 								  + "<i>(lorsqu'il y a une boite physique à trouver)</i><br><br>"
 								  + "Et attention aux moldus !" });
+		  					},
+		  					error: function(object, error) {
+		  						res.render('found', { cacheid:0, message: error.message });
+		  					}
+		  				});
+
+		
+					},
+					error: function(object, error) {
+						res.render('found', { cacheid:0, message: error.message });
+					}
+				});
+
 		},
 		error: function(logEntry, error) {
 			res.render('found', { cacheid:0, message: error.message });
