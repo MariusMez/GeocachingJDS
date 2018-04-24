@@ -25,8 +25,26 @@
 			<header class="major">
 			<h2><%- message %></h2>
 			</header>
-			<a href="/geocache?id=<%= cacheid %>" class="button alt">Retour</a>
+			
 		</section>
+
+<section>
+
+<% if(tbs.length == 0)  { %>
+	<p class="medium">Il n'y a pas de TB dans cette cache. </p>
+					<% } else { %>
+<p>Vous pouvez récupérer un des objets suivants : </p>
+<ul>
+<% objets.forEach(function(obj) { %>
+	<li> <a href="/tb?id=<%= obj.id %>"><b> <%= obj.get("Name") %></b></a>  - <a href="/logtb?action=grab&id=<%= obj.id %>&cacheId=<%= id %>">Récuperez le ! </a> </li>
+<% }); %>
+</ul>
+
+<% } %>
+
+<a href="/geocache?id=<%= cacheid %>" class="button alt">Visualiser la cache</a>
+
+</section>
 	</div>
 
 	<div id="footer">

@@ -133,11 +133,23 @@
 			<% if(cat=='TRADI' || cat=='MULTI' || cat=='LETTERBOX' || cat=='EVENT' || cat=='CITO' || cat=='WHERIGO' || cat=='MYSTERY' || cat=='SPECIAL') { %>
 			<section>
 				<h2>Liste des Objets Voyageurs</h2>
-				<ul>
-				<% objets.forEach(function(obj) { %>
-					<li><%= obj.get("id") %> <%= obj.get("Name") %> </li>
-				<% }); %>
-				</ul>
+				<details>
+					<summary>Cliquez pour voir les objets présents dans cette cache</summary>
+					<ul>
+					<% objets.forEach(function(obj) { %>
+						<li> <a href="/tb?id=<%= obj.id %>"><b> <%= obj.get("Name") %></b></a>  - <a href="/logtb?action=grab&id=<%= obj.id %>&cacheId=<%= id %>">Récuperez le ! </a> </li>
+					<% }); %>
+					</ul>
+				</details>
+				<details>
+					<summary>Cliquez pour voir les objets ayant deja transité dans cette cache</summary>
+					<ul>
+					<% objetsLogged.forEach(function(obj) { %>
+						<li> <a href="/tb?id=<%= obj.get("TravelbugId") %>"><b> <%= obj.get("TravelbugName") %></b></a>  <b><%= moment(obj.get("Date")).utcOffset(120).fromNow() %> le <%= moment(obj.get("Date")).utcOffset(120).format("LL [à] LT") %> </b>- <%= obj.get("Pseudo") %> : <i><%= obj.get("Message") %></i><% if(obj.get("PhotoUrl"))  { %> - <a href="<%= obj.get("PhotoUrl") %>">photo</a><% } %></li>
+					<% }); %>
+					</ul>
+
+				</details>
 			</section>
 			<br /><br />
 			<% } %>

@@ -223,9 +223,23 @@ app.get('/tb', function(req, res) {
 			var cacheName = tb.get("cacheName");	
 			var fav = tb.get("Fav");
 			
-			res.render('tb', { nom:tbName, id:req.query.id, description: tbDescription, 
+			var TravelbugLog = Parse.Object.extend("TravelbugLog");
+			var queryTbsLogged = new Parse.Query(TravelbugLog);
+			queryTbsLogged.descending("createdAt");
+			queryTbsLogged.equalTo("Active", true);
+			queryTbsLogged.equalTo("Travelbug", tb);
+			queryTbsLogged.find({
+				
+				success: function(objetsLogged) {
+			
+					res.render('tb', { nom:tbName, id:req.query.id, description: tbDescription, 
 							   owner:tbOwner, photo: photoUrl, holder: holder, fav:fav,
-							   mission: mission, cacheId:cacheId, cacheName: cacheName});
+							   mission: mission, cacheId:cacheId, cacheName: cacheName, objetsLogged:objetsLogged});
+					},
+					error: function(object, error) {
+						res.render('geocaches', { message:"Redirection toutes les caches" });
+					}
+				});
 		},
 		error: function(object, error) {
 			var queryTbs = new Parse.Query(Travelbug);
@@ -292,16 +306,34 @@ app.get('/geocache', function(req, res) {
 					queryTbs.descending("createdAt");
 					queryTbs.equalTo("Active", true);
 					queryTbs.equalTo("cacheId", geocacheId);
-					queryLog.find({
+					queryTbs.find({
 						success: function(travelbugs) {
-							res.render('geocache', { nom:geocacheName, id:geocacheId, 
-													 fav: geocacheFav, d:geocacheDifficulty, 
-													 t:geocacheTerrain, cat:geocacheCategory, 
-													 size:geocacheSize, coord:geocacheCoordString, 
-													 gps:geocacheGPS, description:geocacheDescription, 
-													 indice:geocacheIndice, photo:geocachePhotoUrl, 
-													 spoiler:geocacheSpoiler, logs:logs,
-													 objets:travelbugs });
+							
+							var TravelbugLog = Parse.Object.extend("TravelbugLog");
+							var queryTbsLogged = new Parse.Query(TravelbugLog);
+							queryTbsLogged.descending("createdAt");
+							queryTbsLogged.equalTo("Action","drop");
+							queryTbsLogged.equalTo("Active", true);
+							queryTbsLogged.equalTo("Geocache", cache);
+							queryTbsLogged.find({
+								
+								success: function(objetsLogged) {
+							
+									res.render('geocache', { nom:geocacheName, id:geocacheId, 
+															 fav: geocacheFav, d:geocacheDifficulty, 
+															 t:geocacheTerrain, cat:geocacheCategory, 
+															 size:geocacheSize, coord:geocacheCoordString, 
+															 gps:geocacheGPS, description:geocacheDescription, 
+															 indice:geocacheIndice, photo:geocachePhotoUrl, 
+															 spoiler:geocacheSpoiler, logs:logs,
+															 objets:travelbugs, objetsLogged:objetsLogged });
+									},
+									error: function(object, error) {
+										res.render('geocaches', { message:"Redirection toutes les caches" });
+									}
+								});
+														 
+								
 						},
 						error: function(object, error) {
 							res.render('geocaches', { message:"Redirection toutes les caches" });
@@ -333,9 +365,24 @@ app.get('/foundit', function(req, res) {
 	    		var geocacheName = object.get("Nom");
 	    		var geocacheCat = object.get("Category");
 	    		var geocacheId = object.id;
-	    		res.render('foundit', { nom:geocacheName, 
-	    								id:geocacheId, 
-			    						cat:geocacheCat });
+				
+				var Travelbug = Parse.Object.extend("Travelbug");
+				var queryTbs = new Parse.Query(Travelbug);
+				queryTbs.descending("createdAt");
+				queryTbs.equalTo("Active", true);
+				queryTbs.equalTo("cacheId", geocacheId);
+				queryTbs.find({
+					success: function(travelbugs) {
+						
+		    		res.render('foundit', { nom:geocacheName, 
+		    								id:geocacheId, 
+				    						cat:geocacheCat, tbs:travelbugs });
+					
+						},
+						error: function(object, error) {
+							res.render('geocaches', { message:"Redirection toutes les caches" });
+						}
+					});
 	    	} else {
 	    		res.render('foundit', { nom:"Code invalide !", id:0, cat:"UNKNOWN" });
 	    	}
@@ -370,11 +417,15 @@ app.get('/logtb', function(req, res) {
 
 	    		var Geocaches = Parse.Object.extend("Geocache");
 				var query = new Parse.Query(Geocaches);
+				if (req.query.cacheId != null) {
+					query.equalTo("objectId",req.query.cacheId);
+				}
 				query.equalTo("Active",true);
 				query.descending("RatioFav");
 				query.find({ 
 					success: function(caches) {
 			    		res.render('foundittb', { nom:tbName,
+												  action:req.query.action,
 			    								  owner:tbOwner,
 			    								  holder:tbHolder,
 			    								  cacheName:tbCacheName,
@@ -446,7 +497,12 @@ app.post('/foundtb', upload.single('pic'), function (req, res, next) {
 
 						if (req.body.id == tb.id) {
 							console.log("Identifiant de TB valide");
-							logEntry.set("Travelbug", tb)
+							logEntry.set("Travelbug", tb);
+							// denormalise to avoid querying each time Travelbug
+							logEntry.set("TravelbugId", tb.id);
+							logEntry.set("TravelbugName", tb.get("Name"));
+							logEntry.set("cacheId", cache.id);
+							logEntry.set("cacheName", cache.get("Nom"));
 						}
 						else {
 							console.log("Identifiant de TB invalide !");
