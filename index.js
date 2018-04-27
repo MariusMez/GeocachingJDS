@@ -81,7 +81,6 @@ app.post('/registerTb', upload.single('pic'), function (req, res, next) {
 
 		sharp(photoFile.buffer).resize(1024, 1024)
 							   .max()
-							   .toFormat('jpeg')
 							   .withoutEnlargement()
 							   .toBuffer()
 							   .then(function(buffer_img) { 
