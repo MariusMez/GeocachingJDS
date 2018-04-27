@@ -463,11 +463,20 @@ app.get('/logtb', function(req, res) {
 			    	}
 			    });
 	    	} else {
-	    		res.render('foundittb', { nom:"Code invalide !", id:0 });
+	    		console.log("Erreur in logtb : results.length is < 0")
+	    		var queryTbs = new Parse.Query(Travelbug);
+				queryTbs.descending("createdAt");
+				queryTbs.equalTo("Active", true);
+				queryTbs.find({
+					success: function(tbs) {
+						res.render('tbs', { message: 'Les objets à trouver', tbs:tbs });
+					}
+				});
 	    	}
 	    },
 	    error: function(object, error) {
-	    	res.render('foundittb', { nom:"Code invalide !", id:0 });
+	    	console.log("General error in logtb")
+	    	res.render('geocaches', { message:"Redirection toutes les caches" });
 	    }	
 	});
 });
