@@ -254,23 +254,24 @@ app.get('/tb', function(req, res) {
 			var cacheName = tb.get("cacheName");	
 			var fav = tb.get("Fav");
 			
+			var data = new Array();
 			var TravelbugLog = Parse.Object.extend("TravelbugLog");
 			var queryTbsLogged = new Parse.Query(TravelbugLog);
 			queryTbsLogged.descending("createdAt");
 			queryTbsLogged.equalTo("Active", true);
 			queryTbsLogged.equalTo("Travelbug", tb);
+			queryTbsLogged.include("Geocache");
 			queryTbsLogged.find({
-				
 				success: function(objetsLogged) {
-			
 					res.render('tb', { nom:tbName, id:req.query.id, description: tbDescription, 
 							   owner:tbOwner, photo: photoUrl, holder: holder, fav:fav,
-							   mission: mission, cacheId:cacheId, cacheName: cacheName, objetsLogged:objetsLogged});
-					},
-					error: function(object, error) {
-						res.render('geocaches', { message:"Redirection toutes les caches" });
-					}
-				});
+							   mission: mission, cacheId:cacheId, cacheName: cacheName, 
+							   objetsLogged:objetsLogged });
+				},
+				error: function(object, error) {
+					res.render('geocaches', { message:"Redirection toutes les caches" });
+				}
+			});
 		},
 		error: function(object, error) {
 			var queryTbs = new Parse.Query(Travelbug);
