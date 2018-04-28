@@ -38,24 +38,87 @@
 			<br />
 
 			<section>
-				<h3>Historique des déplacements</h3>
+				<h2>Historique des déplacements</h2>
 				<br>
+				<div id="map"></div>
+
+				<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBfOPPHsPEYs7o8-xdYce1Bdxgmh-4TBAc&callback=initialize"
+				type="text/javascript"></script>
+
+				<script>
+					locations = [
+						<% objetsLogged.forEach(function(tblog) { %>
+							<% if(tblog.get("Geocache")!=null) { %>
+								[<%= tblog.get("Geocache").get("GPS").latitude %>,<%= tblog.get("Geocache").get("GPS").longitude %>, "<%= tblog.get("Geocache").get("Nom") %>", "<%= tblog.get("Geocache").get("Category") %>"], 
+							<% } %>
+					
+						<% }); %>
+					];
+
+					function initialize() {
+						map = new google.maps.Map(document.getElementById("map"), {
+							mapTypeId: google.maps.MapTypeId.ROADMAP,
+							center: new google.maps.LatLng(locations[0][0], locations[0][1]),
+							zoom: 15
+						});
+
+						for (var i=0; i<locations.length; i++) {
+							
+							var myinfowindow = new google.maps.InfoWindow({
+								content: '<h3 style="color:#83B348;">'+locations[i][2]+'</h3>'
+							});
+
+							var marker = new google.maps.Marker({
+								position: new google.maps.LatLng(locations[i][0], locations[i][1]),
+								map: map,
+								title: locations[i][2],
+								infowindow: myinfowindow,
+								icon: 'public/images/'+locations[i][3]+'.gif'
+							});
+							
+							google.maps.event.addListener(marker, 'click', function () {
+								this.infowindow.open(map, this);
+							});
+						}
+						
+						// Chemin du TB
+						var parcoursTB = [
+							<% objetsLogged.forEach(function(tblog) { %>
+								<% if(tblog.get("Geocache")!=null) { %>
+									new google.maps.LatLng(<%= tblog.get("Geocache").get("GPS").latitude %>, <%= tblog.get("Geocache").get("GPS").longitude %>),
+								<% } %>
+							<% }); %>
+						];
+
+						var traceParcoursTB = new google.maps.Polyline({
+							path: parcoursTB,
+							geodesic: true,
+							strokeColor: "#FF0000",
+							strokeOpacity: 1.0,
+							strokeWeight: 2
+						});
+						
+						traceParcoursTB.setMap(map);
+
+						setBoundsLeftSidebar(locations, 0.9);
+					}
+				</script>
+				<br />
 				<ul>
 				<% objetsLogged.forEach(function(obj) { %>
 					<% if (obj.get("Action") == "Created") { %>
-						<li> <b><%= moment(obj.get("Date")).utcOffset(120).fromNow() %> le <%= moment(obj.get("Date")).utcOffset(120).format("LL [à] LT") %> </b>- <%= obj.get("Pseudo") %> a créé l'objet voyageur </i><% if(obj.get("PhotoUrl"))  { %> - <a href="<%= obj.get("PhotoUrl") %>">photo</a><% } %></li>					
+						<li> <b><%= moment(obj.get("Date")).utcOffset(120).fromNow() %> le <%= moment(obj.get("Date")).utcOffset(120).format("LL [à] LT") %></b> - <%= obj.get("Pseudo") %> a créé l'objet voyageur </i><% if(obj.get("PhotoUrl"))  { %> - <a href="<%= obj.get("PhotoUrl") %>">photo</a><% } %></li>					
 					<% } else if (obj.get("Action") == "drop") { %>
-						<li> <b><%= moment(obj.get("Date")).utcOffset(120).fromNow() %> le <%= moment(obj.get("Date")).utcOffset(120).format("LL [à] LT") %> </b>- <%= obj.get("Pseudo") %> <%= obj.get("Action") %> dans la cache <a href="/geocache?id=<%= obj.get("cacheId") %>"><b> <%= obj.get("cacheName") %></b> </a> : <i><%= obj.get("Message") %></i><% if(obj.get("PhotoUrl"))  { %> - <a href="<%= obj.get("PhotoUrl") %>">photo</a><% } %></li>
+						<li> <b><%= moment(obj.get("Date")).utcOffset(120).fromNow() %> le <%= moment(obj.get("Date")).utcOffset(120).format("LL [à] LT") %></b> - <%= obj.get("Pseudo") %> <%= obj.get("Action") %> dans la cache <a href="/geocache?id=<%= obj.get("cacheId") %>"><b><%= obj.get("cacheName") %></b></a> : <i><%= obj.get("Message") %></i><% if(obj.get("PhotoUrl"))  { %> - <a href="<%= obj.get("PhotoUrl") %>">photo</a><% } %></li>
 					<% } else { %>	
-						<li> <b><%= moment(obj.get("Date")).utcOffset(120).fromNow() %> le <%= moment(obj.get("Date")).utcOffset(120).format("LL [à] LT") %> </b>- <%= obj.get("Pseudo") %> <%= obj.get("Action") %> a partir de la cache <a href="/geocache?id=<%= obj.get("cacheId") %>"><b> <%= obj.get("cacheName") %></b> </a> : <i><%= obj.get("Message") %></i><% if(obj.get("PhotoUrl"))  { %> - <a href="<%= obj.get("PhotoUrl") %>">photo</a><% } %></li>
+						<li> <b><%= moment(obj.get("Date")).utcOffset(120).fromNow() %> le <%= moment(obj.get("Date")).utcOffset(120).format("LL [à] LT") %></b> - <%= obj.get("Pseudo") %> <%= obj.get("Action") %> a partir de la cache <a href="/geocache?id=<%= obj.get("cacheId") %>"><b><%= obj.get("cacheName") %></b></a> : <i><%= obj.get("Message") %></i><% if(obj.get("PhotoUrl"))  { %> - <a href="<%= obj.get("PhotoUrl") %>">photo</a><% } %></li>
 					<% } %> 
 				<% }); %>
 				</ul>
-				
 			</section>
-			<br /><br />
+			<br />
 			<section>
-				<h3>Fil de discussion concernant <%= nom %></h3>
+				<h2>Fil de discussion concernant <%= nom %></h2>
 				<br>
 				<div id="disqus_thread"></div>
 				<script>
