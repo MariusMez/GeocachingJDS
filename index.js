@@ -61,6 +61,10 @@ app.get('/tools', function(req, res) {
 	res.render('tools', { message: 'Outils application mobile' });
 });
 
+app.get('/ranking2017', function(req, res) {
+	res.render('ranking2017');
+});
+
 app.get('/register', function(req, res) {
 	res.render('register');
 });
