@@ -674,7 +674,7 @@ app.post('/found', upload.single('pic'), function (req, res, next) {
 	}
 
 	if(parseFile) {
-		logEntry.set("PhotoUrl", parseFile.url());
+		logEntry.set("PhotoUrl", parseFile.url({forceSecure: true}));
 		logEntry.set("Photo", parseFile);
 	}
 	logEntry.set("Pseudo", req.body.name);
