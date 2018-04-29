@@ -38,11 +38,11 @@
 			<br />
 
 			<section>
-				<h2>Historique des déplacements</h2>
+				<h2>Historique des déplacements (<span id="distance"></span> km)</h2>
 				<br>
 				<div id="map"></div>
 
-				<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBfOPPHsPEYs7o8-xdYce1Bdxgmh-4TBAc&callback=initialize"
+				<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBfOPPHsPEYs7o8-xdYce1Bdxgmh-4TBAc&callback=initialize&libraries=geometry"
 				type="text/javascript"></script>
 
 				<script>
@@ -101,6 +101,10 @@
 						traceParcoursTB.setMap(map);
 
 						setBoundsLeftSidebar(locations, 0.9);
+
+						var distance = google.maps.geometry.spherical.computeLength(traceParcoursTB.getPath());
+						distance = Number((distance / 1000).toFixed(1));
+						document.getElementById('distance').innerHTML = distance;
 					}
 				</script>
 				<br />

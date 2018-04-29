@@ -453,7 +453,8 @@ app.get('/logtb', function(req, res) {
 					query.equalTo("objectId",req.query.cacheId);
 				}
 				query.equalTo("Active",true);
-				query.descending("RatioFav");
+				query.notContainedIn("Category", ["VIRTUAL", "EARTHCACHE", "WEBCAM", "SPECIAL"]); // Only physical boxes and EVENTS
+				query.ascending("Nom");
 				query.find({ 
 					success: function(caches) {
 			    		res.render('foundittb', { nom:tbName,
@@ -562,8 +563,8 @@ app.post('/foundtb', upload.single('pic'), function (req, res, next) {
 								logEntry.set("cacheName", cache.get("Nom"));
 							}
 							else {
-								console.log("Identifiant de TB invalide !");
-								res.render('foundtb', { nom:"Mismatch Identifiants de TB invalide !", tbid:req.body.id });		    	
+								console.log("Identifiant de TB invalide ! : " + req.body.id + ' - ' + tb.id);
+								res.render('foundtb', { message:"Mismatch Identifiants de TB invalide - 2 TB avec même code de suivi !", tbid:req.body.id });		    	
 							}
 
 							if (req.body.action == 'grab') {
