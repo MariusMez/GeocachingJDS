@@ -14,15 +14,15 @@
 			</header>
 			<form ref="uploadForm" id="uploadForm" method="post" action="/registerTb" encType="multipart/form-data">
 				
-				<label for="name">Nom de votre Objet</label>
-				<input type="text" size="50" name="name" id="name" value="" style="border: solid 1px #fff;" placeholder="Le nom sera visible sur le site" required/>
+				<label for="name"><b>Nom</b> de votre Objet</label>
+				<input type="text" size="50" maxlength="50" name="name" id="name" value="" style="border: solid 1px #fff;" placeholder="Le nom sera visible sur le site" required/>
 				<br>
-				<label for="code">Code de votre Tag</label>
-				<input type="text" size="6" name="code" id="code" value="" style="border: solid 1px #fff;" placeholder="Le code ne sera pas visible sur le site mais il permet d'identifier uniquement l'objet au moment des voyages" required/>
+				<label for="code"><b>Code de suivi</b> situé sur le Tag en bois à attacher à votre objet</label>
+				<input type="text" size="4" maxlength="4" name="code" id="code" value="" style="border: solid 1px #fff;" placeholder="Le code ne sera pas visible sur le site mais il permet d'identifier uniquement l'objet au moment des voyages" required/>
 				<br>
 				
 				<label for="description">Description de votre Objet</label>
-				<input type="text" name="description" id="description" value="" style="border: solid 1px #fff; " placeholder="La description sera visible sur le site" required/>
+				<input type="text" name="description" id="description" value="" style="border: solid 1px #fff; " placeholder="La description sera visible sur le site" maxlength="1000" required/>
 				<br>
 				
 				<label for="email" >Votre Email des Jeux de Sophia - <i>Nécessaire au classement de l'épreuve</i></label>
@@ -31,8 +31,8 @@
 				<label for="pseudo">Votre Pseudo pour l'épreuve Géocaching - <i>Attention à bien utiliser le meme pendant toute l'épreuve</i></label>
 				<input type="text" name="pseudo" id="pseudo" value="" style="border: solid 1px #fff;" placeholder="Ce pseudo sera visible sur le site" required/>
 				<br>
-				<label for="mission">La mission de votre Objet Voyageur</label>
-				<input type="text" name="mission" id="mission" value="" style="border: solid 1px #fff;" placeholder="Ce Message sera visible sur le site" maxlength="500" required/>
+				<label for="mission"><b>La mission de votre Objet Voyageur</b></label>
+				<input type="text" name="mission" id="mission" value="" style="border: solid 1px #fff;" placeholder="Mission personnelle que vous choisissez, assurez-vous quelle soit réalisable dans le cadre de l'épreuve" maxlength="500" required/>
 				<br>		
 
 				<label for="pic">Une photo de votre objet (sera visible sur le site)</label>
@@ -40,6 +40,8 @@
 				<br>
 				
 			    <!-- <br><input type="submit" value="Enregistrer" name="submit" class="button alt" id="submitButton" title="Clic ici pour donner vie à ton Objet Voyageur" /> -->
+
+			    <br><input type="submit" value="Enregistrer" name="submit" class="button alt" id="submitButton" title="Clic ici pour donner vie à ton Objet Voyageur" />
 				<h3>Ouverture des créations très prochainement</h3>
 				
 			</form>  				 

@@ -69,7 +69,7 @@ app.get('/register', function(req, res) {
 	res.render('register');
 });
 
-app.post('/registerTb', upload.single('pic'), function (req, res, next) {
+app.post('/registerTb', upload.single('pic'), function(req, res, next) {
 
 	var Travelbug = Parse.Object.extend("Travelbug");
 	var travelbug = new Travelbug();
@@ -77,84 +77,119 @@ app.post('/registerTb', upload.single('pic'), function (req, res, next) {
 	var TravelbugLog = Parse.Object.extend("TravelbugLog");
 	var logEntry = new TravelbugLog(); 
 
-	var parseFile;
+	var TravelbugCode = Parse.Object.extend("TravelbugCode");
+	var query = new Parse.Query("TravelbugCode");
 
-	if(req.file) {
-		var photoFile = req.file;
-		var name = photoFile.originalname;
+	const tracking_code = req.body.code.toUpperCase();
+    query.equalTo('Code', tracking_code);
+    query.equalTo("Active", false);
+    query.first({
+	  success: function(tbcode) {
 
-		sharp(photoFile.buffer).resize(1024, 1024)
-							   .max()
-							   .withoutEnlargement()
-							   .toBuffer()
-							   .then(function(buffer_img) { 
+	  	if(tbcode === undefined) {
+	  		var error = "Le code de suivi est incorrect ou déjà affecté à un autre objet voyageur";
+			console.log(error);
+			res.render('tbregistered', { tbid:0, message: error });
+	  	}
+	  	else {
+		  	console.log(tbcode + " Code retrieve" );
+		    var parseFile;
 
-			var photoFileBase64 = buffer_img.toString('base64');
-			parseFile = new Parse.File(name, { base64: photoFileBase64 })
-			parseFile.save().then(function() {
+			if(req.file) {
+				var photoFile = req.file;
+				var name = photoFile.originalname;
 
-					var photo_url = parseFile.url({forceSecure: true})
-					console.log("Photo saved in registerTb: " + photo_url);
+				sharp(photoFile.buffer).resize(1024, 1024)
+									   .max()
+									   .withoutEnlargement()
+									   .toBuffer()
+									   .then(function(buffer_img) { 
 
-					if(parseFile) {
-						travelbug.set("PhotoUrl", photo_url);
-						travelbug.set("Photo", parseFile);
-					}
-					travelbug.set("Name", req.body.name);
-					travelbug.set("Code", req.body.code);
-					travelbug.set("Description", req.body.description);
-					travelbug.set("Owner", req.body.pseudo);
-					travelbug.set("Email", req.body.email);
-					travelbug.set("Mission", req.body.mission);
-					travelbug.set("CreatedAt", new Date());
-					travelbug.set("cacheId", null); //id de la cache qui le contient . null si holder n'est pas null et reciproquement. 
-					travelbug.set("cacheName", null);
-					travelbug.set("Holder", req.body.pseudo);
-					travelbug.set("Fav", 0);
-					travelbug.set("Active", true);
+					var photoFileBase64 = buffer_img.toString('base64');
+					parseFile = new Parse.File(name, { base64: photoFileBase64 })
+					parseFile.save().then(function() {
 
-					travelbug.save(null, {
-						success: function() {
-							console.log("Successfull TB created");
-				  			logEntry.set("PhotoUrl", photo_url);
-							logEntry.set("Photo", parseFile);
-							logEntry.set("Travelbug", travelbug);
-							logEntry.set("Pseudo", req.body.pseudo);
-							logEntry.set("Email", req.body.email);
-							logEntry.set("Message", req.body.message);
-							logEntry.set("Date", new Date());
-							logEntry.set("Action", "Created");
-							logEntry.set("Active", true);
-							logEntry.set("TravelbugId", travelbug.id);
-							logEntry.set("TravelbugName", travelbug.get("Name"));
-							logEntry.save(null, {
+							var photo_url = parseFile.url({forceSecure: true})
+							console.log("Photo saved in registerTb: " + photo_url);
+
+							if(parseFile) {
+								travelbug.set("PhotoUrl", photo_url);
+								travelbug.set("Photo", parseFile);
+							}
+							travelbug.set("Name", req.body.name);
+							travelbug.set("Code", tracking_code);
+							travelbug.set("Description", req.body.description);
+							travelbug.set("Owner", req.body.pseudo);
+							travelbug.set("Email", req.body.email);
+							travelbug.set("Mission", req.body.mission);
+							travelbug.set("CreatedAt", new Date());
+							travelbug.set("cacheId", null); //id de la cache qui le contient . null si holder n'est pas null et reciproquement. 
+							travelbug.set("cacheName", null);
+							travelbug.set("Holder", req.body.pseudo);
+							travelbug.set("Fav", 0);
+							travelbug.set("Active", true);
+
+							travelbug.save(null, {
 								success: function() {
-									res.render('tbregistered', { tbid:travelbug.id, message:"Bravo " 
-													 + req.body.pseudo + " !<br><br>Votre objet voyageur " 
-													 + req.body.name + " est bien enregistré. <br><br><br>"
-													 + "Il est temps d'aller le poser dans une boite et de vous amuser"
-													 + " à déplacer les objets voyageurs des autres !" });
-									 console.log("Successfull TB log created");
-													 
+									console.log("Successfull TB created");
+						  			logEntry.set("PhotoUrl", photo_url);
+									logEntry.set("Photo", parseFile);
+									logEntry.set("Travelbug", travelbug);
+									logEntry.set("Pseudo", req.body.pseudo);
+									logEntry.set("Email", req.body.email);
+									logEntry.set("Message", req.body.message);
+									logEntry.set("Date", new Date());
+									logEntry.set("Action", "Created");
+									logEntry.set("Active", true);
+									logEntry.set("TravelbugId", travelbug.id);
+									logEntry.set("TravelbugName", travelbug.get("Name"));
+									logEntry.save(null, {
+										success: function() {
+											tbcode.set("Active", true);
+											tbcode.save(null, {
+												success: function() {
+						                        	res.render('tbregistered', { tbid:travelbug.id, message:"Bravo " 
+												     		 + req.body.pseudo + " !<br><br>Votre objet voyageur " 
+															 + req.body.name + " est bien enregistré. <br><br><br>"
+															 + "Il est temps d'aller le poser dans une boite et de vous amuser"
+															 + " à déplacer les objets voyageurs des autres !" 
+															 + "<br><br>N'oubliez pas d'y attacher le code de suivi."});
+											 
+													console.log("Successfull TB log created");
+						                    	},
+						                    	error: function(error) {
+						                       		console.log("Error TBlogEntry : " + error.message);
+													res.render('tbregistered', { tbid:0, message: error.message });
+						                    	}																									 
+											});
+										},
+										error: function(error) {
+											console.log("Error TBlogEntry : " + error.message);
+											res.render('tbregistered', { tbid:0, message: error.message });
+										}
+									});	
 								},
 								error: function(error) {
-									console.log("Error TBlogEntry : " + error.message);
-									res.render('tbregistered', { travelbug:0, message: error.message });
+									res.render('tbregistered', { tbid:0, message: error.message });
 								}
-							});	
-							
+							});		
 						},
-						error: function(error) {
-							res.render('tbregistered', { travelbug:0, message: error.message });
-						}
-					});		
-				},
-				function(error) {
-					console.log("Photofile save error " + error.message);
-				}
-			);
-		});
-	}
+						function(error) {
+							console.log("Photofile save error " + error.message);
+						});
+				});
+			} else {
+				var error = "No file submitted in registerTb";
+				console.log(error);
+				res.render('tbregistered', { tbid:0, message: error });
+			}
+		  }
+	  },
+	  error: function(error) {
+		console.log("Code doesn't exist in base or is already affected : " + error.message);
+		res.render('tbregistered', { tbid:0, message: error.message });
+	  }
+	});
 });
 
 
@@ -205,6 +240,7 @@ app.get('/geocaches', function(req, res) {
 		}
 	});
 });
+
 
 app.get('/photos', function(req, res) {
 	var moment = require('./cloud/moment-with-locales.min.js');
@@ -305,7 +341,6 @@ app.get('/tbs', function(req, res) {
 
 app.get('/geocache', function(req, res) {
 
-	//var moment = require('moment');
 	var moment = require('./cloud/moment-with-locales.min.js');
 	moment.locale('fr');
 	
@@ -499,7 +534,7 @@ app.post('/foundtb', upload.single('pic'), function (req, res, next) {
 
 	var Travelbug = Parse.Object.extend("Travelbug");
 	var query = new Parse.Query(Travelbug);
-	query.equalTo("Code", req.body.tracking);
+	query.equalTo("Code", req.body.tracking.toUpperCase());
 	query.find({
 		success: function(results) {
 			

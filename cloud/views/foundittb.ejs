@@ -26,6 +26,8 @@
 		<section class="container">
 			<header class="major">
 				<h2><%= action %> de l'objet <a href="/tb?id=<%= id %>"> <%= nom %></a></h2>
+				<br>
+				<h4>Mission : <%= mission %></h4>
 			</header>
 			<form ref="uploadForm" id="uploadForm" method="post" action="/foundtb" encType="multipart/form-data">
 				<input type="hidden" name="id" id="<%= id %>" value="<%= id %>" />
