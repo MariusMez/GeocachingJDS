@@ -4,6 +4,55 @@ Parse.Cloud.define("hello", function(request, response) {
 	response.success("Hello world!");
 });
 
+Parse.Cloud.job("addcodestb", function(request, response) {
+  response.message("I just started");
+  
+  var params = request.params;
+  var headers = request.headers;
+  var log = request.log;
+  var fs = require('fs');
+  var TravelbugCode = Parse.Object.extend("TravelbugCode");
+
+  fs.readFile('TB_CODES.txt', 'utf8', function(err, data) {
+    if (err) throw err;
+    codes = data.split(/\n/);
+    codes.forEach(function(code) {
+      var query = new Parse.Query("TravelbugCode");
+      query.equalTo('Code', code);
+      query.first({
+          //is this query need masterKey?
+          useMasterKey: true,
+          success: function(results) {
+              // console.log(JSON.stringify(results));
+              // console.log(results)
+              if (results === undefined) {
+                  var tbCode = new TravelbugCode();
+                  tbCode.save({
+                      Code: code,
+                      Active: false
+                  }, {
+                      success: function(code) {
+                          //response.success(results);
+                      },
+                      error: function(favourites, error) {
+                          //response.error(error);
+                      }
+                  });
+              } else {
+                  //results.set("Active", false);
+                  results.set("Code", code);
+                  results.save(null, { useMasterKey: true }).then(response.success, response.error);
+              }
+          },
+          error: function(error) {
+              error.message("favourites lookup failed");
+              response.error(error);
+          }
+      });
+    });
+  });
+  response.success("I just finished");
+});
 
 Parse.Cloud.job("computeratiodt", function(request, status) {
   // the params passed through the start request
@@ -15,7 +64,6 @@ Parse.Cloud.job("computeratiodt", function(request, status) {
   var log = request.log;
   var _ = require('./underscore-min.js');
 
-  // Update the Job status message
   status.message("I just started");
 
   var Logs = Parse.Object.extend("Log");
