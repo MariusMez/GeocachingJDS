@@ -75,7 +75,6 @@
 			<% if( cat=='TRADI' || cat=='MULTI' || cat=='LETTERBOX' || cat=='EARTHCACHE' || cat=='EVENT' || cat=='CITO' || cat=='WHERIGO' ) { %>
 			<section>
 				<h2>Emplacement</h2>
-				<br>
 				<div id="map"></div>
 			</section>
 			<br /><br />
@@ -85,7 +84,6 @@
 			<% if(cat=='TRADI' || cat=='MULTI' || cat=='LETTERBOX' || cat=='EARTHCACHE' || cat=='EVENT' || cat=='CITO' || cat=='WHERIGO' || cat=='MYSTERY' || cat=='SPECIAL') { %>
 			<section>
 				<h2>Spoiler</h2>
-				<br>
 				<details>
 					<summary>Cliquez pour voir l'indice et l'image Spoiler</summary>
 					<img src="<%= spoiler %>" alt="<%= nom %>"> <br />
@@ -133,8 +131,6 @@
 			<% if(cat=='TRADI' || cat=='MULTI' || cat=='LETTERBOX' || cat=='EVENT' || cat=='CITO' || cat=='WHERIGO' || cat=='MYSTERY' || cat=='SPECIAL') { %>
 			<section>
 				<h2>Liste des Objets Voyageurs</h2>
-				<br />
-
 				<details>
 					<summary>Cliquez pour voir les objets présents dans cette cache</summary>
 					<ul>
@@ -158,7 +154,6 @@
 
 			<section>
 				<h2>Logbook</h2>
-				<br>
 				<ul>
 					<% if(logs.length == 0)  { %>
 					<li><p class="medium">Soyez le premier à trouver la cache et annoncer votre découverte !!!</p></li>
@@ -171,7 +166,6 @@
 
 			<section>
 				<h2>Discussion</h2>
-				<br>
 				<div id="disqus_thread"></div>
 				<script>
 				var disqus_config = function () {
