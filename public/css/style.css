@@ -107,6 +107,10 @@
 		margin-bottom: 1.5em;
 	}
 
+	.clearfix {
+  		overflow: auto;
+	}
+
 	blockquote {
 		border-left: solid 0.5em #82b440;
 		font-style: italic;

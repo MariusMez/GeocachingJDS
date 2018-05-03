@@ -59,26 +59,31 @@
 				-->
 			</header>
 
-			<div id="gridsalv" data-columns>
-
+			<div id="gridsalv" class="clearfix" data-columns>
 				<% geocaches.forEach(function(geocache) { %>
-
 				<div>
-					<a href="/geocache?id=<%= geocache.id %>"><img width="220px;" class="border" src="<%= geocache.get("Photo").url().replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, ''); %>" /><p class="medium"><img width="40px;" align="left" src="https://www.geocaching-jds.fr/public/images/<%= geocache.get('Category') %>BIG.gif" style="margin-right:10px;"/><%= geocache.get("Nom") %></p>
+					<a href="/geocache?id=<%= geocache.id %>">
+						<img width="220px;" class="border" src="<%= geocache.get("Photo").url().replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, ''); %>" />
+						<p class="medium">
+							<img width="40px;" align="left" src="https://www.geocaching-jds.fr/public/images/<%= geocache.get('Category') %>BIG.gif"/><%= geocache.get("Nom") %>
+						</p>
 					</a>
 				</div>
 				<% }); %>
-
 			</div> 
 			
-		</section>
-		
-				<!--
+			<!--
 				<div>
 					<p>Dernière publication pour l'épreuve : le 16 juin 2017. <br>Une Wherigo D5 vous attend : STAR. <br>Bon courage pour cette ultime et dernière étape avant la cache Challenge.</p>
 				</div>
 			-->
-			<div><p>Pour en savoir plus sur les différents types de Géocaches : <a href="/geocaching#typesgeocaches">Cliquez ici</a></p></div>
+			<br>
+			<div>
+				<p>Pour en savoir plus sur les différents types de Géocaches : <a href="/geocaching#typesgeocaches">Cliquez ici</a>
+				<br>
+				Pour découvrir ce qu'est un Objet Voyageur et comment créer le votre : <a href="/geocaching">Cliquez ici</a></p>
+			</div>
+		</section>
 
 		</div>
 	</div>
@@ -89,7 +94,6 @@
 			<section>
 
 				<h2>Les derniers logs</h2>
-				<br>
 				<ul>
 					<% logs.forEach(function(log) { %>
 
