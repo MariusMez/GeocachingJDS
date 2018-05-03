@@ -33,7 +33,6 @@
 		<div id="content" class="container">
 			<section>
 				<header class="major">
-
 					<h2>Classement Général</h2>
 				</header>
 
@@ -101,7 +100,6 @@
 
 			<section>
 				<h2>Classement FTF, STF, TTF</h2>
-				<br>
 				<ul style="list-style-type:decimal; margin-left:30px;">
 					<% geocacheursFTF.forEach(function(g, i) {  if(g.get("ScoreFTF") > 0 ) { %>
 					<li><b><%= g.get("Pseudo") %></b> avec <%= g.get("ScoreFTF") %> point<%if(g.get("ScoreFTF")>1) { %>s <% } %></li>
@@ -114,7 +112,6 @@
 
 			<section>
 				<h2>Classement des Caches préférées</h2>
-				<br>
 				<ul style="list-style-type:decimal; margin-left:30px;">
 					<% geocaches.forEach(function(geocache) { %>
 					<li><b><%= geocache.get("Fav") %></b> 👍 (<%= geocache.get("RatioFav") %> % des visites) pour <b><a href="/geocache?id=<%= geocache.id %>"> <%= geocache.get("Nom") %> </a> </b></li>
