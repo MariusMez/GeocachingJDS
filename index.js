@@ -422,6 +422,37 @@ app.get('/geocache', function(req, res) {
 	});
 });
 
+app.get('/flashit', function(req, res) {
+	var Geocache = Parse.Object.extend("Geocache");
+	var query = new Parse.Query(Geocache);
+	query.equalTo("codeId", req.query.id);
+	query.find({
+		success: function(results) {
+			if(results.length > 0) {
+	    		for (var i = 0; i < results.length; i++) { 
+	    			var object = results[i];
+	    		}
+	    		var geocacheName = object.get("Nom");
+	    		var geocacheCat = object.get("Category");
+	    		var geocacheId = object.get("codeId");
+				
+				console.log(geocacheId)
+				
+				res.render('flashit', { nom:geocacheName, 
+		    								code:req.query.id, 
+											cat:geocacheCat});
+					
+
+	    	} else {
+	    		res.render('flashit', { nom:"Code invalide !", id:0, cat:"UNKNOWN" });
+	    	}
+	    },
+	    error: function(object, error) {
+	    	res.render('flashit', { nom:"Code invalide !", id:0, cat:"UNKNOWN" });
+	    }	
+	});
+});
+
 
 app.get('/foundit', function(req, res) {
 	var Geocache = Parse.Object.extend("Geocache");
@@ -463,6 +494,39 @@ app.get('/foundit', function(req, res) {
 	    }	
 	});
 });
+
+app.get('/myscore', function(req, res) {
+	var pseudo = req.query.pseudo;
+	var Logs = Parse.Object.extend("Log");
+	
+	var scoreTotal = 0;
+	
+	console.log("Score for " + pseudo);
+	var queryCaches = new Parse.Query(Logs);
+	queryCaches.equalTo("Pseudo", pseudo);
+	queryCaches.equalTo("Active", true);
+	queryCaches.include('Geocache');
+	queryCaches.find().then ( function(mylogs) {
+		//console.log(pseudo+ " logged " + mylogs.length + " caches ");	
+		var promise = Parse.Promise.as();
+		var scoreDT = 0;
+  		mylogs.forEach(function(log) {
+			//console.log(pseudo+ " logged " + log.get("Geocache").get("Difficulty") + " cache ");	
+  			promise = promise.then(function() {
+  				scoreDT = scoreDT + log.get("Geocache").get("Difficulty") + log.get("Geocache").get("Terrain");
+  				return scoreDT;
+  			});	
+  		});		
+		return promise;
+	}).then(function(scoreDT) {
+		scoreTotal = scoreTotal + scoreDT
+		console.log(pseudo+ " has score of " + scoreDT);	
+		res.render('myscore', { pseudo:pseudo, score:scoreDT});
+	})
+	
+});
+		
+	
 
 
 // TODO : gérer le cas ou le TB est présent dans une cache
@@ -663,6 +727,54 @@ app.post('/foundtb', upload.single('pic'), function (req, res, next) {
 	});
 });
 
+app.post('/flash', function(req, res) {
+	var email = req.body.email;
+	var codeGc = req.body.code;
+	var Logs = Parse.Object.extend("Log");
+	var Geocache = Parse.Object.extend("Geocache");
+	
+	console.log("gc code " + codeGc + req.body.code + req.code);
+	
+	var query = new Parse.Query(Geocache);
+	query.equalTo("codeId", codeGc);
+	query.find({
+		success: function(results) {
+			
+			if(results.length > 0) {
+				console.log("je suis la")
+	    		var object = results[0];
+				var geocacheName = object.get("Nom");
+	    		var geocacheCat = object.get("Category");
+	    		var geocacheId = object.id;
+				
+				console.log("cache " + geocacheName);
+				
+				var queryCaches = new Parse.Query(Logs);
+				queryCaches.equalTo("Email", email);
+				queryCaches.equalTo("Active", true);
+				queryCaches.equalTo("Geocache", object);
+				queryCaches.find({
+					success: function(resLogs) {
+						
+						console.log("ici " + resLogs.length);
+				
+						
+						if(resLogs.length > 0) {
+				    		
+				    		res.render('found', { nom:geocacheName, 
+				    								id:geocacheId, 
+													cat:geocacheCat });
+						} else {
+				    		res.render('foundit', { nom:geocacheName, 
+				    								id:geocacheId, 
+													cat:geocacheCat });
+						}
+					}
+				});
+			}
+		}
+	});
+});
 
 app.post('/found', upload.single('pic'), function (req, res, next) {
 
