@@ -120,12 +120,13 @@ app.post('/registerTb', upload.single('pic'), function(req, res, next) {
 							travelbug.set("Code", tracking_code);
 							travelbug.set("Description", req.body.description);
 							travelbug.set("Owner", req.body.pseudo);
-							travelbug.set("Email", req.body.email);
+							travelbug.set("OwnerEmail", req.body.email);
 							travelbug.set("Mission", req.body.mission);
 							travelbug.set("CreatedAt", new Date());
 							travelbug.set("cacheId", null); //id de la cache qui le contient . null si holder n'est pas null et reciproquement. 
 							travelbug.set("cacheName", null);
 							travelbug.set("Holder", req.body.pseudo);
+							travelbug.set("HolderEmail", req.body.email);
 							travelbug.set("Fav", 0);
 							travelbug.set("Active", true);
 
@@ -436,8 +437,6 @@ app.get('/flashit', function(req, res) {
 	    		var geocacheCat = object.get("Category");
 	    		var geocacheId = object.get("codeId");
 				
-				console.log(geocacheId)
-				
 				res.render('flashit', { nom:geocacheName, 
 		    								code:req.query.id, 
 											cat:geocacheCat});
@@ -675,12 +674,14 @@ app.post('/foundtb', upload.single('pic'), function (req, res, next) {
 								tb.set("cacheId", null);
 								tb.set("cacheName", null);
 								tb.set("Holder", req.body.name);
+								tb.set("HolderEmail", req.body.email);
 							}
 							if (req.body.action == 'drop') {
 								logEntry.set("Action", "drop");
 								tb.set("cacheId", cache.id);
 								tb.set("cacheName", cache.get("Nom"));
 								tb.set("Holder", null);
+								tb.set("HolderEmail", null);
 							}
 
 							logEntry.set("Active", true);
@@ -728,46 +729,58 @@ app.post('/foundtb', upload.single('pic'), function (req, res, next) {
 });
 
 app.post('/flash', function(req, res) {
-	var email = req.body.email;
-	var codeGc = req.body.code;
 	var Logs = Parse.Object.extend("Log");
 	var Geocache = Parse.Object.extend("Geocache");
-	
-	console.log("gc code " + codeGc + req.body.code + req.code);
-	
+		
 	var query = new Parse.Query(Geocache);
-	query.equalTo("codeId", codeGc);
+	query.equalTo("codeId", req.body.code);
 	query.find({
 		success: function(results) {
 			
 			if(results.length > 0) {
-				console.log("je suis la")
-	    		var object = results[0];
-				var geocacheName = object.get("Nom");
-	    		var geocacheCat = object.get("Category");
-	    		var geocacheId = object.id;
+	    		var cache = results[0];
 				
-				console.log("cache " + geocacheName);
-				
-				var queryCaches = new Parse.Query(Logs);
-				queryCaches.equalTo("Email", email);
-				queryCaches.equalTo("Active", true);
-				queryCaches.equalTo("Geocache", object);
-				queryCaches.find({
+				var queryLogs = new Parse.Query(Logs);
+				queryLogs.equalTo("Email", req.body.email);
+				queryLogs.equalTo("Active", true);
+				queryLogs.equalTo("Geocache", cache);
+				queryLogs.find({
 					success: function(resLogs) {
-						
-						console.log("ici " + resLogs.length);
-				
-						
+												
 						if(resLogs.length > 0) {
-				    		
-				    		res.render('found', { nom:geocacheName, 
-				    								id:geocacheId, 
-													cat:geocacheCat });
+
+							var Travelbug = Parse.Object.extend("Travelbug");
+							var queryTbIns = new Parse.Query(Travelbug);
+							queryTbIns.descending("createdAt");
+							queryTbIns.equalTo("Active", true);
+							queryTbIns.equalTo("cacheId", cache.id);
+							queryTbIns.find({
+								success: function(travelbugsInCache) {
+									
+									var queryTbsHands = new Parse.Query(Travelbug);
+									queryTbsHands.descending("createdAt");
+									queryTbsHands.equalTo("Active", true);
+									queryTbsHands.equalTo("HolderEmail", req.body.email);
+									queryTbsHands.find({
+										success: function(travelbugsInHands) {
+							
+											res.render('found', { cacheid:cache.id, tbsout: travelbugsInCache, tbsin: travelbugsInHands, message:"La cache a déja été trouvée mais vous pouvez quand meme faire voyager des objets.  <br><br>"});
+						  					
+						  					},
+						  					error: function(object, error) {
+						  						res.render('found', { cacheid:0, message: error.message });
+						  					}
+						  				});
+		
+										},
+										error: function(object, error) {
+											res.render('found', { cacheid:0, message: error.message });
+										}
+									});
 						} else {
-				    		res.render('foundit', { nom:geocacheName, 
-				    								id:geocacheId, 
-													cat:geocacheCat });
+				    		res.render('foundit', { nom:cache.get("Nom"), 
+				    								id:cache.id, 
+													cat:cache.get("Category") });
 						}
 					}
 				});
@@ -859,11 +872,11 @@ app.post('/found', upload.single('pic'), function (req, res, next) {
 					var queryTbsHands = new Parse.Query(Travelbug);
 					queryTbsHands.descending("createdAt");
 					queryTbsHands.equalTo("Active", true);
-					queryTbsHands.equalTo("Holder", req.body.name);
+					queryTbsHands.equalTo("HolderEmail", req.body.email);
 					queryTbsHands.find({
 						success: function(travelbugsInHands) {
 			
-						res.render('found', { cacheid:cache.id, tbsout: travelbugsInCache, tbsin: travelbugsInHands, cacheid:req.body.id, message:"Bravo " + req.body.name 
+						res.render('found', { cacheid:cache.id, tbsout: travelbugsInCache, tbsin: travelbugsInHands, message:"Bravo " + req.body.name 
 								  + " !<br><br>N'oubliez pas de signer aussi le logbook ;-) <br><br>"
 								  + "<i>(lorsqu'il y a une boite physique à trouver)</i><br><br>"
 								  + "Et attention aux moldus !" });
