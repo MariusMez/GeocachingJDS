@@ -3,6 +3,8 @@
 <head>
 	<title><%= nom %> - Géocaching Jeux de Sophia 2018</title>
 	<% include ./partials/head %>
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" />
+	<script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"></script>
 </head>
 <body>
 	<% include ./partials/menu %>
@@ -42,71 +44,79 @@
 				<h2>Historique des déplacements (<span id="distance"></span> km)</h2>
 				<div id="map"></div>
 
-				<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBfOPPHsPEYs7o8-xdYce1Bdxgmh-4TBAc&callback=initialize&libraries=geometry"
-				type="text/javascript"></script>
+				<script type="text/javascript">
+					var map = L.map('map').setView([43.624, 7.052383], 13.5);
 
-				<script>
-					locations = [
+					L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+					    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+					}).addTo(map);
+
+    				L.control.scale().addTo(map);
+
+					var LeafIcon = L.Icon.extend({
+					    options: {
+					        iconAnchor:   [12, 12],
+					        popupAnchor:  [7, -7]
+					    }
+					});
+
+					var TRADI = new LeafIcon({iconUrl: 'public/images/TRADI.gif'}),
+    					MULTI = new LeafIcon({iconUrl: 'public/images/MULTI.gif'}),
+    					WHERIGO = new LeafIcon({iconUrl: 'public/images/WHERIGO.gif'}),
+    					VIRTUAL = new LeafIcon({iconUrl: 'public/images/VIRTUAL.gif'}),
+    					EARTHCACHE = new LeafIcon({iconUrl: 'public/images/EARTHCACHE.gif'}),
+    					LETTERBOX = new LeafIcon({iconUrl: 'public/images/LETTERBOX.gif'}),
+    					EVENT = new LeafIcon({iconUrl: 'public/images/EVENT.gif'}),
+    					SPECIAL = new LeafIcon({iconUrl: 'public/images/SPECIAL.gif'}),
+    					MULTI = new LeafIcon({iconUrl: 'public/images/MULTI.gif'}),
+    					MYSTERY = new LeafIcon({iconUrl: 'public/images/MYSTERY.gif'});
+
+					<% objetsLogged.forEach(function(tblog) { %>
+						<% if(tblog.get("Geocache")!=null) { %>
+							L.marker([<%= tblog.get("Geocache").get("GPS").latitude %>, <%= tblog.get("Geocache").get("GPS").longitude %>], {icon: <%= tblog.get("Geocache").get("Category") %>}).addTo(map).bindPopup('<h3 style="color:#83B348;"><a href="/geocache?id=<%= tblog.get("Geocache").id %>"><%= tblog.get("Geocache").get("Nom") %></a></h3>');
+						<% } %>
+					<% }); %>
+
+					var parcoursTB = [
 						<% objetsLogged.forEach(function(tblog) { %>
 							<% if(tblog.get("Geocache")!=null) { %>
-								[<%= tblog.get("Geocache").get("GPS").latitude %>,<%= tblog.get("Geocache").get("GPS").longitude %>, "<%= tblog.get("Geocache").get("Nom") %>", "<%= tblog.get("Geocache").get("Category") %>"], 
+								new L.LatLng(<%= tblog.get("Geocache").get("GPS").latitude %>, <%= tblog.get("Geocache").get("GPS").longitude %>),
 							<% } %>
-					
 						<% }); %>
 					];
 
-					function initialize() {
-						map = new google.maps.Map(document.getElementById("map"), {
-							mapTypeId: google.maps.MapTypeId.ROADMAP,
-							center: new google.maps.LatLng(locations[0][0], locations[0][1]),
-							zoom: 15
-						});
+					L.Polyline = L.Polyline.include({
+					    getDistance: function() {
+					        // distance in meters
+					        var mDistanse = 0,
+					            length = this._latlngs.length;
+					        for (var i = 1; i < length; i++) {
+					            mDistanse += this._latlngs[i].distanceTo(this._latlngs[i - 1]);
+					        }
+					        return Number((mDistanse / 1000).toFixed(2));
+					    }
+					});
 
-						for (var i=0; i<locations.length; i++) {
-							
-							var myinfowindow = new google.maps.InfoWindow({
-								content: '<h3 style="color:#83B348;">'+locations[i][2]+'</h3>'
-							});
+					var traceParcoursTB = new L.Polyline(parcoursTB, {
+					    color: 'red',
+					    weight: 3,
+					    opacity: 0.6,
+					    smoothFactor: 1
+					});
+					traceParcoursTB.addTo(map);
 
-							var marker = new google.maps.Marker({
-								position: new google.maps.LatLng(locations[i][0], locations[i][1]),
-								map: map,
-								title: locations[i][2],
-								infowindow: myinfowindow,
-								icon: 'public/images/'+locations[i][3]+'.gif'
-							});
-							
-							google.maps.event.addListener(marker, 'click', function () {
-								this.infowindow.open(map, this);
-							});
-						}
-						
-						// Chemin du TB
-						var parcoursTB = [
-							<% objetsLogged.forEach(function(tblog) { %>
-								<% if(tblog.get("Geocache")!=null) { %>
-									new google.maps.LatLng(<%= tblog.get("Geocache").get("GPS").latitude %>, <%= tblog.get("Geocache").get("GPS").longitude %>),
-								<% } %>
-							<% }); %>
-						];
+					<% if (holder==null && cacheId != null) { %>
+						var TB_PHOTO = new LeafIcon({iconUrl: '<%= photo %>', iconSize: [36, 36], iconAnchor: [50, 10]});
+						L.marker(parcoursTB[0], {icon: TB_PHOTO}).addTo(map);
+					<% } %>
 
-						var traceParcoursTB = new google.maps.Polyline({
-							path: parcoursTB,
-							geodesic: true,
-							strokeColor: "#FF0000",
-							strokeOpacity: 1.0,
-							strokeWeight: 2
-						});
-						
-						traceParcoursTB.setMap(map);
+					var bounds = new L.LatLngBounds(parcoursTB);
+					map.fitBounds(bounds, {padding: [50, 50]});
 
-						setBoundsLeftSidebar(locations, 0.9);
+					document.getElementById('distance').innerHTML = traceParcoursTB.getDistance();
 
-						var distance = google.maps.geometry.spherical.computeLength(traceParcoursTB.getPath());
-						distance = Number((distance / 1000).toFixed(1));
-						document.getElementById('distance').innerHTML = distance;
-					}
 				</script>
+				
 				<br />
 				<ul>
 				<% objetsLogged.forEach(function(obj) { %>
@@ -125,17 +135,12 @@
 				<h2>Fil de discussion concernant <%= nom %></h2>
 				<div id="disqus_thread"></div>
 				<script>
-				var disqus_config = function () {
-					// this.page.url = PAGE_URL; 
-					this.page.identifier = <%= id %>;
-				};
-
-				(function() {
-				var d = document, s = d.createElement('script');
-				s.src = 'https://geocaching-jds.disqus.com/embed.js';
-				s.setAttribute('data-timestamp', +new Date());
-				(d.head || d.body).appendChild(s);
-				})();
+					(function() {
+					var d = document, s = d.createElement('script');
+					s.src = 'https://geocaching-jds.disqus.com/embed.js';
+					s.setAttribute('data-timestamp', +new Date());
+					(d.head || d.body).appendChild(s);
+					})();
 				</script>
 				<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 			</section>

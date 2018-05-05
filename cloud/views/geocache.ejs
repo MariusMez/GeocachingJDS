@@ -4,6 +4,8 @@
 	<title><%= nom %> - Géocaching Jeux de Sophia 2018</title>
 	<% include ./partials/head %>
 	<!-- <script src='https://www.google.com/recaptcha/api.js'></script> -->
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" />
+	<script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"></script>
 </head>
 <body>
 	<div class="wrapper style1">
@@ -35,32 +37,6 @@
 				<header class="major">
 
 					<img width="470px;" align="right" src="<%= photo %>" alt="<%= nom %>" style="margin-bottom:20px;">
-
-					<!-- <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script> -->
-					<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBfOPPHsPEYs7o8-xdYce1Bdxgmh-4TBAc&callback=initialize"
-  type="text/javascript"></script>
-
-					<script>
-						locations = [[<%= gps.latitude %>, <%= gps.longitude %>]];
-
-						function initialize() {
-							map = new google.maps.Map(document.getElementById("map"), {
-								mapTypeId: google.maps.MapTypeId.ROADMAP,
-								center: new google.maps.LatLng(locations[0][0], locations[0][1]),
-								zoom: 17
-							});
-							for (var i=0; i<locations.length; i++) {
-								var marker = new google.maps.Marker({
-									position: new google.maps.LatLng(locations[i][0], locations[i][1]),
-									map: map
-								})
-							}
-							//setBoundsLeftSidebar(locations, 0.3);
-						}
-
-						//google.maps.event.addDomListener(window, 'load', initialize);
-					</script>
-
 					<% include ./partials/geocachecategory %><h2><%= nom %></h2>
 					<span class="byline"><%= coord %></span>
 					<% include ./partials/rating %>
@@ -76,6 +52,21 @@
 			<section>
 				<h2>Emplacement</h2>
 				<div id="map"></div>
+
+				<script type="text/javascript">
+					var map = L.map('map').setView([<%= gps.latitude %>, <%= gps.longitude %>], 17);
+
+					L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+					    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+					}).addTo(map);
+
+					L.marker([<%= gps.latitude %>, <%= gps.longitude %>]).addTo(map)
+    									   .bindPopup("<%= nom %>")
+    									   .openPopup();
+
+    				L.control.scale().addTo(map);
+				</script>
+
 			</section>
 			<br /><br />
 			<% } %>
@@ -168,17 +159,12 @@
 				<h2>Discussion</h2>
 				<div id="disqus_thread"></div>
 				<script>
-				var disqus_config = function () {
-				// this.page.url = PAGE_URL; 
-					this.page.identifier = <%= id %>;
-				};
-
-				(function() {
-				var d = document, s = d.createElement('script');
-				s.src = 'https://geocaching-jds.disqus.com/embed.js';
-				s.setAttribute('data-timestamp', +new Date());
-				(d.head || d.body).appendChild(s);
-				})();
+					(function() {
+					var d = document, s = d.createElement('script');
+					s.src = 'https://geocaching-jds.disqus.com/embed.js';
+					s.setAttribute('data-timestamp', +new Date());
+					(d.head || d.body).appendChild(s);
+					})();
 				</script>
 				<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 			</section>

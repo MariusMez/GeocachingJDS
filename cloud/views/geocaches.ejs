@@ -3,7 +3,9 @@
 	<head>
 		<title>LISTE DES CACHES - Géocaching Jeux de Sophia 2018</title>
 		<% include ./partials/head %>
-		<link rel="stylesheet" href="css/grid.css" />
+		<link rel="stylesheet" href="public/css/grid.css" />
+		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" />
+		<script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"></script>
 	</head>
 	<body>
 
@@ -126,53 +128,50 @@
 
 				<div id="map"></div>
 
-				<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBfOPPHsPEYs7o8-xdYce1Bdxgmh-4TBAc&callback=initialize"
-				type="text/javascript"></script>
+				<script type="text/javascript">
+					var map = L.map('map').setView([43.624, 7.052383], 13.5);
 
-				<script>
-					locations = [
+					L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+					    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+					}).addTo(map);
+
+					var LeafIcon = L.Icon.extend({
+					    options: {
+					        iconAnchor:   [12, 12],
+					        popupAnchor:  [7, -7]
+					    }
+					});
+
+					var TRADI = new LeafIcon({iconUrl: 'public/images/TRADI.gif'}),
+    					MULTI = new LeafIcon({iconUrl: 'public/images/MULTI.gif'}),
+    					WHERIGO = new LeafIcon({iconUrl: 'public/images/WHERIGO.gif'}),
+    					VIRTUAL = new LeafIcon({iconUrl: 'public/images/VIRTUAL.gif'}),
+    					EARTHCACHE = new LeafIcon({iconUrl: 'public/images/EARTHCACHE.gif'}),
+    					LETTERBOX = new LeafIcon({iconUrl: 'public/images/LETTERBOX.gif'}),
+    					EVENT = new LeafIcon({iconUrl: 'public/images/EVENT.gif'}),
+    					SPECIAL = new LeafIcon({iconUrl: 'public/images/SPECIAL.gif'}),
+    					MULTI = new LeafIcon({iconUrl: 'public/images/MULTI.gif'}),
+    					MYSTERY = new LeafIcon({iconUrl: 'public/images/MYSTERY.gif'});
+
+    				var geocaches = [
+    					<% geocaches.forEach(function(geocache) { %>
+							new L.LatLng(<%= geocache.get("GPS").latitude %>, <%= geocache.get("GPS").longitude %>),
+						<% }); %>
+					];
 
 					<% geocaches.forEach(function(geocache) { %>
-						[<%= geocache.get("GPS").latitude %>,<%= geocache.get("GPS").longitude %>, "<%= geocache.get("Nom") %>","<%= geocache.get("Category") %>"],
-						<% }); %>
-					
+						L.marker([<%= geocache.get("GPS").latitude %>, <%= geocache.get("GPS").longitude %>], {icon: <%= geocache.get("Category") %>}).addTo(map).bindPopup('<h3 style="color:#83B348;"><a href="/geocache?id=<%= geocache.id %>"><%= geocache.get("Nom") %></a></h3>');
+					<% }); %>
 
-						//[43.6131,7.06354, "Mystery", "MYSTERY"]
-						];
+    				L.control.scale().addTo(map);
 
-						function initialize() {
-							map = new google.maps.Map(document.getElementById("map"), {
-								mapTypeId: google.maps.MapTypeId.ROADMAP,
-								center: new google.maps.LatLng(locations[0][0], locations[0][1]),
-								zoom: 10
-							});
+    				var bounds = new L.LatLngBounds(geocaches);
+					map.fitBounds(bounds, {padding: [50, 50]});
 
-							for (var i=0; i<locations.length; i++) {
-								
-								var mytext = 'Infowindow contents in HTML'
-								var myinfowindow = new google.maps.InfoWindow({
-									content: '<h3 style="color:#83B348;">'+locations[i][2]+'</h3>'
-								});
+				</script>
 
-								var marker = new google.maps.Marker({
-									position: new google.maps.LatLng(locations[i][0], locations[i][1]),
-									map: map,
-									title: locations[i][2],
-									infowindow: myinfowindow,
-									icon: 'images/'+locations[i][3]+'.gif'
-								});
-								
-								google.maps.event.addListener(marker, 'click', function () {
-									this.infowindow.open(map, this);
-								});
-							}
-							setBoundsLeftSidebar(locations, 0.9);
-						}
-
-					</script>
-					<br>
-					<br>
-					<a href="/ranking" class="button alt">Voir le classement</a>
+				<br><br>
+				<a href="/ranking" class="button alt">Voir le classement</a>
 
 				</section>
 			</div>

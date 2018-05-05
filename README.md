@@ -16,7 +16,7 @@ cd GeocachingJDS && npm install
 ## Run
 
 - We recommend using PM2 from http://pm2.keymetrics.io 
-- Edit file ``ecosystem.json``` and change settings accordingly to your installation
+- Edit file ```ecosystem.json``` and change settings accordingly to your installation
 - Run  ```pm2 start ecosystem.json —watch```
 
 ## Monitor
