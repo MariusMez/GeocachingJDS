@@ -135,7 +135,7 @@
 					<summary>Cliquez pour voir les objets présents dans cette cache</summary>
 					<ul>
 					<% objets.forEach(function(obj) { %>
-						<li> <a href="/tb?id=<%= obj.id %>"><b> <%= obj.get("Name") %></b></a>  - <a href="/logtb?action=grab&id=<%= obj.id %>&cacheId=<%= id %>">Récuperez le ! </a> </li>
+						<li> <a href="/tb?id=<%= obj.id %>"><b> <%= obj.get("Name") %></b></a> 
 					<% }); %>
 					</ul>
 				</details>

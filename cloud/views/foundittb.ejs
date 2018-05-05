@@ -50,7 +50,7 @@
 				Numéro de suivi de l'Objet Voyageur
 				<input type="text" name="tracking" id="tracking" value="" style="border: solid 1px #fff;" placeholder="Ce numéro est inscrit ou attaché sur l'objet voyageur" required/>
 				<br>
-				
+				<% if(action=='drop') { %>
 				Un petit Message pour partager votre découverte avec le propriétaire de l'Objet Voyageur
 				<input type="text" name="message" id="message" value="" style="border: solid 1px #fff;" placeholder="Ce Message sera visible sur le site" maxlength="500" required/>
 				<br>		
@@ -58,17 +58,23 @@
 				Une photo souvenir (sera visible sur le site) pour aider à accomplir la mission de l'objet
 				<input type="file" name="pic" id="pic" accept="image/*">
 				<br>
-				<br>
-				Votre Email des Jeux de Sophia - <i>Nécessaire au classement de l'épreuve</i>
-				<input type="email" name="email" id="email" value="" style="border: solid 1px #fff;" placeholder="L'email ne sera pas visible sur le site" required/>
-				<br>
-				Votre Pseudo pour l'épreuve Géocaching
-				<input type="text" name="name" id="name" value="" style="border: solid 1px #fff;" placeholder="Ce pseudo sera visible sur le site" required/>
-				<br>
-
-				<br>
+								<br>
 				Si vous avez apprécié découvrir cet objet, attribuez lui un point favori en cochant cette case : 
 				<input type="checkbox" name="fav" value="true" /> 👍
+
+
+				<% } %>
+				<br>
+				<% if(email == "" ) { %>
+				Votre Email des Jeux de Sophia - <i>Nécessaire au classement de l'épreuve</i>
+				<% } %>
+				<input <% if(email != "" ) { %>  type="hidden" <% } %>  type="email" name="email" id="email" value="<%= email %>" style="border: solid 1px #fff;" placeholder="L'email ne sera pas visible sur le site" required/>
+				<br>
+				<% if(pseudo == "" ) { %>
+				Votre Pseudo pour l'épreuve Géocaching
+				<% } %>
+				<input <% if(pseudo != "" ) { %>  type="hidden" <% } %> type="text" name="name" id="name" value="<%= pseudo %>" style="border: solid 1px #fff;" placeholder="Ce pseudo sera visible sur le site" required/>
+				<br>
 
 				<br><br><input type="submit" value="Envoyer" name="submit" class="button alt" id="submitButton" title="Clic ici pour envoyer la découverte" />
 				
