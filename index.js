@@ -269,12 +269,12 @@ app.get('/geocaches', function(req, res) {
 });
 
 
-app.get('/photos', function(req, res) {
+app.get('/photoscaches', function(req, res) {
 	var page = req.query.page;
 	if (page === undefined) {
 		page = 1;
 	}
-	var max = 15;
+	var max = 9;
 
 	var Log = Parse.Object.extend("Log");
 	var queryLog = new Parse.Query(Log);
@@ -292,20 +292,47 @@ app.get('/photos', function(req, res) {
 			queryLog.include("Geocache");
 			queryLog.find({
 				success: function(logs) {
-					var Geocaches = Parse.Object.extend("Geocache");
-					var query = new Parse.Query(Geocaches);
-					query.equalTo("Active", true);
-					query.descending("createdAt");
-					query.find({ 
-						success: function(caches) {
-							res.render('photos', { message: 'Les caches à trouver', 
-												   geocaches: caches,
-												   logs: logs, 
-												   page: page,
-												   pages: count/max });
-						}
-					});
+					res.render('photos', { logs: logs, 
+										   page: page,
+										   pages: count/max });
 				}
+			});
+	    },
+	    error: function(error) {
+	    	// The request failed
+	    }
+	});
+});
+
+app.get('/photostbs', function(req, res) {
+	var page = req.query.page;
+	if (page === undefined) {
+		page = 1;
+	}
+	var max = 9;
+
+	var TravelbugLog = Parse.Object.extend("TravelbugLog");
+	var queryLog = new Parse.Query(TravelbugLog);
+	queryLog.descending("createdAt");
+	queryLog.equalTo("Active", true);
+	queryLog.exists("PhotoUrl");
+	queryLog.count({
+		success: function(count) {
+	    	var queryLog = new Parse.Query(TravelbugLog);
+			queryLog.descending("createdAt");
+			queryLog.equalTo("Active", true);
+			queryLog.exists("PhotoUrl");
+			queryLog.limit(max);
+			queryLog.skip(max * page)
+			queryLog.find({
+				success: function(logs) {
+					res.render('photostbs', { logs: logs, 
+										      page: page,
+										      pages: count/max });
+				},
+			    error: function(error) {
+			    	res.redirect("/index");
+			    }
 			});
 	    },
 	    error: function(error) {

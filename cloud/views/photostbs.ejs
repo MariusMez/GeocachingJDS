@@ -1,0 +1,47 @@
+	<!DOCTYPE HTML>
+	<html>
+	<head>
+		<title>PHOTOS DE LA COURSE AUX OBJETS VOYAGEURS - Géocaching Jeux de Sophia 2018</title>
+		<% include ./partials/head %>
+		<link rel="stylesheet" href="public/css/grid.css" />
+	</head>
+	<body>
+
+		<% include ./partials/menu %>
+		
+		<div id="main" class="wrapper style4">
+
+			<div id="intro" class="container">
+				<section>
+					<header class="major">
+						<h2>Toutes les photos de l'épreuve</h2>
+						<span class="byline">Voici les photos des Log des Objets Voyageurs</span>				
+					</header>
+
+					<div id="gridsalv" class="clearfix" data-columns>
+
+						<% logs.forEach(function(log) { %>
+						<div>
+							<a href="<%= log.get("PhotoUrl") %>"><img width="250px;" class="border" src="<%= log.get("PhotoUrl") %>" /><p><%= log.get("TravelbugName") %> - <b><%= log.get("Pseudo") %></b></p>
+							</a>
+						</div>
+						<% }); %>
+
+					</div>
+
+					<%  for (var i = 1; i < pages; i++) { 
+					    if(page==i) { %>
+							&raquo; Page <%= i %>&nbsp;&nbsp;
+						<% } else { %>
+							<a href="/photos?page=<%= i %>">Page <%= i %></a>&nbsp;&nbsp;
+						<% } %>
+					<% } %>
+
+				</section>
+			</div>
+		</div>
+
+		<% include ./partials/footer %>
+		<script src="public/js/salvattore.min.js"></script>
+	</body>
+	</html>

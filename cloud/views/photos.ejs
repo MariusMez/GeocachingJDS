@@ -1,7 +1,7 @@
 	<!DOCTYPE HTML>
 	<html>
 	<head>
-		<title>PHOTOS DE LA COURSE AUX OBJETS VOYAGEURS - Géocaching Jeux de Sophia 2018</title>
+		<title>PHOTOS DES LOG DES CACHES - Géocaching Jeux de Sophia 2018</title>
 		<% include ./partials/head %>
 		<link rel="stylesheet" href="public/css/grid.css" />
 	</head>
@@ -30,11 +30,11 @@
 					</div>
 
 					<%  for (var i = 1; i < pages; i++) { 
-						    if(page==i) { %>
-								&raquo; Page <%= i %>&nbsp;&nbsp;
-							<% } else { %>
-								<a href="/photos?page=<%= i %>">Page <%= i %></a>&nbsp;&nbsp;
-							<% } %>
+					    if(page==i) { %>
+							&raquo; Page <%= i %>&nbsp;&nbsp;
+						<% } else { %>
+							<a href="/photos?page=<%= i %>">Page <%= i %></a>&nbsp;&nbsp;
+						<% } %>
 					<% } %>
 
 				</section>
