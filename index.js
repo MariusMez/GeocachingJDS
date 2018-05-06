@@ -17,6 +17,8 @@ var fs = require('fs');
 const sharp = require('sharp');
 // var ca = [fs.readFileSync("/etc/letsencrypt/live/geocaching-jds.fr/fullchain.pem")];
 
+var jds = require('./geocaching-jds');
+
 var api = new ParseServer({
   databaseURI: process.env.MONGODB_ADDON_URI, // Use the MongoDB URI
  // databaseOptions: {
@@ -71,6 +73,8 @@ app.get('/register', function(req, res) {
 
 app.post('/registerTb', upload.single('pic'), function(req, res, next) {
 
+	var tracking_code = req.body.code.toUpperCase();
+
 	var Travelbug = Parse.Object.extend("Travelbug");
 	var travelbug = new Travelbug();
 
@@ -82,8 +86,6 @@ app.post('/registerTb', upload.single('pic'), function(req, res, next) {
 
 	var TravelbugCode = Parse.Object.extend("TravelbugCode");
 	var query = new Parse.Query("TravelbugCode");
-
-	const tracking_code = req.body.code.toUpperCase();
     query.equalTo('Code', tracking_code);
     query.equalTo("Active", false);
     query.first({
@@ -169,6 +171,7 @@ app.post('/registerTb', upload.single('pic'), function(req, res, next) {
 														
 														geocacheur.set("Email", req.body.email);
 														geocacheur.set("Pseudo", req.body.pseudo);
+														geocacheur.set("Active", true);
 														geocacheur.save(null, {
 															success: function() {
 																res.render('tbregistered', { tbid:travelbug.id, message:"Bravo " 
@@ -333,19 +336,12 @@ app.get('/tb', function(req, res) {
 							   objetsLogged:objetsLogged });
 				},
 				error: function(object, error) {
-					res.render('geocaches', { message:"Redirection toutes les caches" });
+					res.redirect('/geocaches');
 				}
 			});
 		},
 		error: function(object, error) {
-			var queryTbs = new Parse.Query(Travelbug);
-			queryTbs.descending("createdAt");
-			queryTbs.equalTo("Active", true);
-			queryTbs.find({
-				success: function(tbs) {
-					res.render('tbs', { message: 'Les objets à trouver', tbs:tbs });
-				}
-			});
+			res.redirect('/tbs');
 		}
 	});
 });
@@ -425,67 +421,62 @@ app.get('/geocache', function(req, res) {
 															 objets:travelbugs, objetsLogged:objetsLogged });
 									},
 									error: function(object, error) {
-										res.render('geocaches', { message:"Redirection toutes les caches" });
+										res.redirect('/geocaches');
 									}
 								});
-														 
-								
 						},
 						error: function(object, error) {
-							res.render('geocaches', { message:"Redirection toutes les caches" });
+							res.redirect('/geocaches');
 						}
 					});
 				},
 				error: function(object, error) {
-					res.render('geocaches', { message:"Redirection toutes les caches" });
+					res.redirect('/geocaches');
 				}	
 			});	
 		},
 		error: function(object, error) {
-			res.render('geocaches', { message:"Redirection toutes les caches" });
+			res.redirect('/geocaches');
 		}	
 	});
 });
 
 app.get('/flashit', function(req, res) {
-	var Geocache = Parse.Object.extend("Geocache");
-	var query = new Parse.Query(Geocache);
-	query.equalTo("codeId", req.query.id);
-	query.find({
-		success: function(results) {
-			if(results.length > 0) {
-	    		for (var i = 0; i < results.length; i++) { 
-	    			var object = results[i];
-	    		}
-	    		var geocacheName = object.get("Nom");
-	    		var geocacheCat = object.get("Category");
-	    		var geocacheId = object.get("codeId");
-				
-				res.render('flashit', { nom:geocacheName, 
-		    								code:req.query.id, 
-											cat:geocacheCat});
-					
-
-	    	} else {
-	    		res.render('flashit', { nom:"Code invalide !", id:0, cat:"UNKNOWN" });
-	    	}
-	    },
-	    error: function(object, error) {
-	    	res.render('flashit', { nom:"Code invalide !", id:0, cat:"UNKNOWN" });
-	    }	
-	});
+	var codeId = req.query.id;
+	jds.getGeocacheWithCodeId(codeId).then(function(cache) {
+        if(cache) {
+            res.render('flashit', { nom: cache.get("Nom"), 
+	    							code: cache.get("codeId"), 
+									cat: cache.get("Category")});
+        } else {
+            console.log("Geocache with codeId: " + codeId + " was not found");
+            res.render('error', { message:"Code de suivi invalide !"}); 
+        }
+    }, function(error) {
+        console.log("Error in flashit: " + error);
+        res.render('error', { message:"Code de suivi invalide ! " + error.message });
+    });
 });
 
 app.post('/myscore', function(req, res) {
 	var email = req.body.email;
 	var Logs = Parse.Object.extend("Log");
-	
+
+	const nbPointsFoundIt = 20;
+	const nbPointsFTF = 3;
+	const nbPointsSTF = 2;
+	const nbPointsTTF = 1;
+	const nbPointsFavTB = 2;
+	const nbPointsMission = 5;
+	const nbPointsNewTBDiscover = 10;
+	const nbPointsFirstCacheVisit = 10;
+	const nbPointsTBOwnerByMove = 2;
 	
 	var queryCaches = new Parse.Query(Logs);
 	queryCaches.equalTo("Email", email);
 	queryCaches.equalTo("Active", true);
 	queryCaches.include('Geocache');
-	queryCaches.find().then ( function(mylogs) {
+	queryCaches.find().then( function(mylogs) {
 		var scoreCaches = { logs:0, dt:0, ftf:0};
 	
 		console.log(email+ " logged " + mylogs.length + " caches ");	
@@ -495,8 +486,8 @@ app.post('/myscore', function(req, res) {
 			console.log(email+ " logged cache with Difficulty " + log.get("Geocache").get("Difficulty"));	
   			promise = promise.then(function() {
   				scoreCaches.dt = scoreCaches.dt + log.get("Geocache").get("Difficulty") + log.get("Geocache").get("Terrain");
-  				scoreCaches.logs = scoreCaches.logs + 10;
-  				scoreCaches.ftf = scoreCaches.ftf + 3*log.get("FTF") + 2*log.get("STF") + 1*log.get("TTF"); 
+  				scoreCaches.logs = scoreCaches.logs + nbPointsFoundIt;
+  				scoreCaches.ftf = scoreCaches.ftf + nbPointsFTF*log.get("FTF") + nbPointsSTF*log.get("STF") + nbPointsTTF*log.get("TTF"); 
   				return scoreCaches;
   			});	
   		});		
@@ -512,7 +503,7 @@ app.post('/myscore', function(req, res) {
 		queryTbs.find().then ( function(mylogs) {
 			var scoreTb = { drop:0, dropTB:0, dropgc:0, missions:0, fav:0, owner:0};
 		
-			console.log(email+ " logged " + mylogs.length + " TB ");	
+			console.log(email + " logged " + mylogs.length + " TB ");	
 			var promise = Parse.Promise.as();
 			
 	  		mylogs.forEach(function(log) {
@@ -520,15 +511,15 @@ app.post('/myscore', function(req, res) {
 					console.log(email+ " logged TB with owner " + log.get("Travelbug").get("OwnerEmail"));	
 
 					if (log.get("Email") == email) {
-						scoreTb.dropTB = scoreTb.dropTB + 10*log.get("NewCache");
-						scoreTb.dropgc = scoreTb.dropgc + 10*log.get("NewTB");
+						scoreTb.dropTB = scoreTb.dropTB + nbPointsFirstCacheVisit*log.get("NewCache");
+						scoreTb.dropgc = scoreTb.dropgc + nbPointsNewTBDiscover*log.get("NewTB");
 						if (log.get("Mission") != undefined) {
-			  				scoreTb.missions = scoreTb.missions + 5*log.get("Mission");													
+			  				scoreTb.missions = scoreTb.missions + nbPointsMission * log.get("Mission");													
 						}
 					}  			
 	  				if (log.get("Travelbug").get("OwnerEmail") == email) {
-		  				scoreTb.fav = scoreTb.fav + log.get("Fav")*2; 	  	
-		  				scoreTb.owner = scoreTb.owner + 2;				
+		  				scoreTb.fav = scoreTb.fav + log.get("Fav") * nbPointsFavTB; 	  	
+		  				scoreTb.owner = scoreTb.owner * nbPointsTBOwnerByMove;				
 	  				}
 	  				return scoreTb;
 	  			});	
@@ -552,13 +543,8 @@ app.post('/myscore', function(req, res) {
 	})
 	
 });
-		
-	
 
 
-// TODO : gérer le cas ou le TB est présent dans une cache
-// Ajouter l'option Récupérer dans la cache : nom de la cache
-// Gérer les cas d'erreur Grab depuis une autre cache que celui dans lequel il est affecté dans la BDD
 app.get('/logtb', function(req, res) {
 	var Travelbug = Parse.Object.extend("Travelbug");
 	var Geocacheur = Parse.Object.extend("Geocacheur");
@@ -588,9 +574,7 @@ app.get('/logtb', function(req, res) {
 				query.notContainedIn("Category", ["VIRTUAL", "EARTHCACHE", "WEBCAM", "SPECIAL"]); // Only physical boxes and EVENTS
 				query.ascending("Nom");
 				query.find({ 
-
 					success: function(caches) {
-
 						var queryGeocacheurs = new Parse.Query(Geocacheur);
 						queryGeocacheurs.equalTo("objectId", req.query.geocacheurId);
 						queryGeocacheurs.find({
@@ -609,30 +593,23 @@ app.get('/logtb', function(req, res) {
 						    								  geocaches:caches,
 						    								  id:tbId });
 						    	} else {
-							    		res.render('found', { cacheid:0, message: "Geocacheur non trouvé" });
+							    	res.render('found', { cacheid:0, message: "Geocacheur non trouvé" });
 						    	}
 						    }, 
 						    error: function(object, error) {
-					  				res.render('found', { cacheid:0, message: "Geocacheur non trouvé" });
+					  			res.render('found', { cacheid:0, message: "Geocacheur non trouvé" });
 					  		}
 					  	});
 			    	}
 			    });
 	    	} else {
 	    		console.log("Erreur in logtb : results.length is < 0")
-	    		var queryTbs = new Parse.Query(Travelbug);
-				queryTbs.descending("createdAt");
-				queryTbs.equalTo("Active", true);
-				queryTbs.find({
-					success: function(tbs) {
-						res.render('tbs', { message: 'Les objets à trouver', tbs:tbs });
-					}
-				});
+	    		res.redirect('/tbs');
 	    	}
 	    },
 	    error: function(object, error) {
 	    	console.log("General error in logtb")
-	    	res.render('geocaches', { message:"Redirection toutes les caches" });
+	    	res.redirect('/geocaches');
 	    }	
 	});
 });
@@ -718,10 +695,10 @@ app.post('/foundtb', upload.single('pic'), function (req, res, next) {
 					        success: function(results) {
 					        	if(results.length == 0) {
 									console.log("Cache non trouvee ! : " + req.body.geocache + ' - ' + tb.id);
-									res.render('foundtb', { message:"La cache n'a pas encore ete trouvee pour faire voyager un tb !", tbid:req.body.id });		    	
+									res.render('foundtb', { message: "La cache n'a pas encore été trouvée pour faire voyager un tb !", tbid:req.body.id });		    	
 					        	} else {
 
-					        		console.log("Cache trouvee ! ");
+					        		console.log("Cache trouvée ! ");
 
 									logEntry.set("Geocache", tb.get("Geocache"));
 
@@ -802,7 +779,7 @@ app.post('/foundtb', upload.single('pic'), function (req, res, next) {
 													}		
 
 
-													console.log("on regarde si le geocacheur n'a pas deja 2 tb en main et qu'il essaye pas d'en grab un troisieme");
+													console.log("on regarde si le geocacheur n'a pas deja 3 tb en main et qu'il essaye pas d'en grab un quatrième");
 
 
 													var nbTBinHands = new Parse.Query(Travelbug);
@@ -812,8 +789,8 @@ app.post('/foundtb', upload.single('pic'), function (req, res, next) {
 													nbTBinHands.find({
 														success: function(nbTbs) {
 
-															if(nbTbs.length >= 2) {
-																res.render("error", {message: "Il n'est pas possible d'avoir plus de 2 TB en mains"});
+															if(nbTbs.length >= 3) {
+																res.render("error", {message: "Il n'est pas possible d'avoir plus de 3 TB en mains"});
 															} else {
 
 																tb.save();
@@ -884,104 +861,78 @@ app.post('/foundtb', upload.single('pic'), function (req, res, next) {
 });
 
 app.post('/flash', function(req, res) {
-	var Logs = Parse.Object.extend("Log");
-	var Geocache = Parse.Object.extend("Geocache");
-	var Geocacheur = Parse.Object.extend("Geocacheur");
-		
-	var query = new Parse.Query(Geocache);
-	query.equalTo("codeId", req.body.code);
-	query.find({
-		success: function(results) {
-			
-			if(results.length > 0) {
-	    		var cache = results[0];
-				
-				var queryLogs = new Parse.Query(Logs);
-				queryLogs.equalTo("Email", req.body.email);
-				queryLogs.equalTo("Active", true);
-				queryLogs.equalTo("Geocache", cache);
-				queryLogs.find({
-					success: function(resLogs) {
-												
-						if(resLogs.length > 0) {
+	
+	var codeId = req.body.code;
+	var email = req.body.email
+	jds.getGeocacheWithCodeId(codeId).then(function(cache) {
+        if(cache) {
+        	console.log("if cache")
+			jds.getLogWithEmailAndCache(email, cache).then(function(resLogs) {
+		        if(resLogs) {
+		        	console.log("if resLogs : " + JSON.stringify(resLogs, null, "    "));
+		        	jds.getAllTravelbugsInCache(cache).then(function(travelbugsInCache) {
+		        		console.log("after getAllTravelbugsInCache")
+				        if(travelbugsInCache) {
+				        	console.log("if travelbugsInCache")
+				            jds.getAllTravelbugsInHands(email).then(function(travelbugsInHands) {
+						        if(travelbugsInHands) {
+						        	console.log("if travelbugsInHands")
+						        	jds.getGeocacheurWithEmail(email).then(function(geocacheur) {
+								        if(geocacheur) {
+								        	console.log("if cache")
+								            res.render('found', { cacheid:cache.id, 
+								            					  geocacheurId:geocacheur.id, 
+								            					  tbsout: travelbugsInCache, 
+								            					  tbsin: travelbugsInHands, 
+								            					  message:"La cache a déja été trouvée mais vous pouvez quand meme faire voyager des objets.<br><br>" });
+								        } else {
+								        	res.render('error', { message: "Geocacheur non trouvé avec l'email : " + email });
+								        }
+								    }, function(error) {
+								    	res.render('error', { message: error.message });
+								    });
+						        } else {
+						            res.render('error', { message: "Pas d'objet voyageur dans les mains de ce géocacheur : " + email });
+						        }
+						    }, function(error) {
+						        res.render('error', { message: error.message });
+						    });
 
-							var Travelbug = Parse.Object.extend("Travelbug");
-							var queryTbIns = new Parse.Query(Travelbug);
-							queryTbIns.descending("createdAt");
-							queryTbIns.equalTo("Active", true);
-							queryTbIns.equalTo("cacheId", cache.id);
-							queryTbIns.find({
-								success: function(travelbugsInCache) {
-									
-									var queryTbsHands = new Parse.Query(Travelbug);
-									queryTbsHands.descending("createdAt");
-									queryTbsHands.equalTo("Active", true);
-									queryTbsHands.equalTo("HolderEmail", req.body.email);
-									queryTbsHands.find({
-										success: function(travelbugsInHands) {
-							
-											console.log("j'essaye de trouver le geocacheur")
-											var queryGeocacheur = new Parse.Query(Geocacheur);
-											queryGeocacheur.equalTo("Email", req.body.email);
-											queryGeocacheur.find({
-												success: function(geocacheurs) {
-													if(geocacheurs.length == 1) {
-											    		var geocacheur = geocacheurs[0];
+				        } else {
+				            res.render('error', { message: "Pas d'objet voyageur dans cette cache" });
+				        }
+				    }, function(error) {
+				    	res.render('error', { message: error.message });
+				    });
 
-											    		console.log("le geocacheur : " + geocacheur.get("Email") );
-							
-														res.render('found', { cacheid:cache.id, geocacheurId:geocacheur.id, tbsout: travelbugsInCache, tbsin: travelbugsInHands, message:"La cache a déja été trouvée mais vous pouvez quand meme faire voyager des objets.  <br><br>"});
-													} else {
-											    		res.render('error', { cacheid:0, message: "Geocacheur non trouvé" });
-											    	}
-											    }, 
-											    error: function(object, error) {
-										  				res.render('error', { cacheid:0, message: "Geocacheur non trouvé" });
-										  		}
-										  	});
-											  					
-						  					},
-						  					error: function(object, error) {
-						  						res.render('error', { cacheid:0, message: error.message });
-						  					}
-						  				});
-		
-										},
-										error: function(object, error) {
-											res.render('error', { cacheid:0, message: error.message });
-										}
-									});
-						} else {
+		        } else {
+		            console.log("Log with email: " + email + " was not found - Looking for a Geocacheur to prepare a new Log");
+					jds.getGeocacheurWithEmail(email).then(function(geocacheur) {
+				        if(geocacheur) {
+				            res.render('foundit', { nom: cache.get("Nom"), 
+					    							id: cache.id, 
+					    							email: geocacheur.get("Email"), 
+					    							pseudo: geocacheur.get("Pseudo"),
+													cat: cache.get("Category") });
+				        } else {
+				        	res.render('error', { message: "Geocacheur non trouvé avec l'email : " + email });
+				        }
+				    }, function(error) {
+				    	res.render('error', { message: error.message });
+				    });
+		        }
+		    }, 
+		    function(error) {
+		    	res.render('error', { message: error.message });
+		    });
+        } else {
+            console.log("Geocache with codeId: " + codeId + " was not found");
+            res.render('error', { message:"Code de suivi introuvable !"}); 
+        }
+    }, function(error) {
+        res.render('error', { message: error.message });
+    });
 
-							console.log("j'essaye de trouver le geocacheur")
-							var queryGeocacheur = new Parse.Query(Geocacheur);
-							queryGeocacheur.equalTo("Email", req.body.email);
-							queryGeocacheur.find({
-								success: function(geocacheurs) {
-									if(geocacheurs.length == 1) {
-							    		var geocacheur = geocacheurs[0];
-
-							    		console.log("le geocacheur : " + geocacheur.get("Email") );
-							    		
-							    		res.render('foundit', { nom:cache.get("Nom"), 
-							    								id:cache.id, 
-							    								email: geocacheur.get("Email"), 
-							    								pseudo: geocacheur.get("Pseudo"),
-																cat:cache.get("Category") });
-							    	} else {
-							    		res.render('error', { cacheid:0, message: "Geocacheur non trouvé" });
-							    	}
-							    }, 
-							    error: function(object, error) {
-						  				res.render('error', { cacheid:0, message: "Geocacheur non trouvé" });
-						  		}
-						  	});
-						}
-					}
-				});
-			}
-		}
-	});
 });
 
 app.post('/found', upload.single('pic'), function (req, res, next) {

@@ -23,41 +23,37 @@
 	<div class="wrapper style3">
 		<section class="container">
 			<header class="major">
-			<h2><%- message %></h2>
+				<h2><%- message %></h2>
 			</header>
-			
 		</section>
 
-<section>
+		<section>
 
-<% if(tbsout.length == 0)  { %>
-	<p class="medium">Il n'y a pas de TB dans cette cache. </p>
-					<% } else { %>
-<p>Vous pouvez récupérer un des objets suivants : </p>
-<ul>
-<% tbsout.forEach(function(obj) { %>
-	<li> <a style="color:blue;" href="/tb?id=<%= obj.id %>"><b> <%= obj.get("Name") %></b></a>  - <a style="color:blue;" href="/logtb?action=grab&id=<%= obj.id %>&cacheId=<%= cacheid %>&geocacheurId=<%= geocacheurId %>">Récuperez le ! </a> </li>
-<% }); %>
-</ul>
+		<% if(tbsout.length == 0)  { %>
+			<p class="medium">Il n'y a pas de TB dans cette cache. </p>
+		<% } else { %>
+			<p>Vous pouvez récupérer un des objets suivants : </p>
+			<ul>
+			<% tbsout.forEach(function(obj) { %>
+				<li><a style="color:blue;" href="/tb?id=<%= obj.id %>"><b><%= obj.get("Name") %></b></a> - <a style="color:blue;" href="/logtb?action=grab&id=<%= obj.id %>&cacheId=<%= cacheid %>&geocacheurId=<%= geocacheurId %>">Récuperez le !</a></li>
+			<% }); %>
+			</ul>
+		<% } %>
 
-<% } %>
+		<% if(tbsin.length == 0)  { %>
+			<p class="medium">Vous ne possédez pas de TB à déposer dans cette cache. </p>
+		<% } else { %>
+			<p>Vous pouvez déposer un des objets suivants : </p>
+			<ul>
+			<% tbsin.forEach(function(obj) { %>
+				<li><a style="color:blue;" href="/tb?id=<%= obj.id %>"><b><%= obj.get("Name") %></b></a> - <a style="color:blue;" href="/logtb?action=drop&id=<%= obj.id %>&cacheId=<%= cacheid %>&geocacheurId=<%= geocacheurId %>">Déposez le !</a></li>
+			<% }); %>
+			</ul>
+		<% } %>
 
-	<% if(tbsin.length == 0)  { %>
-		<p class="medium">Vous ne possédez pas de TB à déposer dans cette cache. </p>
-						<% } else { %>
-	<p>Vous pouvez déposer un des objets suivants : </p>
-	<ul>
-	<% tbsin.forEach(function(obj) { %>
-		<li> <a style="color:blue;" href="/tb?id=<%= obj.id %>"><b> <%= obj.get("Name") %></b></a>  - <a style="color:blue;" href="/logtb?action=drop&id=<%= obj.id %>&cacheId=<%= cacheid %>&geocacheurId=<%= geocacheurId %>">Déposez le ! </a> </li>
-	<% }); %>
-	</ul>
+		<a href="/geocache?id=<%= cacheid %>" class="button alt">Visualiser la cache</a>
 
-	<% } %>
-
-
-<a href="/geocache?id=<%= cacheid %>" class="button alt">Visualiser la cache</a>
-
-</section>
+		</section>
 	</div>
 
 	<div id="footer">

@@ -38,7 +38,6 @@
    				   <!-- <option value="grabholder">Récupérer des mains d'un autre géocacheur</option> -->
 				</select>
 				<br>
-				<br>
 				Géocache concernée : 
 				<select name="geocache">
 				    <% geocaches.forEach(function(cache) { %>
@@ -47,7 +46,7 @@
 				</select>
 				<br>
 				<br>
-				Numéro de suivi de l'Objet Voyageur
+				Code de suivi de l'Objet Voyageur
 				<input type="text" name="tracking" id="tracking" value="" style="border: solid 1px #fff;" placeholder="Ce numéro est inscrit ou attaché sur l'objet voyageur" required/>
 				<br>
 				<% if(action=='drop') { %>
@@ -58,7 +57,7 @@
 				Une photo souvenir (sera visible sur le site) pour aider à accomplir la mission de l'objet
 				<input type="file" name="pic" id="pic" accept="image/*">
 				<br>
-								<br>
+				<br>
 				Si vous avez apprécié découvrir cet objet, attribuez lui un point favori en cochant cette case : 
 				<input type="checkbox" name="fav" value="true" /> 👍
 
@@ -75,8 +74,8 @@
 				<% } %>
 				<input <% if(pseudo != "" ) { %>  type="hidden" <% } %> type="text" name="name" id="name" value="<%= pseudo %>" style="border: solid 1px #fff;" placeholder="Ce pseudo sera visible sur le site" required/>
 				<br>
-
-				<br><br><input type="submit" value="Envoyer" name="submit" class="button alt" id="submitButton" title="Clic ici pour envoyer la découverte" />
+				<br>
+				<input type="submit" value="Envoyer" name="submit" class="button alt" id="submitButton" title="Clic ici pour envoyer la découverte" />
 				
 			</form>  				 
 		</section>

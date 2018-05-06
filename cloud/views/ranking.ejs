@@ -36,16 +36,8 @@
 					<h2>Classement Général</h2>
 				</header>
 
-				<h3>Calcul en temps réel de mon score</h3>
-				<form ref="uploadForm" id="uploadForm" method="post" action="/myscore" style="display: flex; flex-direction: row;">
-					<input type="email" name="email" id="email" value="" style="border: solid 1px #000; width: 70%; display: block;" placeholder="Email pour vous identifier" required/>
-					<input type="submit" value="Detail de mon score" name="submit" style="border: solid 1px #000; width: 30%; display: block;" class="button alt" id="submitButton" title="Voir mon score" />
-					
-				</form>  
-				<br/>
-
-				<h3>Classement global</h3>
-				<p>Note: le classement général n'est pas calculé en temps réel tandis que le calcul individuel l'est ! attendez un recalcul pour que les deux soient alignés</p>
+				<p class="small"><b>Note :</b> le classement général n'est pas calculé en temps réel tandis que le <a href="#classement_individuel">classement individuel</a> l'est ! Attendez un recalcul pour que les deux soient alignés.</p>
+				
 				<table class="zebra">
 					<thead>
 						<tr>
@@ -105,7 +97,6 @@
 					</tbody>
 					
 				</table>
-
 			</section>
 
 			<section>
@@ -115,11 +106,8 @@
 					<li><b><%= g.get("Pseudo") %></b> avec <%= g.get("ScoreFTF") %> point<%if(g.get("ScoreFTF")>1) { %>s <% } %></li>
 					<%} }); %>
 				</ul>
-
 			</section>
 			<br>
-			<br>
-
 			<section>
 				<h2>Classement des Caches préférées</h2>
 				<ul style="list-style-type:decimal; margin-left:30px;">
@@ -130,10 +118,25 @@
 				</ul>
 			</section>
 			<br>
+			<section id="classement_individuel">
+				<header class="major">
+					<h2>Classement Individuel</h2>
+				</header>
+				<h2>Calcul en temps réel de mon score</h2>
+				<form ref="uploadForm" id="uploadForm" method="post" action="/myscore" style="display: flex; flex-direction: row;">
+					<input type="email" name="email" id="email" value="" style="border: solid 1px #000; width: 70%; display: block;" placeholder="Email de participant pour vous identifier" required/>
+					<input type="submit" value="Détail de mon score" name="submit" style="border: solid 1px #000; width: 30%; display: block;" class="button alt" id="submitButton" title="Voir mon score" />
+				</form>  
+				<p class="small">Classement "temps réél" pour le fun et succeptible de varier après vérification sur les logbooks ;-)</p>
+			</section>
 			<br>
 			<br>
-			<p>Classement "temps réél" pour le fun et succeptible de varier après vérification sur les logbooks ;-)</p>
-			<h5><a href="/ranking2017"><u>&raquo; Archive du classement et des caches - édition 2017</u></a></h5>
+			<section>
+				<header class="major">
+					<h2>Classement des éditions précédentes</h2>
+				</header>
+				<a href="/ranking2017"><b>&raquo; Archive du classement et des caches - édition 2017</b></a>
+			</section>
 		</div>
 	</div>
 
