@@ -36,7 +36,7 @@
 <p>Vous pouvez récupérer un des objets suivants : </p>
 <ul>
 <% tbsout.forEach(function(obj) { %>
-	<li> <a style="color:blue;" href="/tb?id=<%= obj.id %>"><b> <%= obj.get("Name") %></b></a>  - <a style="color:blue;" href="/logtb?action=grab&id=<%= obj.id %>&cacheId=<%= cacheid %>">Récuperez le ! </a> </li>
+	<li> <a style="color:blue;" href="/tb?id=<%= obj.id %>"><b> <%= obj.get("Name") %></b></a>  - <a style="color:blue;" href="/logtb?action=grab&id=<%= obj.id %>&cacheId=<%= cacheid %>&geocacheurId=<%= geocacheurId %>">Récuperez le ! </a> </li>
 <% }); %>
 </ul>
 
@@ -48,7 +48,7 @@
 	<p>Vous pouvez déposer un des objets suivants : </p>
 	<ul>
 	<% tbsin.forEach(function(obj) { %>
-		<li> <a style="color:blue;" href="/tb?id=<%= obj.id %>"><b> <%= obj.get("Name") %></b></a>  - <a style="color:blue;" href="/logtb?action=drop&id=<%= obj.id %>&cacheId=<%= cacheid %>">Déposez le ! </a> </li>
+		<li> <a style="color:blue;" href="/tb?id=<%= obj.id %>"><b> <%= obj.get("Name") %></b></a>  - <a style="color:blue;" href="/logtb?action=drop&id=<%= obj.id %>&cacheId=<%= cacheid %>&geocacheurId=<%= geocacheurId %>">Déposez le ! </a> </li>
 	<% }); %>
 	</ul>
 

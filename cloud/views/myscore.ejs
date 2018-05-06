@@ -12,14 +12,30 @@
 		<div id="content" class="container">
 			<section>
 
-				<p><h3>Score de <i><%= pseudo %></i></h3></p>
+				<p><h3>Score de <i><%= email %></i> : <%= scoreTotal %> </h3></p>
+				<p>Note: ce score peut etre différent de celui marqué sur le <a href="/ranking">classement général</a> car il est calculé en temps réel et l'autre ne l'est pas. </p>
 
-				<p><%- score %></p>
+				<h5> Score relatif aux caches trouvées</h5>
+				<ul>
+					<li>Caches Trouvées (10 points par cache) : <b><%- scoresCache.logs %> </b></li>
+					<li>Somme des Etoiles Difficulté/Terrain : <b> <%- scoresCache.dt %> </b></li>
+					<li>Somme des FTF (3 points)/STF (2 points)/TTF (1 point) : <b> <%- scoresCache.ftf %> </b></li>
+				</ul>
+
+				<h5> Score relatif aux objets déplacés</h5>
+				<ul>
+					<li>Objets uniques deplacés (10 points par objets différents) : <b><%- scoreTb.dropTB %> </b></li>
+					<li>Caches visitées en premier par un objet (10 points par visite de cache par TB) : <b><%- scoreTb.dropgc %> </b></li>
+					<li>Missions satisfaites (5 points par mission): <b> <%- scoreTb.missions %> </b></li>
+					<li>Deplacement de mon objet (2 points par deplacement): <b> <%- scoreTb.owner %> </b></li>
+					<li>Point favori de mon objet (2 points par favori): <b> <%- scoreTb.fav %> </b></li>
+					
+				</ul>
 
 			</section>
 			<br />
 
-			
+			<a href="/ranking" class="button alt">Retourner au classement</a>
 
 
 		</div>
