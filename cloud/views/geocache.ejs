@@ -50,7 +50,7 @@
 			
 			<% if( cat=='TRADI' || cat=='MULTI' || cat=='LETTERBOX' || cat=='EARTHCACHE' || cat=='EVENT' || cat=='CITO' || cat=='WHERIGO' ) { %>
 			<section>
-				<h2>Emplacement</h2>
+				<h2>📍 Emplacement</h2>
 				<div id="map"></div>
 
 				<script type="text/javascript">
@@ -74,7 +74,7 @@
 
 			<% if(cat=='TRADI' || cat=='MULTI' || cat=='LETTERBOX' || cat=='EARTHCACHE' || cat=='EVENT' || cat=='CITO' || cat=='WHERIGO' || cat=='MYSTERY' || cat=='SPECIAL') { %>
 			<section>
-				<h2>Spoiler</h2>
+				<h2>🃏 Spoiler</h2>
 				<details>
 					<summary>Cliquez pour voir l'indice et l'image Spoiler</summary>
 					<img src="<%= spoiler %>" alt="<%= nom %>"> <br />
@@ -121,7 +121,7 @@
 
 			<% if(cat=='TRADI' || cat=='MULTI' || cat=='LETTERBOX' || cat=='EVENT' || cat=='CITO' || cat=='WHERIGO' || cat=='MYSTERY' || cat=='SPECIAL') { %>
 			<section>
-				<h2>Liste des Objets Voyageurs</h2>
+				<h2>🗿 Objets Voyageurs</h2>
 				<details>
 					<summary>Cliquez pour voir les objets présents dans cette cache</summary>
 					<ul>
@@ -144,7 +144,7 @@
 			<% } %>
 
 			<section>
-				<h2>Logbook</h2>
+				<h2>📝 Logbook</h2>
 				<ul>
 					<% if(logs.length == 0)  { %>
 					<li><p class="medium">Soyez le premier à trouver la cache et annoncer votre découverte !!!</p></li>
@@ -156,7 +156,7 @@
 			</section>
 
 			<section>
-				<h2>Discussion</h2>
+				<h2>💬 Discussion</h2>
 				<div id="disqus_thread"></div>
 				<script>
 					(function() {

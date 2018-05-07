@@ -36,7 +36,12 @@
 				<p>Vous pouvez récupérer un des objets suivants : </p>
 				<ul>
 				<% tbsout.forEach(function(obj) { %>
-					<li><a style="color:blue;" href="/tb?id=<%= obj.id %>"><b><%= obj.get("Name") %></b></a> - <a style="color:blue;" href="/logtb?action=grab&id=<%= obj.id %>&cacheId=<%= cacheid %>&geocacheurId=<%= geocacheurId %>">Récuperez le !</a></li>
+					<li>
+						<a href="/tb?id=<%= obj.id %>" style="color:white; font-size: 1.5em; margin-right: 20px;">
+							<b><%= obj.get("Name") %></b>
+						</a>
+						<a href="/logtb?action=grab&id=<%= obj.id %>&cacheId=<%= cacheid %>&geocacheurId=<%= geocacheurId %>" class="button small alt">Récuperez le !</a>
+					</li>
 				<% }); %>
 				</ul>
 			<% } %>
@@ -44,10 +49,15 @@
 			<% if(tbsin.length == 0)  { %>
 				<p class="medium">Vous ne possédez pas de TB à déposer dans cette cache. </p>
 			<% } else { %>
-				<p>Vous pouvez déposer un des objets suivants : </p>
+				<p>Vous pouvez y déposer un des objets suivants : </p>
 				<ul>
 				<% tbsin.forEach(function(obj) { %>
-					<li><a style="color:blue;" href="/tb?id=<%= obj.id %>"><b><%= obj.get("Name") %></b></a> - <a style="color:blue;" href="/logtb?action=drop&id=<%= obj.id %>&cacheId=<%= cacheid %>&geocacheurId=<%= geocacheurId %>">Déposez le !</a></li>
+					<li>
+						<a href="/tb?id=<%= obj.id %>" style="color:white; font-size: 1.5em; margin-right: 20px;">
+							<b><%= obj.get("Name") %></b>
+						</a> 
+						 <a href="/logtb?action=drop&id=<%= obj.id %>&cacheId=<%= cacheid %>&geocacheurId=<%= geocacheurId %>" class="button small alt">Déposez le !</a>
+					</li>
 				<% }); %>
 				</ul>
 			<% } %>
@@ -55,6 +65,7 @@
 			</section>
 		<% } %>
 
+		<br><br>
 		<a href="/geocache?id=<%= cacheid %>" class="button alt">Visualiser la cache</a>
 
 	</div>

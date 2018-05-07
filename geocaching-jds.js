@@ -70,7 +70,6 @@ var getGeocacheurWithEmail = function(email) {
     var Geocacheur = Parse.Object.extend("Geocacheur");    
     var query = new Parse.Query(Geocacheur);
     query.equalTo("Email", email);
-    query.equalTo("Active", true);
     query.first().then(function(result) {
         if(result) {
             promise.resolve(result);

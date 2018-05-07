@@ -918,11 +918,12 @@ app.post('/flash', function(req, res) {
 						        	jds.getGeocacheurWithEmail(email).then(function(geocacheur) {
 								        if(geocacheur) {
 								        	console.log("if cache")
-								            res.render('found', { cacheid:cache.id, 
-								            					  geocacheurId:geocacheur.id, 
+								            res.render('found', { cacheid: cache.id,
+								            					  cat: cache.get("Category"), 
+								            					  geocacheurId: geocacheur.id, 
 								            					  tbsout: travelbugsInCache, 
 								            					  tbsin: travelbugsInHands, 
-								            					  message:"La cache a déja été trouvée mais vous pouvez quand meme faire voyager des objets.<br><br>" });
+								            					  message: "La cache a déja été trouvée mais vous pouvez quand même faire voyager des objets.<br><br>" });
 								        } else {
 								        	res.render('error', { message: "Geocacheur non trouvé avec l'email : " + email });
 								        }
