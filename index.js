@@ -48,7 +48,6 @@ app.use('/public', express.static(path.join(__dirname, '/public')));
 // Serve the Parse API on the /parse URL prefix
 var mountPath = process.env.PARSE_MOUNT || '/parse';
 app.use(mountPath, api);
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
 	extended: true
@@ -74,6 +73,13 @@ app.get('/register', function(req, res) {
 app.post('/registerTb', upload.single('pic'), function(req, res, next) {
 
 	var tracking_code = req.body.code.toUpperCase();
+	var email = req.body.email.toLowerCase();
+	var name = req.body.name;
+	var description = req.body.description;
+	var pseudo = req.body.pseudo;
+	var mission = req.body.mission;
+	var message = req.body.message;
+	var photoFile = req.file;
 
 	var Travelbug = Parse.Object.extend("Travelbug");
 	var travelbug = new Travelbug();
@@ -81,142 +87,130 @@ app.post('/registerTb', upload.single('pic'), function(req, res, next) {
 	var TravelbugLog = Parse.Object.extend("TravelbugLog");
 	var logEntry = new TravelbugLog(); 
 
-	var Geocacheur = Parse.Object.extend("Geocacheur");
-	var geocacheur = new Geocacheur();
+	jds.getInactiveTravelbugCodeWithCode(tracking_code).then(function(tbcode) {
+        if(tbcode) {
+		  	// On vérifie que l'email n'a pas déjà un objet associé
+			jds.getAllTravelbugsWithOwnerEmail(email).then(function(results) {
+				console.log(JSON.stringify(results) + " results");
+		        if(results.length > 0) {
+			  		var error = "Il y a déjà un autre objet voyageur associé à l'adresse email " + email + "<br><br>"
+			  				  + "Un seul objet voyageur par participant est autorisé, merci.";
+					console.log(error);
+					res.render('error', {message:error});
+				} 
+				else {
+					if(photoFile) {
+						var filename = photoFile.originalname;
+						console.log("In if(photofile)")
 
-	var TravelbugCode = Parse.Object.extend("TravelbugCode");
-	var query = new Parse.Query("TravelbugCode");
-    query.equalTo('Code', tracking_code);
-    query.equalTo("Active", false);
-    query.first({
-	  success: function(tbcode) {
+						sharp(photoFile.buffer).resize(1024, 1024)
+											   .max()
+											   .withoutEnlargement()
+											   .toBuffer()
+											   .then(function(buffer_img) { 
 
-	  	if(tbcode === undefined) {
-	  		var error = "Le code de suivi est incorrect ou déjà affecté à un autre objet voyageur";
-			console.log(error);
-			res.render('tbregistered', { tbid:0, message: error });
-	  	}
-	  	else {
-		  	console.log(tbcode + " Code retrieve" );
+							var photoFileBase64 = buffer_img.toString('base64');
+							var parseFile = new Parse.File(filename, {base64:photoFileBase64})
 
-		  	// on verifie que l email n'a pas deja un objet
-			var Travelbug = Parse.Object.extend("Travelbug");
-			var query = new Parse.Query(Travelbug);
-			query.equalTo("OwnerEmail", req.body.email);
-			query.find({
-				success: function(results) {
-					
-					if(results.length > 0) {
-				  		var error = "Il y a deja un autre objet voyageur associé a l'adresse email " + req.body.email;
-						console.log(error);
-						res.render('tbregistered', { tbid:0, message: error });
-
-					} else {
-
-					    var parseFile;
-
-						if(req.file) {
-							var photoFile = req.file;
-							var name = photoFile.originalname;
-
-							sharp(photoFile.buffer).resize(1024, 1024)
-												   .max()
-												   .withoutEnlargement()
-												   .toBuffer()
-												   .then(function(buffer_img) { 
-
-								var photoFileBase64 = buffer_img.toString('base64');
-								parseFile = new Parse.File(name, { base64: photoFileBase64 })
-								parseFile.save().then(function() {
-
-										var photo_url = parseFile.url({forceSecure: true})
-										console.log("Photo saved in registerTb: " + photo_url);
-
-										if(parseFile) {
-											travelbug.set("PhotoUrl", photo_url);
-											travelbug.set("Photo", parseFile);
-										}
-										travelbug.set("Name", req.body.name);
-										travelbug.set("Code", tracking_code);
-										travelbug.set("Description", req.body.description);
-										travelbug.set("Owner", req.body.pseudo);
-										travelbug.set("OwnerEmail", req.body.email);
-										travelbug.set("Mission", req.body.mission);
-										travelbug.set("CreatedAt", new Date());
-										travelbug.set("cacheId", null); //id de la cache qui le contient . null si holder n'est pas null et reciproquement. 
-										travelbug.set("cacheName", null);
-										travelbug.set("Holder", req.body.pseudo);
-										travelbug.set("HolderEmail", req.body.email);
-										travelbug.set("Fav", 0);
-										travelbug.set("Active", true);
-
-										travelbug.save(null, {
+							parseFile.save().then(function() {
+								var photo_url = parseFile.url({forceSecure: true})
+								console.log("Photo saved in registerTb: " + photo_url);
+								if(parseFile) {
+									console.log("In if(parsefile)");
+									travelbug.set("PhotoUrl", photo_url);
+									travelbug.set("Photo", parseFile);
+								}
+								travelbug.set("Name", name);
+								travelbug.set("Code", tracking_code);
+								travelbug.set("Description", description);
+								travelbug.set("Owner", pseudo);
+								travelbug.set("OwnerEmail", email);
+								travelbug.set("Mission", mission);
+								travelbug.set("CreatedAt", new Date());
+								travelbug.set("cacheId", null); //id de la cache qui le contient . null si holder n'est pas null et reciproquement. 
+								travelbug.set("cacheName", null);
+								travelbug.set("Holder", pseudo);
+								travelbug.set("HolderEmail", email);
+								travelbug.set("Fav", 0);
+								travelbug.set("Active", true);
+								travelbug.save(null, {
+									success: function() {
+										console.log("Successfull TB created");
+										logEntry.set("PhotoUrl", photo_url);
+										logEntry.set("Photo", parseFile);
+										logEntry.set("Travelbug", travelbug);
+										logEntry.set("Pseudo", pseudo);
+										logEntry.set("Email", email);
+										logEntry.set("Message", message);
+										logEntry.set("Date", new Date());
+										logEntry.set("Action", "Created");
+										logEntry.set("Active", true);
+										logEntry.set("TravelbugId", travelbug.id);
+										logEntry.set("TravelbugName", travelbug.get("Name"));
+										logEntry.save(null, {
 											success: function() {
-												console.log("Successfull TB created");
-									  			logEntry.set("PhotoUrl", photo_url);
-												logEntry.set("Photo", parseFile);
-												logEntry.set("Travelbug", travelbug);
-												logEntry.set("Pseudo", req.body.pseudo);
-												logEntry.set("Email", req.body.email);
-												logEntry.set("Message", req.body.message);
-												logEntry.set("Date", new Date());
-												logEntry.set("Action", "Created");
-												logEntry.set("Active", true);
-												logEntry.set("TravelbugId", travelbug.id);
-												logEntry.set("TravelbugName", travelbug.get("Name"));
-												logEntry.save(null, {
-													success: function() {
-														tbcode.set("Active", true);
+												jds.saveOrUpdateGeocacheur(email, pseudo, true).then(function(geocacheur) {
+											        if(geocacheur) {
+
+											        	tbcode.set("Active", true);
 														tbcode.save();
-														
-														geocacheur.set("Email", req.body.email);
-														geocacheur.set("Pseudo", req.body.pseudo);
-														geocacheur.set("Active", true);
-														geocacheur.save(null, {
-															success: function() {
-																res.render('tbregistered', { tbid:travelbug.id, message:"Bravo " 
-															     		 + req.body.pseudo + " !<br><br>Votre objet voyageur " 
-																		 + req.body.name + " est bien enregistré. <br><br><br>"
-																		 + "Il est temps d'aller le poser dans une boite et de vous amuser"
-																		 + " à déplacer les objets voyageurs des autres !" 
-																		 + "<br><br>N'oubliez pas d'y attacher le code de suivi."});
-														 
-																console.log("Successfull TB log created");
-															}, 
-															error: function(error) {
-																console.log("Error during creation of geocacheur : " + error.message);
-																res.render('tbregistered', { tbid:0, message: error.message });
-															}
-														});
-														
-														
-									                },
-							                    	error: function(error) {
-							                       		console.log("Error TBlogEntry : " + error.message);
-														res.render('tbregistered', { tbid:0, message: error.message });
-							                    	}																									 
-												});
-											},
-											error: function(error) {
-												console.log("Error TBlogEntry : " + error.message);
-												res.render('tbregistered', { tbid:0, message: error.message });
-											}
-										});	
-									})
-								});
-							}
-						}},
-							error: function(error) {
-								console.log("Error TBlogEntry : " + error.message);
-								res.render('tbregistered', { tbid:0, message: error.message });
-							}
-						});
-						} },
-						error: function(error) {
-							console.log("Error TBlogEntry : " + error.message);
-							res.render('tbregistered', { tbid:0, message: error.message });
-						}
-				});
+											            
+											            res.render('tbregistered', { 
+															tbid: travelbug.id, 
+															message: "Bravo " + pseudo + " !<br><br>Votre objet voyageur " 
+																	 + name + " est bien enregistré. <br><br><br>"
+																 	 + "Il est temps d'aller le poser dans une boite et de vous amuser"
+																 	 + " à déplacer les objets voyageurs des autres participants !" 
+																 	 + "<br><br>N'oubliez pas d'y attacher le code de suivi." });
+											        } 
+											        else {
+											            console.error("Error during creation of geocacheur : " + error.message);
+														res.render('error', {message:error.message});
+											        }
+											    }, function(error) {
+											        console.error(error.message);
+													res.render('error', {message:error.message});
+											    });				
+									        },
+							                error: function(error) {
+							                	console.error("Error TBlogEntry : " + error.message);
+												res.render('error', {message:error.message});
+							                }																									 
+										});
+									},
+									error: function(error) {
+										console.error("Error TBlogEntry : " + error.message);
+										res.render('error', {message:error.message});
+									}
+								});	
+							}, function(error) {
+								console.error("Error saving photofile " + error.message);
+								res.render('error', {message:error.message});
+							});
+						}, function(error) {
+								console.error("Error compressing photofile " + error.message);
+								res.render('error', {message:error.message});
+							});
+					}
+					else {
+						var error = "Une photo de l'objet voyageur est requise.";
+						console.error(error);
+						res.render('error', {message:error});
+					}
+				}
+		    }, function(error) {
+		    	console.error(error.message);
+				res.render('error', {message:error.message});
+		    });
+        } else {
+   	  		var error = "Le code de suivi est incorrect ou déjà affecté à un autre objet voyageur.";
+			console.error(error);
+			res.render('error', {message:error});
+        }
+    }, function(error) {
+        console.error(error.message);
+		res.render('error', {message:error.message});
+    });
 });
 
 
@@ -236,7 +230,7 @@ app.get('/ranking', function(req, res) {
 			queryGeocacheurs.equalTo("Active", true);
 			queryGeocacheurs.limit(1000);
 			queryGeocacheurs.find().then(function(rankFTF) {
-				res.render('ranking', { geocacheurs: rank, geocacheursFTF: rankFTF, geocaches: caches });
+				res.render('ranking', {geocacheurs:rank, geocacheursFTF:rankFTF, geocaches:caches});
 			});
 		});
 	});
@@ -261,7 +255,7 @@ app.get('/geocaches', function(req, res) {
 			query.descending("RatioFav");
 			query.find({ 
 				success: function(caches) {
-					res.render('geocaches', { message: 'Les caches à trouver', geocaches:caches, logs:logs });
+					res.render('geocaches', {message:'Les caches à trouver', geocaches:caches, logs:logs});
 				}
 			});
 		}
@@ -299,7 +293,8 @@ app.get('/photoscaches', function(req, res) {
 			});
 	    },
 	    error: function(error) {
-	    	// The request failed
+	    	console.error(error.message);
+	    	res.redirect('/');
 	    }
 	});
 });
@@ -331,18 +326,20 @@ app.get('/photostbs', function(req, res) {
 										      pages: count/max });
 				},
 			    error: function(error) {
-			    	res.redirect("/index");
+			    	console.error(error.message);
+	    			res.redirect('/');
 			    }
 			});
 	    },
 	    error: function(error) {
-	    	// The request failed
+	    	console.error(error.message);
+	    	res.redirect('/');
 	    }
 	});
 });
 
 app.get('/geocaching', function(req, res) {
-	res.render('geocaching', { message: 'Régles du jeu Geocaching' });
+	res.render('geocaching');
 });
 
 app.get('/tb', function(req, res) {
@@ -632,7 +629,8 @@ app.get('/logtb', function(req, res) {
 															  action:req.query.action,
 						    								  owner:tbOwner,
 						    								  holder:tbHolder,
-						    								  email:geocacheur.get("Email"), pseudo:geocacheur.get("Pseudo"),
+						    								  email:geocacheur.get("Email"), 
+						    								  pseudo:geocacheur.get("Pseudo"),
 						    								  cacheName:tbCacheName,
 						    								  cacheId:tbCacheId,
 						    								  mission:tbMission,
@@ -654,15 +652,13 @@ app.get('/logtb', function(req, res) {
 	    	}
 	    },
 	    error: function(object, error) {
-	    	console.log("General error in logtb")
+	    	console.error(error.message)
 	    	res.redirect('/geocaches');
 	    }	
 	});
 });
 
 app.post('/foundtb', upload.single('pic'), function (req, res, next) {
-
-	console.log("foundtb" + JSON.stringify(req.body))
 	var TravelbugLog = Parse.Object.extend("TravelbugLog");
 	var Geocache = Parse.Object.extend("Geocache");
 	var logEntry = new TravelbugLog();
@@ -751,7 +747,6 @@ app.post('/foundtb', upload.single('pic'), function (req, res, next) {
 									if (req.body.id == tb.id) {
 										console.log("Identifiant de TB valide");
 										logEntry.set("Travelbug", tb);
-										// denormalise to avoid querying each time Travelbug
 										logEntry.set("TravelbugId", tb.id);
 										logEntry.set("TravelbugName", tb.get("Name"));
 										logEntry.set("cacheId", cache.id);
@@ -787,9 +782,6 @@ app.post('/foundtb', upload.single('pic'), function (req, res, next) {
 									} else {
 										logEntry.set("Fav", false);
 									}
-									
-									console.log("on commence les query" );
-
 
 									var queryTbFirstOnGc = new Parse.Query(TravelbugLog);
 									queryTbFirstOnGc.descending("createdAt");
@@ -1098,25 +1090,29 @@ app.post('/found', upload.single('pic'), function (req, res, next) {
 										queryTbsHands.find({
 											success: function(travelbugsInHands) {
 								
-											res.render('found', { cacheid:cache.id, geocacheurId:geocacheur.id, tbsout: travelbugsInCache, tbsin: travelbugsInHands, message:"Bravo " + req.body.name 
+											res.render('found', { 
+												cacheid: cache.id, 
+												cat: cache.get("Category"),
+												geocacheurId: geocacheur.id, 
+												tbsout: travelbugsInCache, 
+												tbsin: travelbugsInHands, 
+												message:"Bravo " + req.body.name 
 													  + " !<br><br>N'oubliez pas de signer aussi le logbook ;-) <br><br>"
 													  + "<i>(lorsqu'il y a une boite physique à trouver)</i><br><br>"
 													  + "Et attention aux moldus !" });
 							  					},
 							  					error: function(object, error) {
-							  						res.render('error', { cacheid:0, message: error.message });
+							  						res.render('error', { message: error.message });
 							  					}
-							  				});
-							
+							  				});							
 										},
 										error: function(object, error) {
-											res.render('error', { cacheid:0, message: error.message });
+											res.render('error', { message: error.message });
 										}
 									});
-
 							},
 							error: function(logEntry, error) {
-								res.render('error', { cacheid:0, message: error.message });
+								res.render('error', { message: error.message });
 							}
 						});									
 					},
@@ -1127,13 +1123,20 @@ app.post('/found', upload.single('pic'), function (req, res, next) {
 					}
 				});  
 
-				res.render('found', { cacheid:cache.id, geocacheurId:geocacheur.id, tbsout: travelbugsInCache, tbsin: travelbugsInHands, message:"La cache a déja été trouvée mais vous pouvez quand meme faire voyager des objets.  <br><br>"});
-			} else {
-	    		res.render('error', { cacheid:0, message: "Geocacheur non trouvé" });
+				res.render('found', { 
+					cacheid: cache.id, 
+					cat: cache.get("Category"),
+					geocacheurId:geocacheur.id, 
+					tbsout: travelbugsInCache, 
+					tbsin: travelbugsInHands, 
+					message:"La cache a déja été trouvée mais vous pouvez quand meme faire voyager des objets.<br><br>"});
+			} 
+			else {
+	    		res.render('error', { message: "Geocacheur non trouvé" });
 	    	}
 	    }, 
-	    error: function(object, error) {
-  				res.render('error', { cacheid:0, message: "Geocacheur non trouvé" });
+	    error: function(error) {
+  			res.render('error', { message: error.message });
   		}
   	});
 

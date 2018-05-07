@@ -17,6 +17,7 @@
     "multer": "1.3.0",
     "parse": "~1.11.1",
     "parse-server": "*",
+    "csv": "0.3.7",
     "recaptcha-verify": "0.1.1"
   },
   "scripts": {

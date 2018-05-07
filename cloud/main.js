@@ -4,6 +4,57 @@ Parse.Cloud.define("hello", function(request, response) {
 	response.success("Hello world!");
 });
 
+Parse.Cloud.job("addgeocacheurs", function(request, response) {
+  response.message("I just started");
+  var csv = require('csv'); 
+  var obj = csv(); 
+
+  var Geocacheur = Parse.Object.extend("Geocacheur");
+
+  obj.from.path('Geocacheurs.csv').to.array(function(geocacheurs) {
+    geocacheurs.forEach(function(geocacheur) {
+      var firstname = geocacheur[0];
+      var companyname = geocacheur[1];
+      var email = geocacheur[2].toLowerCase();
+
+      var query = new Parse.Query(Geocacheur);
+      query.equalTo('Email', email);
+      query.first({
+          success: function(results) {
+              // console.log(JSON.stringify(results));
+              // console.log(results)
+              if (results === undefined) {
+                  var geocacheur = new Geocacheur();
+                  geocacheur.save({
+                      Email: email,
+                      Pseudo: firstname,
+                      Company: companyname,
+                      Enrollment: "preload",
+                      Active: false
+                  }, {
+                      success: function(user) {
+                          // response.success("Geocacher added");
+                      },
+                      error: function(error) {
+                          //response.error("Saving Geocacher");
+                      }
+                  });
+              } else {
+                // Geocacheur exist, we do nothing
+                //results.set("Active", false);
+                //results.save(null, { useMasterKey: true }).then(response.success, response.error);
+              }
+          },
+          error: function(error) {
+              error.message("Impossible to find Geocacheur - lookup failed");
+              response.error(error);
+          }
+      });
+    });
+  });
+  response.success("I just finished");
+});
+
 Parse.Cloud.job("addcodestb", function(request, response) {
   response.message("I just started");
   
@@ -20,8 +71,6 @@ Parse.Cloud.job("addcodestb", function(request, response) {
       var query = new Parse.Query("TravelbugCode");
       query.equalTo('Code', code);
       query.first({
-          //is this query need masterKey?
-          useMasterKey: true,
           success: function(results) {
               // console.log(JSON.stringify(results));
               // console.log(results)
@@ -191,16 +240,13 @@ Parse.Cloud.job("computefavratio", function(request, status) {
 });
 
 Parse.Cloud.job("computeranking", function(request, status) {
-  // the params passed through the start request
   var params = request.params;
-  // Headers from the request that triggered the job
   var headers = request.headers;
 
   // get the parse-server logger
   var log = request.log;
   var _ = require('./underscore-min.js');
 
-  // Update the Job status message
   status.message("I just started");
   var scoreFoundIt = 20;
   var scoreFTF = 3;
@@ -229,11 +275,8 @@ Parse.Cloud.job("computeranking", function(request, status) {
   		});
   	});
   }).then(function(result) {
-    // Mark the job as successful
-    // success and error only support string as parameters
     status.success("I just finished");
 }, function(error) {
-    // Mark the job as errored
     status.error("There was an error");
 })
 
