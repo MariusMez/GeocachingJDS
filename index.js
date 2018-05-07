@@ -268,7 +268,7 @@ app.get('/photoscaches', function(req, res) {
 	if (page === undefined) {
 		page = 1;
 	}
-	var max = 9;
+	var max = 12;
 
 	var Log = Parse.Object.extend("Log");
 	var queryLog = new Parse.Query(Log);
@@ -304,7 +304,7 @@ app.get('/photostbs', function(req, res) {
 	if (page === undefined) {
 		page = 1;
 	}
-	var max = 9;
+	var max = 12;
 
 	var TravelbugLog = Parse.Object.extend("TravelbugLog");
 	var queryLog = new Parse.Query(TravelbugLog);
