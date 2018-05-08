@@ -41,7 +41,7 @@
 			<br />
 
 			<section>
-				<h2>🌍 Historique des déplacements (<span id="distance"></span> km)</h2>
+				<h2>🌍 Historique des déplacements (<span id="distance">0</span> km)</h2>
 				<div id="map"></div>
 
 				<script type="text/javascript">
@@ -123,9 +123,11 @@
 					<% if (obj.get("Action") == "Created") { %>
 						<li> <b><%= moment(obj.get("Date")).utcOffset(120).fromNow() %> le <%= moment(obj.get("Date")).utcOffset(120).format("LL [à] LT") %></b> - <%= obj.get("Pseudo") %> a créé l'objet voyageur </i><% if(obj.get("PhotoUrl"))  { %> - <a href="<%= obj.get("PhotoUrl").replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, ''); %>">photo</a><% } %></li>					
 					<% } else if (obj.get("Action") == "drop") { %>
-						<li> <b><%= moment(obj.get("Date")).utcOffset(120).fromNow() %> le <%= moment(obj.get("Date")).utcOffset(120).format("LL [à] LT") %></b> - <%= obj.get("Pseudo") %> <%= obj.get("Action") %> dans la cache <a href="/geocache?id=<%= obj.get("cacheId") %>"><b><%= obj.get("cacheName") %></b></a> : <i><%= obj.get("Message") %></i><% if(obj.get("PhotoUrl"))  { %> - <a href="<%= obj.get("PhotoUrl").replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, ''); %>">photo</a><% } %></li>
+						<li> <b><%= moment(obj.get("Date")).utcOffset(120).fromNow() %> le <%= moment(obj.get("Date")).utcOffset(120).format("LL [à] LT") %></b> - <%= obj.get("Pseudo") %> <%= obj.get("Action") %> dans la cache <a href="/geocache?id=<%= obj.get("cacheId") %>"><b><%= obj.get("cacheName") %></b></a> : <i><%= obj.get("Message") %></i><% if(obj.get("PhotoUrl"))  { %> - <a href="<%= obj.get("PhotoUrl").replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, ''); %>">photo</a><% } %>
+						<% if(obj.get("Fav") == true)  { %> - 👍 <% } %></li>
 					<% } else { %>	
-						<li> <b><%= moment(obj.get("Date")).utcOffset(120).fromNow() %> le <%= moment(obj.get("Date")).utcOffset(120).format("LL [à] LT") %></b> - <%= obj.get("Pseudo") %> <%= obj.get("Action") %> a partir de la cache <a href="/geocache?id=<%= obj.get("cacheId") %>"><b><%= obj.get("cacheName") %></b></a> : <i><%= obj.get("Message") %></i><% if(obj.get("PhotoUrl"))  { %> - <a href="<%= obj.get("PhotoUrl").replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, ''); %>">photo</a><% } %></li>
+						<li> <b><%= moment(obj.get("Date")).utcOffset(120).fromNow() %> le <%= moment(obj.get("Date")).utcOffset(120).format("LL [à] LT") %></b> - <%= obj.get("Pseudo") %> <%= obj.get("Action") %> a partir de la cache <a href="/geocache?id=<%= obj.get("cacheId") %>"><b><%= obj.get("cacheName") %></b></a> : <i><%= obj.get("Message") %></i><% if(obj.get("PhotoUrl"))  { %> - <a href="<%= obj.get("PhotoUrl").replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, ''); %>">photo</a><% } %>
+						<% if(obj.get("Fav") == true)  { %> - 👍 <% } %></li>
 					<% } %> 
 				<% }); %>
 				</ul>
