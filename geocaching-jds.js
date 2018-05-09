@@ -18,6 +18,27 @@ var createThumbnail = function createThumbnail(image_buffer, maxWidth, maxHeight
                                });
 };
 
+
+var getGeocache = function(id) {
+    var promise = new Parse.Promise();
+
+    var Geocache = Parse.Object.extend("Geocache");
+    var query = new Parse.Query(Geocache);
+    query.get(id).then(function(result) {
+        if(result) {
+            promise.resolve(result);
+        } else {
+            console.log("Geocache ID: " + id + " was not found");
+            promise.resolve(null);
+        }
+    }, function(error) {
+        console.error("Error searching for Geocache with id: " + id + " Error: " + error);
+        promise.error(error);
+    });
+
+    return promise;
+}
+
 var getGeocacheWithCodeId = function(geocacheCodeId) {
     var promise = new Parse.Promise();
 
@@ -28,11 +49,33 @@ var getGeocacheWithCodeId = function(geocacheCodeId) {
         if(result) {
             promise.resolve(result);
         } else {
-            console.log("Geocache ID: " + geocacheCodeId + " was not found");
+            console.log("Geocache CodeId: " + geocacheCodeId + " was not found");
             promise.resolve(null);
         }
     }, function(error) {
-        console.error("Error searching for Geocache with id: " + geocacheCodeId + " Error: " + error);
+        console.error("Error searching for Geocache with CodeId: " + geocacheCodeId + " Error: " + error);
+        promise.error(error);
+    });
+
+    return promise;
+}
+
+var getTravelbugWithTrackingCode = function(trackingCode) {
+    var promise = new Parse.Promise();
+
+    var Travelbug = Parse.Object.extend("Travelbug");
+    var query = new Parse.Query(Travelbug);
+    query.equalTo("Code", trackingCode);
+    query.equalTo("Active", true);
+    query.first().then(function(result) {
+        if(result) {
+            promise.resolve(result);
+        } else {
+            console.log("Travelbug with tracking code: " + trackingCode + " was not found");
+            promise.resolve(null);
+        }
+    }, function(error) {
+        console.error("Error searching for Travelbug with tracking code: " + trackingCode + " Error: " + error);
         promise.error(error);
     });
 
@@ -174,6 +217,29 @@ var getAllTravelbugsInHands = function(email) {
     return promise;
 }
 
+var hasEmailFoundGeocache = function(email, geocache) {
+    var promise = new Parse.Promise();
+    
+    var Log = Parse.Object.extend('Log');
+    var query = new Parse.Query(Log);
+    query.equalTo("Email", email);
+    query.equalTo("Geocache", geocache);
+    query.equalTo("Active", true);
+    query.first().then(function(result) {
+        if(result) {
+            promise.resolve(result);
+        } else {
+            console.log("Email " + email + "didn't find Geocache yet");
+            promise.resolve(null);
+        }
+    }, function(error) {
+        console.error("Error searching for Log with: " + email + " Error: " + error);
+        promise.error(error);
+    });
+
+    return promise;
+}
+
 var saveOrUpdateGeocacheur = function(email, pseudo, active) {
     var promise = new Parse.Promise();
 
@@ -219,12 +285,85 @@ var saveOrUpdateGeocacheur = function(email, pseudo, active) {
     return promise;
 }
 
+var isFirstTbDropOnGeocache = function(tb, geocache) {
+    var promise = new Parse.Promise();
+
+    var TravelbugLog = Parse.Object.extend("TravelbugLog");
+    var query = new Parse.Query(TravelbugLog);
+    query.descending("createdAt");
+    query.equalTo("Active", true);
+    query.equalTo("cacheId", geocache.id);
+    query.equalTo("TravelbugId", tb.id);
+    query.equalTo("Action", "drop");
+    query.count().then(function(result) {
+        if(result > 0) {
+            promise.resolve(false);
+        } else {
+            promise.resolve(true);
+        }
+    }, function(error) {
+        promise.error(error);
+    });
+
+    return promise;
+}
+
+var isFirstTbDropByEmail = function(tb, email) {
+    var promise = new Parse.Promise();
+
+    var TravelbugLog = Parse.Object.extend("TravelbugLog");
+    var query = new Parse.Query(TravelbugLog);
+    query.descending("createdAt");
+    query.equalTo("Active", true);
+    query.equalTo("Email", email);
+    query.equalTo("TravelbugId", tb.id);
+    query.equalTo("Action", "drop");
+    query.count().then(function(result) {
+        if(result > 0) {
+            promise.resolve(false);
+        } else {
+            promise.resolve(true);
+        }
+    }, function(error) {
+        promise.error(error);
+    });
+
+    return promise;
+}
+
+var countTravelBugHoldByEmail = function(email) {
+    var promise = new Parse.Promise();
+
+    var Travelbug = Parse.Object.extend("Travelbug");
+    var query = new Parse.Query(Travelbug);
+    query.descending("createdAt");
+    query.equalTo("Active", true);
+    query.equalTo("HolderEmail", email);
+    query.count().then(function(result) {
+        if(result) {
+            promise.resolve(result);
+        } else {
+            promise.resolve(result);
+        }
+    }, function(error) {
+        promise.error(error);
+    });
+
+    return promise;
+}
+
 module.exports.createThumbnail = createThumbnail;
+module.exports.getGeocache = getGeocache;
 module.exports.getGeocacheWithCodeId = getGeocacheWithCodeId;
+module.exports.getTravelbugWithTrackingCode = getTravelbugWithTrackingCode;
 module.exports.getInactiveTravelbugCodeWithCode = getInactiveTravelbugCodeWithCode;
 module.exports.getLogWithEmailAndCache = getLogWithEmailAndCache;
 module.exports.getGeocacheurWithEmail = getGeocacheurWithEmail;
 module.exports.getAllTravelbugsInCache = getAllTravelbugsInCache;
 module.exports.getAllTravelbugsWithOwnerEmail = getAllTravelbugsWithOwnerEmail;
 module.exports.getAllTravelbugsInHands = getAllTravelbugsInHands;
+module.exports.hasEmailFoundGeocache = hasEmailFoundGeocache;
 module.exports.saveOrUpdateGeocacheur = saveOrUpdateGeocacheur;
+module.exports.isFirstTbDropOnGeocache = isFirstTbDropOnGeocache;
+module.exports.isFirstTbDropByEmail = isFirstTbDropByEmail;
+module.exports.countTravelBugHoldByEmail = countTravelBugHoldByEmail;

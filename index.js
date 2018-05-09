@@ -91,7 +91,6 @@ app.post('/registerTb', upload.single('pic'), function(req, res, next) {
         if(tbcode) {
 		  	// On vérifie que l'email n'a pas déjà un objet associé
 			jds.getAllTravelbugsWithOwnerEmail(email).then(function(results) {
-				console.log(JSON.stringify(results) + " results");
 		        if(results.length > 0) {
 			  		var error = "Il y a déjà un autre objet voyageur associé à l'adresse email " + email + "<br><br>"
 			  				  + "Un seul objet voyageur par participant est autorisé, merci.";
@@ -101,93 +100,83 @@ app.post('/registerTb', upload.single('pic'), function(req, res, next) {
 				else {
 					if(photoFile) {
 						var filename = photoFile.originalname;
-						sharp(photoFile.buffer).resize(1024, 1024)
-											   .max()
-											   .withoutEnlargement()
-											   .toBuffer()
-											   .then(function(buffer_img) { 
+						var photoFileBase64 = photoFile.buffer.toString('base64');
+						var parseFile = new Parse.File(filename, {base64:photoFileBase64})
 
-							var photoFileBase64 = buffer_img.toString('base64');
-							var parseFile = new Parse.File(filename, {base64:photoFileBase64})
+						parseFile.save().then(function() {
+							var photo_url = parseFile.url({forceSecure: true})
+							console.log("Photo saved in registerTb: " + photo_url);
+							if(parseFile) {
+								travelbug.set("PhotoUrl", photo_url);
+								travelbug.set("Photo", parseFile);
+							}
+							travelbug.set("Name", name);
+							travelbug.set("Code", tracking_code);
+							travelbug.set("Description", description);
+							travelbug.set("Owner", pseudo);
+							travelbug.set("OwnerEmail", email);
+							travelbug.set("Mission", mission);
+							travelbug.set("CreatedAt", new Date());
+							travelbug.set("cacheId", null); //id de la cache qui le contient . null si holder n'est pas null et reciproquement. 
+							travelbug.set("cacheName", null);
+							travelbug.set("Holder", pseudo);
+							travelbug.set("HolderEmail", email);
+							travelbug.set("Fav", 0);
+							travelbug.set("Active", true);
+							travelbug.save(null, {
+								success: function() {
+									console.log("Successfull TB created");
+									logEntry.set("PhotoUrl", photo_url);
+									logEntry.set("Photo", parseFile);
+									logEntry.set("Travelbug", travelbug);
+									logEntry.set("Pseudo", pseudo);
+									logEntry.set("Email", email);
+									logEntry.set("Message", message);
+									logEntry.set("Date", new Date());
+									logEntry.set("Action", "Created");
+									logEntry.set("Active", true);
+									logEntry.set("TravelbugId", travelbug.id);
+									logEntry.set("TravelbugName", travelbug.get("Name"));
+									logEntry.save(null, {
+										success: function() {
+											jds.saveOrUpdateGeocacheur(email, pseudo, true).then(function(geocacheur) {
+										        if(geocacheur) {
 
-							parseFile.save().then(function() {
-								var photo_url = parseFile.url({forceSecure: true})
-								console.log("Photo saved in registerTb: " + photo_url);
-								if(parseFile) {
-									travelbug.set("PhotoUrl", photo_url);
-									travelbug.set("Photo", parseFile);
-								}
-								travelbug.set("Name", name);
-								travelbug.set("Code", tracking_code);
-								travelbug.set("Description", description);
-								travelbug.set("Owner", pseudo);
-								travelbug.set("OwnerEmail", email);
-								travelbug.set("Mission", mission);
-								travelbug.set("CreatedAt", new Date());
-								travelbug.set("cacheId", null); //id de la cache qui le contient . null si holder n'est pas null et reciproquement. 
-								travelbug.set("cacheName", null);
-								travelbug.set("Holder", pseudo);
-								travelbug.set("HolderEmail", email);
-								travelbug.set("Fav", 0);
-								travelbug.set("Active", true);
-								travelbug.save(null, {
-									success: function() {
-										console.log("Successfull TB created");
-										logEntry.set("PhotoUrl", photo_url);
-										logEntry.set("Photo", parseFile);
-										logEntry.set("Travelbug", travelbug);
-										logEntry.set("Pseudo", pseudo);
-										logEntry.set("Email", email);
-										logEntry.set("Message", message);
-										logEntry.set("Date", new Date());
-										logEntry.set("Action", "Created");
-										logEntry.set("Active", true);
-										logEntry.set("TravelbugId", travelbug.id);
-										logEntry.set("TravelbugName", travelbug.get("Name"));
-										logEntry.save(null, {
-											success: function() {
-												jds.saveOrUpdateGeocacheur(email, pseudo, true).then(function(geocacheur) {
-											        if(geocacheur) {
-
-											        	tbcode.set("Active", true);
-														tbcode.save();
-											            
-											            res.render('tbregistered', { 
-															tbid: travelbug.id, 
-															message: "Bravo " + pseudo + " !<br><br>Votre objet voyageur " 
-																	 + name + " est bien enregistré. <br><br><br>"
-																 	 + "Il est temps d'aller le poser dans une boite et de vous amuser"
-																 	 + " à déplacer les objets voyageurs des autres participants !" 
-																 	 + "<br><br>N'oubliez pas d'y attacher le code de suivi." });
-											        } 
-											        else {
-											            console.error("Error during creation of geocacheur : " + error.message);
-														res.render('error', {message:error.message});
-											        }
-											    }, function(error) {
-											        console.error(error.message);
+										        	tbcode.set("Active", true);
+													tbcode.save();
+										            
+										            res.render('tbregistered', { 
+														tbid: travelbug.id, 
+														message: "Bravo " + pseudo + " !<br><br>Votre objet voyageur " 
+																 + name + " est bien enregistré. <br><br><br>"
+															 	 + "Il est temps d'aller le poser dans une boite et de vous amuser"
+															 	 + " à déplacer les objets voyageurs des autres participants !" 
+															 	 + "<br><br>N'oubliez pas d'y attacher le code de suivi." });
+										        } 
+										        else {
+										            console.error("Error during creation of geocacheur : " + error.message);
 													res.render('error', {message:error.message});
-											    });				
-									        },
-							                error: function(error) {
-							                	console.error("Error TBlogEntry : " + error.message);
+										        }
+										    }, function(error) {
+										        console.error(error.message);
 												res.render('error', {message:error.message});
-							                }																									 
-										});
-									},
-									error: function(error) {
-										console.error("Error TBlogEntry : " + error.message);
-										res.render('error', {message:error.message});
-									}
-								});	
-							}, function(error) {
-								console.error("Error saving photofile " + error.message);
-								res.render('error', {message:error.message});
-							});
+										    });				
+								        },
+						                error: function(error) {
+						                	console.error("Error TBlogEntry : " + error.message);
+											res.render('error', {message:error.message});
+						                }																									 
+									});
+								},
+								error: function(error) {
+									console.error("Error TBlogEntry : " + error.message);
+									res.render('error', {message:error.message});
+								}
+							});	
 						}, function(error) {
-								console.error("Error compressing photofile " + error.message);
-								res.render('error', {message:error.message});
-							});
+							console.error("Error saving photofile " + error.message);
+							res.render('error', {message:error.message});
+						});
 					}
 					else {
 						var error = "Une photo de l'objet voyageur est requise.";
@@ -704,246 +693,150 @@ app.get('/logtb', function(req, res) {
 
 app.post('/foundtb', upload.single('pic'), function (req, res, next) {
 	var TravelbugLog = Parse.Object.extend("TravelbugLog");
-	var Geocache = Parse.Object.extend("Geocache");
 	var logEntry = new TravelbugLog();
 
 	var travelBugId = req.body.id;
-	var tracking_code = req.body.tracking.toUpperCase();
+	var trackingCode = req.body.tracking.toUpperCase();
 	var email = req.body.email.toLowerCase();
 	var action = req.body.action;
 	var name = req.body.name;
 	var message = req.body.message;
-	var geocache = req.body.geocache;
+	var geocacheId = req.body.geocache;
 	var fav = req.body.fav;
 	var photoFile = req.file;
 
-	var parseFile;
+	jds.getTravelbugWithTrackingCode(trackingCode).then(function(tb) {
+        if(tb) {
+			console.log("Regardons si " + email + " a trouve la cache ID " + geocacheId + " pour pouvoir balader " + tb.id);
+			jds.getGeocache(geocacheId).then(function(cache) {
+		        if(cache) {
+					jds.hasEmailFoundGeocache(email, cache).then(function(result) {
+				        if(result) {
+							if (travelBugId == tb.id) {
+								console.log("Identifiant de TB valide");
+								logEntry.set("Pseudo", name);
+								logEntry.set("Email", email);
+								logEntry.set("Message", message);
+								logEntry.set("Date", new Date());
+								logEntry.set("Active", true);
+								logEntry.set("Travelbug", tb);
+								logEntry.set("TravelbugId", tb.id);
+								logEntry.set("TravelbugName", tb.get("Name"));
+								logEntry.set("Geocache", cache);
+								logEntry.set("cacheId", cache.id);
+								logEntry.set("cacheName", cache.get("Nom"));
 
-	var Travelbug = Parse.Object.extend("Travelbug");
-	var query = new Parse.Query(Travelbug);
-	query.equalTo("Code", tracking_code);
-	query.find({
-		success: function(results) {
-			
-			if(results.length > 0) {
-				console.log("Successfull TB retrieve");
+								if(photoFile) {
+									var photoFileBase64 = photoFile.buffer.toString('base64');
+									var parseFile = new Parse.File(photoFile.originalname, { base64: photoFileBase64 })
+									parseFile.save().then(function () {
+										var photo_url = parseFile.url({forceSecure: true})
+										logEntry.set("PhotoUrl", photo_url);
+										logEntry.set("Photo", parseFile);
+										logEntry.set("MissionReviewed", false);
+									},
+									function (error) {
+										console.error("Photofile save error in foundtb: " + error.message);
+									});
+								}
 
-	    		for (var i = 0; i < results.length; i++) { 
-	    			var tb = results[i];
-	    		}
+								if (action == 'grab') {
+									logEntry.set("Action", "grab");
+									tb.set("cacheId", null);
+									tb.set("cacheName", null);
+									tb.set("Holder", name);
+									tb.set("HolderEmail", email);
+								}
 
-	    		// Need to initialize a promise object because sharp class return a promise
-	    		// This handle the case when no picture are submitted (no required args here)
-	    		var promise = new Promise(function(resolve, reject) {
-  					resolve(1);
-				});
+								if (action == 'drop') {
+									logEntry.set("Action", "drop");
+									tb.set("cacheId", cache.id);
+									tb.set("cacheName", cache.get("Nom"));
+									tb.set("Holder", null);
+									tb.set("HolderEmail", null);
+								}
 
-	    		if(photoFile) {
-	    			promise = sharp(photoFile.buffer).resize(1024, 1024)
-												     .max()
-												     .withoutEnlargement()
-												     .toBuffer()
-				}
+								if (fav == "true") {
+									logEntry.set("Fav", true);
+									tb.increment("Fav");
+								} else {
+									logEntry.set("Fav", false);
+								}
 
-				// Use promise object instanciated previously by me or redefined by sharp if pic file is submitted
-				promise.then(function(buffer_img) { 
-					if(photoFile) {
-						var photoFileBase64 = buffer_img.toString('base64');
-						parseFile = new Parse.File(photoFile.originalname, { base64: photoFileBase64 })
-						parseFile.save().then(function () {
-								var photo_url = parseFile.url({forceSecure: true})
-								console.log("Photo TB saved in foundtb : " + photo_url);
-								logEntry.set("PhotoUrl", photo_url); // Doesn't seems to work
-								logEntry.set("Photo", parseFile); // Doesn't seems to work
-								logEntry.set("MissionReviewed", false);
-							},
-							function (error) {
-								console.log("Photofile save error in foundtb" + error.message);
-							}
-						);
-					}
-
-					// Hack WTF, don't know why it doesn't save without this part...
-					if(parseFile) {
-						logEntry.set("PhotoUrl", parseFile.url({forceSecure: true})); // Seems to work
-						logEntry.set("Photo", parseFile); // Seems to work
-						logEntry.set("MissionReviewed", false);
-					}
-
-					console.log("Regardons si " + email + " a trouve la cache " + geocache + " pour pouvoir balader " + tb.id);
-
-					var Geocache = Parse.Object.extend("Geocache");
-					var queryGc = new Parse.Query(Geocache);
-					queryGc.get(geocache, {
-						success: function(cache) {
-
-						logEntry.set("Pseudo", name);
-						logEntry.set("Email", email);
-						logEntry.set("Message", message);
-						logEntry.set("Date", new Date());
-						
-						var Log = Parse.Object.extend('Log');
-					    var queryCache = new Parse.Query(Log);
-
-						queryCache.equalTo("Email", email);
-						queryCache.equalTo("Geocache", cache);
-
-						queryCache.find({
-					        success: function(results) {
-					        	if(results.length == 0) {
-									console.log("Cache non trouvee ! : " + geocache + ' - ' + tb.id);
-									res.render('error', { message: "La cache n'a pas encore été trouvée pour faire voyager un tb !" });		    	
-					        	} else {
-
-					        		console.log("Cache trouvée ! ");
-
-									if (travelBugId == tb.id) {
-										console.log("Identifiant de TB valide");
-										logEntry.set("Travelbug", tb);
-										logEntry.set("TravelbugId", tb.id);
-										logEntry.set("TravelbugName", tb.get("Name"));
-										logEntry.set("Geocache", cache);
-										logEntry.set("cacheId", cache.id);
-										logEntry.set("cacheName", cache.get("Nom"));
-									}
-									else {
-										console.log("Identifiant de TB invalide ! : " + travelBugId + ' - ' + tb.id);
-										res.render('error', { message:"Mismatch Identifiants de TB invalide - 2 TB avec même code de suivi !" });		    	
-									}
-										
-									console.log("traitement selon " + action );
-									
-									if (action == 'grab') {
-										logEntry.set("Action", "grab");
-										tb.set("cacheId", null);
-										tb.set("cacheName", null);
-										tb.set("Holder", name);
-										tb.set("HolderEmail", email);
-									}
-									if (action == 'drop') {
-										logEntry.set("Action", "drop");
-										tb.set("cacheId", cache.id);
-										tb.set("cacheName", cache.get("Nom"));
-										tb.set("Holder", null);
-										tb.set("HolderEmail", null);
-									}
-
-									logEntry.set("Active", true);
-
-									if(fav == "true") {
-										logEntry.set("Fav", true);
-										tb.increment("Fav");
+								jds.isFirstTbDropOnGeocache(tb, cache).then(function(firstimeTbDropInGeocache) {
+									if(firstimeTbDropInGeocache) {
+										logEntry.set("NewCache", 1);
 									} else {
-										logEntry.set("Fav", false);
+										logEntry.set("NewCache", 0);
 									}
 
-									var queryTbFirstOnGc = new Parse.Query(TravelbugLog);
-									queryTbFirstOnGc.descending("createdAt");
-									queryTbFirstOnGc.equalTo("Active", true);
-									queryTbFirstOnGc.equalTo("cacheId", cache.id);
-									queryTbFirstOnGc.equalTo("TravelbugId", tb.id);
-									queryTbFirstOnGc.equalTo("Action", "drop");
-									queryTbFirstOnGc.find({
-										success: function(logsGc) {
-											console.log("on regarde si c'est la premiere fois que ce tb rencontre cette cache : " + logsGc.length);
-											
-											if(logsGc.length > 0) {
-												logEntry.set("NewCache", 0);
+									jds.isFirstTbDropByEmail(tb, email).then(function(firstimeTbDropByEmail) {
+										if(firstimeTbDropByEmail) {
+											logEntry.set("NewTB", 1);
+										} else {
+											logEntry.set("NewTB", 0);
+										}
+
+										jds.countTravelBugHoldByEmail(email).then(function(nbTbs) {
+											if (nbTbs > 3) {
+												res.render("error", { message: "Il n'est pas possible de détenir plus de 3 objets voyageurs en même temps." });
 											} else {
-												logEntry.set("NewCache", 1);
+												tb.save();
+												//cache.save();
+												logEntry.save(null, {
+													success: function (logEntry) {
+														res.render('foundtb', { tbid: travelBugId, 
+															message: "Super " + name + " !<br><br>Votre action sur l'objet voyageur "
+															+ tb.get("Name") + " est bien enregistrée. <br><br><br>"
+															+ "Merci de contribuer à la réussite de sa mission !"
+														});
+													},
+													error: function (error) {
+														console.error("Error TB LogEntry : " + error.message);
+														res.render('error', { message: error.message });
+													}
+												});
 											}
-
-											var queryFirstDrop = new Parse.Query(TravelbugLog);
-											queryFirstDrop.descending("createdAt");
-											queryFirstDrop.equalTo("Active", true);
-											queryFirstDrop.equalTo("Email", email);
-											queryFirstDrop.equalTo("TravelbugId", tb.id);
-											queryFirstDrop.equalTo("Action", "drop");
-											queryFirstDrop.find({
-												success: function(logsTb) {
-													console.log("on regarde si c'est la premiere fois que " + email + " loggue ce tb : " + logsTb.length);
-													
-													if(logsTb.length > 0) {
-														logEntry.set("NewTB", 0);
-													} else {
-														logEntry.set("NewTB", 1);
-													}		
-
-													console.log("on regarde si le geocacheur n'a pas deja 3 tb en main et qu'il essaye pas d'en grab un quatrième");
-
-													var nbTBinHands = new Parse.Query(Travelbug);
-													nbTBinHands.descending("createdAt");
-													nbTBinHands.equalTo("Active", true);
-													nbTBinHands.equalTo("HolderEmail", email);
-													nbTBinHands.find({
-														success: function(nbTbs) {
-
-															if(nbTbs.length >= 3) {
-																res.render("error", { message: "Il n'est pas possible d'avoir plus de 3 TB en mains" });
-															} else {
-
-																tb.save();
-																//cache.save();
-																logEntry.save(null, {
-																	success: function(logEntry) {
-																		res.render('foundtb', { tbid:travelBugId, message:"Super " 
-																							    + name + " !<br><br>Votre action sur l'objet voyageur " 
-																								+ tb.get("Name") + " est bien enregistrée. <br><br><br>"
-																								+ "Merci de contribuer à la réussite de sa mission !" });
-																	},
-																	error: function(logEntry, error) {
-																		console.log("Error TBlogEntry : " + error.message);
-																		res.render('error', { message: error.message });
-																	}
-																});
-																
-															}
-
-														},
-														error: function(logEntry, error) {
-															console.log("Error TBlogEntry : " + error.message);
-															res.render('error', { message: error.message });
-														}
-													});								
-												},
-												error: function(object, error) {
-													console.log("Error found Cache in TBlogEntry : " + error.message);
-													res.render('error', { message: error.message });
-												}
-											});
-										},
-									error: function(object, error) {
-										console.log("Error found Cache in TBlogEntry : " + error.message);
+									    }, function(error) {
+									        console.error("Error countTravelBugHoldByEmail : " + error.message);
+											res.render('error', { message: error.message });
+									    });
+								    }, function(error) {
+								        console.error("Error isFirstTbDropByEmail : " + error.message);
 										res.render('error', { message: error.message });
-									}
-								});
-						}
-					},
-					error: function(logEntry, error) {
-						console.log("Error found Cache in TBlogEntry : " + error.message);
+								    });
+							    }, function(error) {
+							        console.error("Error isFirstTbDropOnGeocache : " + error.message);
+									res.render('error', { message: error.message });
+							    });
+							}
+							else {
+								console.error("Identifiant de TB invalide ! : " + travelBugId + ' - ' + tb.id);
+								res.render('error', { message: "Mismatch Identifiants de TB invalide - 2 TB avec même code de suivi !" });
+							}
+				        } else {
+				            console.error("Pas de log présent sur cette géocache ! : " + geocacheId + ' - ' + tb.id);
+							res.render('error', {message: "La cache n'ayant pas encore été logguée, impossible d'y faire voyager un tb !"});
+				        }
+				    }, function(error) {
+				        console.error("Error searching hasEmailFoundGeocache in LogEntry : " + error.message);
 						res.render('error', { message: error.message });
-					}
-				});
-
-						},
-						error: function(logEntry, error) {
-							console.log("Unsuccessfull cache retrieve : " + error.message);
-							res.render('error', { message: error.message });
-						}
-					});
-				});
-	    	}
-		
-	    	else {
-				console.log("Unsuccessfull TB retrieve");
-				res.render('error', { message:"Code de suivi invalide !" });
-	    	}
-	    },
-	    error: function(object, error) {
-	    	console.log("Error TB retrieve : " + error.message);
-	    	res.render('error', { message:"Code de suivi invalide !" });
-	    }
-	});
+				    });
+		        } else {
+					res.render('error', { message: "Géocache non trouvée !" });
+		        }
+		    }, function(error) {
+		        console.error("Error Cache retrieve : " + error.message);
+				res.render('error', { message: error.message });
+		    });
+        } else {
+            console.error("Unsuccessfull TB retrieve or Inactive TB");
+			res.render('error', { message:"Code de suivi invalide ou Objet Voyageur désactivé." });
+        }
+    }, function(error) {
+    	console.error("Error getTravelbugWithTrackingCode : " + error.message);
+		res.render('error', { message:error.message });
+    });
 });
 
 app.post('/flash', function(req, res) {

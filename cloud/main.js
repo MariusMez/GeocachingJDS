@@ -6,26 +6,39 @@ Parse.Cloud.define("hello", function(request, response) {
 	response.success("Hello world!");
 });
 
-
-Parse.Cloud.beforeSave("Log", function(request, response) {
+function processPhoto(request, response) {
 	const sharp = require('sharp');
+	const maxWidth = 1280;
+	const maxHeight = 1280;
 	var url = request.object.get("Photo").url();
     if(url === "") {
-        return;
+        response.error();
     }
 
     Parse.Cloud.httpRequest({ url: url }).then(function(response) {
    		return response.buffer;
 	}).then(function(image_buffer) {
-		jds.createThumbnail(image_buffer, 1280, 1280).then(function(thumbnail) {
+		jds.createThumbnail(image_buffer, maxWidth, maxHeight).then(function(thumbnail) {
 		    request.object.set("Photo", thumbnail);
-    		request.object.set("PhotoUrl", thumbnail.url());
+    		request.object.set("PhotoUrl", thumbnail.url({forceSecure: true}));
 			response.success();
 		    }, function(error) {
 		        console.error("Thumbnail creation error: " + error.message);
 		        response.error();
 		    });
 	});
+}
+
+Parse.Cloud.beforeSave("Log", function(request, response) {
+	processPhoto(request, response);
+});
+
+Parse.Cloud.beforeSave("Travelbug", function(request, response) {
+	processPhoto(request, response);
+});
+
+Parse.Cloud.beforeSave("TravelbugLog", function(request, response) {
+	processPhoto(request, response);
 });
 
 Parse.Cloud.job("Resize all PhotoLog", function(request, response) {
