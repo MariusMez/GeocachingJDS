@@ -1,3 +1,23 @@
+var createThumbnail = function createThumbnail(image_buffer, maxWidth, maxHeight) {
+    const sharp = require('sharp');
+    console.log("Generating Thumbnail...");
+    return sharp(image_buffer).resize(maxWidth, maxHeight)
+                              .max()
+                              .withoutEnlargement()
+                              .toFormat('jpeg')
+                              .toBuffer()
+                              .then(function(buffer_img) { 
+                                    console.log("Buffer returned, creating Parse File");
+                                    var thumb = new Parse.File("thumbnail.jpg", { base64: buffer_img.toString('base64') });
+                                    return thumb.save();
+                               }).then(function(thumbnail) {
+                                    return thumbnail;
+                               }, function(error) {
+                                    console.log("Thumbnail generation error: " + error.message);
+                                    return;
+                               });
+};
+
 var getGeocacheWithCodeId = function(geocacheCodeId) {
     var promise = new Parse.Promise();
 
@@ -199,6 +219,7 @@ var saveOrUpdateGeocacheur = function(email, pseudo, active) {
     return promise;
 }
 
+module.exports.createThumbnail = createThumbnail;
 module.exports.getGeocacheWithCodeId = getGeocacheWithCodeId;
 module.exports.getInactiveTravelbugCodeWithCode = getInactiveTravelbugCodeWithCode;
 module.exports.getLogWithEmailAndCache = getLogWithEmailAndCache;
