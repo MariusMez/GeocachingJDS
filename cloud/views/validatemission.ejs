@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-	<title>PHOTOS DE LA COURSE AUX OBJETS VOYAGEURS - Géocaching Jeux de Sophia 2018</title>
+	<title>MISSION VALIDATOR - Géocaching Jeux de Sophia 2018</title>
 	<% include ./partials/head %>
 </head>
 <body>
@@ -13,8 +13,8 @@
 		<div id="intro" class="container">
 			<section>
 				<header class="major">
-					<h2>Toutes les photos de la course</h2>
-					<span class="byline">Photos des Logs des Objets Voyageurs</span>				
+					<h2>Toutes les photos des missions à valider</h2>
+					<span class="byline">Voici les photos des Log des Objets Voyageurs</span>				
 				</header>
 
 				<div style="display:flex; flex-wrap:wrap; justify-content:space-evenly; align-items: baseline;" class="clearfix">
@@ -26,7 +26,7 @@
 					<% }); %>
 				</div>
 
-				<%  for (var i = 1; i <= pages; i++) { 
+				<%  for (var i = 1; i < pages; i++) { 
 				    if(page==i) { %>
 						&raquo; Page <%= i %>&nbsp;&nbsp;
 					<% } else { %>

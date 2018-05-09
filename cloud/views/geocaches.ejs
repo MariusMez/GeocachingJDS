@@ -99,7 +99,10 @@
 				<% logs.forEach(function(log) { %>
 
 				<% if(log.get("Geocache").get("Active") == true)  { %>
-				<li><b><a href="/geocache?id=<%= log.get("Geocache").id %>"> <%= log.get("Geocache").get("Nom") %> </a> : <%= moment(log.get("Date")).utcOffset(120).fromNow() %> le <%= moment(log.get("Date")).utcOffset(120).format("LL [à] LT") %> </b>- <%= log.get("Pseudo") %> : <i><%= log.get("Message") %></i></li>
+					<li>
+						<b><a href="/geocache?id=<%= log.get("Geocache").id %>"> <%= log.get("Geocache").get("Nom") %> </a> : <%= moment(log.get("Date")).utcOffset(120).fromNow() %> le <%= moment(log.get("Date")).utcOffset(120).format("LL [à] LT") %> </b>- <%= log.get("Pseudo") %> : <i><%= log.get("Message") %></i>
+						<% if(log.get("Fav") == true)  { %> - 👍 <% } %>
+					</li>
 				<% } %>
 				
 				<% }); %>

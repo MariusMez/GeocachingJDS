@@ -50,18 +50,16 @@
 				<input type="text" name="tracking" id="tracking" value="" style="border: solid 1px #fff;" placeholder="Ce numéro est inscrit ou attaché sur l'objet voyageur" size="4" maxlength="4" required/>
 				<br>
 				<% if(action=='drop') { %>
-				Un petit Message pour partager votre découverte avec le propriétaire de l'Objet Voyageur
-				<input type="text" name="message" id="message" value="" style="border: solid 1px #fff;" placeholder="Ce Message sera visible sur le site" maxlength="500" required/>
-				<br>		
+					Un petit Message pour partager votre découverte avec le propriétaire de cet objet
+					<input type="text" name="message" id="message" value="" style="border: solid 1px #fff;" placeholder="Ce Message sera visible sur le site" maxlength="500" required/>
+					<br>		
 
-				Une photo souvenir (sera visible sur le site) pour aider à accomplir la mission de l'objet
-				<input type="file" name="pic" id="pic" accept="image/*">
-				<br>
-				<br>
-				Si vous avez apprécié découvrir cet objet, attribuez lui un point favori en cochant cette case : 
-				<input type="checkbox" name="fav" value="true" /> 👍
-
-
+					Une photo souvenir (sera visible sur le site) pour aider à accomplir la mission de l'objet
+					<input type="file" name="pic" id="pic" accept="image/*">
+					<br>
+					<br>
+					Si vous avez apprécié découvrir cet objet, attribuez lui un point favori en cochant cette case : 
+					<input type="checkbox" name="fav" value="true" /> 👍
 				<% } %>
 				<br>
 				<% if(email == "" ) { %>
