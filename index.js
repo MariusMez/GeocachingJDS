@@ -227,25 +227,25 @@ app.get('/geocaches', function(req, res) {
 	var moment = require('./cloud/moment-with-locales.min.js');
 	moment.locale('fr');
 	app.locals.moment = moment;
-	var Log = Parse.Object.extend("Log");
-	var queryLog = new Parse.Query(Log);
-	queryLog.descending("createdAt");
-	queryLog.equalTo("Active", true);
-	queryLog.limit(5); 
-	queryLog.include("Geocache");
-	queryLog.find({
-		success: function(logs) {
-			var Geocaches = Parse.Object.extend("Geocache");
-			var query = new Parse.Query(Geocaches);
-			query.equalTo("Active",true);
-			query.descending("RatioFav");
-			query.find({ 
-				success: function(caches) {
-					res.render('geocaches', {message:'Les caches à trouver', geocaches:caches, logs:logs});
-				}
-			});
-		}
-	});
+
+	var startingDate = new Date("Sat, 19 May 2018 08:00:00 GMT");
+	var now = Date.now();
+	var start = false;
+	if(startingDate < now) {
+		start = true;
+	}
+
+	jds.getAllPublishedGeocaches().then(function(geocaches) {
+        jds.getLastLogs(5).then(function(logs) {
+	        res.render('geocaches', { geocaches:geocaches, logs:logs, start:start });
+	    }, function(error) {
+	        console.error("Error in getLastLogs: " + error);
+	        res.redirect('/');
+	    });
+    }, function(error) {
+        console.error("Error in getAllPublishedGeocaches: " + error);
+        res.redirect('/');
+    });
 });
 
 
@@ -444,6 +444,7 @@ app.get('/geocache', function(req, res) {
 	query.get(req.query.id, {
 		success: function(cache) {				 
 			var geocacheName = cache.get("Nom");
+			var geocachePublicationDate = cache.get("Publication");
 			var geocacheDifficulty = cache.get("Difficulty");
 			var geocacheTerrain = cache.get("Terrain");
 			var geocacheSize = cache.get("Size");
@@ -488,7 +489,8 @@ app.get('/geocache', function(req, res) {
 															 size:geocacheSize, coord:geocacheCoordString, 
 															 gps:geocacheGPS, description:geocacheDescription, 
 															 indice:geocacheIndice, photo:geocachePhotoUrl, 
-															 spoiler:geocacheSpoiler, logs:logs,
+															 spoiler:geocacheSpoiler, logs:logs, 
+															 publication:geocachePublicationDate,
 															 objets:travelbugs, objetsLogged:objetsLogged });
 									},
 									error: function(object, error) {

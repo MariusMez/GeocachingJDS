@@ -60,6 +60,53 @@ var getGeocacheWithCodeId = function(geocacheCodeId) {
     return promise;
 }
 
+var getAllPublishedGeocaches = function() {
+    var promise = new Parse.Promise();
+
+    var Geocaches = Parse.Object.extend("Geocache");
+    var query = new Parse.Query(Geocaches);
+    query.equalTo("Active",true);
+    query.lessThanOrEqualTo("Publication", new Date());
+    query.descending("Publication");
+    query.find().then(function(results) {
+        if(results) {
+            promise.resolve(results);
+        } else {
+            console.log("No Geocaches");
+            promise.resolve(null);
+        }
+    }, function(error) {
+        console.error("Error searching for published Geocaches - Error: " + error);
+        promise.error(error);
+    });
+
+    return promise;
+}
+
+var getLastLogs = function(limit) {
+    var promise = new Parse.Promise();
+
+    var Log = Parse.Object.extend("Log");
+    var query = new Parse.Query(Log);
+    query.descending("createdAt");
+    query.equalTo("Active", true);
+    query.limit(limit); 
+    query.include("Geocache");
+    query.find().then(function(results) {
+        if(results) {
+            promise.resolve(results);
+        } else {
+            console.log("No Logs");
+            promise.resolve(null);
+        }
+    }, function(error) {
+        console.error("Error searching for Logs - Error: " + error);
+        promise.error(error);
+    });
+
+    return promise;
+}
+
 var getTravelbugWithTrackingCode = function(trackingCode) {
     var promise = new Parse.Promise();
 
@@ -411,3 +458,5 @@ module.exports.isFirstTbDropByEmail = isFirstTbDropByEmail;
 module.exports.countTravelBugHoldByEmail = countTravelBugHoldByEmail;
 module.exports.getLastMissionToValidate = getLastMissionToValidate;
 module.exports.validateMission = validateMission;
+module.exports.getLastLogs = getLastLogs;
+module.exports.getAllPublishedGeocaches = getAllPublishedGeocaches;

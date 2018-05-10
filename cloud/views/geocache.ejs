@@ -45,6 +45,7 @@
 
 				<p><%- description %></p>
 
+				<p style="text-align: right;"><i>Cache publiée le <%= moment(publication).utcOffset(120).format("LL [à] LT") %></i></p>
 			</section>
 			<br /><br />
 			
@@ -109,10 +110,8 @@
 			<% } %>
 
 			<% if( cat=='VIRTUAL' || cat=='WEBCAM' || cat=='EARTHCACHE' || cat=='EVENT' || cat=='CITO' ) { %>
-			<br>
 			<section>
 				<h2>👣 Formulaire pour valider votre participation</h2>
-				<br>
 				<form ref="uploadForm" id="uploadForm" method="post" action="/found" encType="multipart/form-data">
 					<input type="hidden" name="id" id="<%= id %>" value="<%= id %>" />
 
