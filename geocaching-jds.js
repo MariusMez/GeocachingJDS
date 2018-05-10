@@ -352,6 +352,48 @@ var countTravelBugHoldByEmail = function(email) {
     return promise;
 }
 
+var getLastMissionToValidate = function() {
+    var promise = new Parse.Promise();
+    
+    var TravelbugLog = Parse.Object.extend("TravelbugLog");
+    var query = new Parse.Query(TravelbugLog);
+    query.equalTo("Active", true);
+    query.equalTo("MissionReviewed", false);
+    query.exists("PhotoUrl");
+    query.include("Travelbug");
+    query.ascending("createdAt");
+    query.first().then(function(result) {
+        if(result) {
+            promise.resolve(result);
+        } else {
+            promise.resolve(null);
+        }
+    }, function(error) {
+        console.error("Error searching for Mission in TravelBugLog - Error: " + error);
+        promise.error(error);
+    });
+
+    return promise;
+}
+
+var validateMission = function(missionId, validationScore) {
+    var promise = new Parse.Promise();
+    
+    var TravelbugLog = Parse.Object.extend("TravelbugLog");
+    var tblog = new TravelbugLog();
+    tblog.id = missionId;
+    tblog.set("MissionReviewed", true);
+    tblog.set("Mission", validationScore);
+    tblog.save(null).then(function() {
+            promise.resolve(tblog)
+        }, function(error) {
+            console.error(error)
+            promise.resolve(null)
+        });
+
+    return promise;
+}
+
 module.exports.createThumbnail = createThumbnail;
 module.exports.getGeocache = getGeocache;
 module.exports.getGeocacheWithCodeId = getGeocacheWithCodeId;
@@ -367,3 +409,5 @@ module.exports.saveOrUpdateGeocacheur = saveOrUpdateGeocacheur;
 module.exports.isFirstTbDropOnGeocache = isFirstTbDropOnGeocache;
 module.exports.isFirstTbDropByEmail = isFirstTbDropByEmail;
 module.exports.countTravelBugHoldByEmail = countTravelBugHoldByEmail;
+module.exports.getLastMissionToValidate = getLastMissionToValidate;
+module.exports.validateMission = validateMission;

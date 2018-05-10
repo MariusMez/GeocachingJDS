@@ -13,26 +13,26 @@
 		<div id="intro" class="container">
 			<section>
 				<header class="major">
-					<h2>Toutes les photos des missions à valider</h2>
+					<h2>Dernière mission à valider</h2>
 					<span class="byline">Voici les photos des Log des Objets Voyageurs</span>				
 				</header>
 
 				<div style="display:flex; flex-wrap:wrap; justify-content:space-evenly; align-items: baseline;" class="clearfix">
-					<% logs.forEach(function(log) { %>
-					<div style="padding-right: 50px; padding-bottom: 15px; text-align: center;">
-						<a href="<%= log.get("PhotoUrl") %>"><img width="250px;" class="border" src="<%= log.get("PhotoUrl") %>" /><p><%= log.get("TravelbugName") %> <br> <b><%= log.get("Pseudo") %></b></p>
+					<div class="border" style="margin-bottom: 15px; text-align: center;">
+						<a href="<%= mission.get("PhotoUrl").replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, '') %>">
+							<img width="600px;" class="border image" src="<%= mission.get("PhotoUrl").replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, '') %>" />
 						</a>
+						<p style="margin-top: 10px;">
+							<a href="/tb?id=<%= mission.get("Travelbug").id %>"><b><%= mission.get("TravelbugName") %></b></a> - <%= mission.get("Pseudo") %>, le <%= moment(mission.get("Date")).utcOffset(120).format("LL [à] LT") %> a écrit : <i><%= mission.get("Message") %></i> 
+							<br><br>
+							Mission : <i><%= mission.get("Travelbug").get("Mission") %></i>
+						</p>
+						<div style="margin-bottom: 30px;">
+							<a href="/validatemission?id=<%= mission.id %>&score=1" style="margin-right:150px;" class="button alt small">✅ Valider</a>
+							<a href="/validatemission?id=<%= mission.id %>&score=0" style="margin-left:150px;" class="button alt small">❌ Refuser</a>
+						</div>
 					</div>
-					<% }); %>
 				</div>
-
-				<%  for (var i = 1; i < pages; i++) { 
-				    if(page==i) { %>
-						&raquo; Page <%= i %>&nbsp;&nbsp;
-					<% } else { %>
-						<a href="/photostbs?page=<%= i %>">Page <%= i %></a>&nbsp;&nbsp;
-					<% } %>
-				<% } %>
 
 			</section>
 		</div>

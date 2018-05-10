@@ -331,44 +331,39 @@ app.get('/photostbs', function(req, res) {
 });
 
 app.get('/missionvalidator', function(req, res) {
-	var page = req.query.page;
-	if (page === undefined) {
-		page = 1;
-	}
-	var max = 10;
+	var moment = require('./cloud/moment-with-locales.min.js');
+	moment.locale('fr');
+	
+	var shortDateFormat = "dddd @ HH:mm"; 
+	app.locals.moment = moment; 
+	app.locals.shortDateFormat = shortDateFormat;
+	
+	jds.getLastMissionToValidate().then(function(mission) {
+        if(mission) {
+            res.render('validatemission', { mission: mission });
+        } else {
+            res.render('error', { message:"Pas de missions à Valider" }); 
+        }
+    }, function(error) {
+        console.error("Error in getAllMissionsToValidate: " + error);
+        res.render('error', { message: error.message });
+    });
+});
 
-	var TravelbugLog = Parse.Object.extend("TravelbugLog");
-	var queryLog = new Parse.Query(TravelbugLog);
-	queryLog.descending("createdAt");
-	queryLog.equalTo("Active", true);
-	queryLog.exists("PhotoUrl");
-	queryLog.count({
-		success: function(count) {
-	    	var queryLog = new Parse.Query(TravelbugLog);
-			queryLog.descending("createdAt");
-			queryLog.equalTo("Active", true);
-			queryLog.equalTo("MissionReviewed", false);
-			queryLog.exists("PhotoUrl");
-			queryLog.include("Travelbug");
-			queryLog.limit(max);
-			queryLog.skip(max * page)
-			queryLog.find({
-				success: function(logs) {
-					res.render('validatemission', { logs: logs, 
-										      		page: page,
-										      		pages: count/max });
-				},
-			    error: function(error) {
-			    	console.error(error.message);
-	    			res.redirect('/');
-			    }
-			});
-	    },
-	    error: function(error) {
-	    	console.error(error.message);
-	    	res.redirect('/');
-	    }
-	});
+app.get('/validatemission', function(req, res) {
+	missionId = req.query.id;
+	validationScore = req.query.score;
+
+	jds.validateMission(missionId, validationScore).then(function(result) {
+        if(result) {
+            res.redirect('/missionvalidator');
+        } else {
+            res.render('error', { message:"Mission introuvable" }); 
+        }
+    }, function(error) {
+        console.error("Error in validateMission: " + error);
+        res.render('error', { message: error.message });
+    });
 });
 
 app.get('/geocaching', function(req, res) {
@@ -529,13 +524,13 @@ app.get('/flashit', function(req, res) {
             res.render('error', { message:"Code de suivi invalide !"}); 
         }
     }, function(error) {
-        console.log("Error in flashit: " + error);
+        console.error("Error in flashit: " + error);
         res.render('error', { message:"Code de suivi invalide ! " + error.message });
     });
 });
 
 app.post('/myscore', function(req, res) {
-	var email = req.body.email;
+	var email = req.body.email.toLowerCase();
 	var Logs = Parse.Object.extend("Log");
 
 	const nbPointsFoundIt = 20;
@@ -841,8 +836,8 @@ app.post('/foundtb', upload.single('pic'), function (req, res, next) {
 
 app.post('/flash', function(req, res) {
 	
-	var codeId = req.body.code;
-	var email = req.body.email
+	var codeId = req.body.code.toUpperCase();
+	var email = req.body.email.toLowerCase();
 
 	jds.getGeocacheWithCodeId(codeId).then(function(cache) {
         if(cache) {

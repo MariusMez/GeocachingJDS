@@ -10,9 +10,12 @@ function processPhoto(request, response) {
 	const sharp = require('sharp');
 	const maxWidth = 1280;
 	const maxHeight = 1280;
-	var url = request.object.get("Photo").url();
-    if(url === "") {
-        response.error();
+	
+	var photo = request.object.get("Photo");
+    if(photo === undefined) {
+        response.success();
+    } else {
+    	var url = photo.url();
     }
 
     Parse.Cloud.httpRequest({ url: url }).then(function(response) {
@@ -30,15 +33,15 @@ function processPhoto(request, response) {
 }
 
 Parse.Cloud.beforeSave("Log", function(request, response) {
-	processPhoto(request, response);
+	if(request.object.isNew()) { processPhoto(request, response); } else { response.success(); }
 });
 
 Parse.Cloud.beforeSave("Travelbug", function(request, response) {
-	processPhoto(request, response);
+	if(request.object.isNew()) { processPhoto(request, response); } else { response.success(); }
 });
 
 Parse.Cloud.beforeSave("TravelbugLog", function(request, response) {
-	processPhoto(request, response);
+	if(request.object.isNew()) { processPhoto(request, response); } else { response.success(); }
 });
 
 Parse.Cloud.job("Resize all PhotoLog", function(request, response) {
