@@ -38,7 +38,7 @@
 				<% tbsout.forEach(function(obj) { %>
 					<li>
 						<a href="/tb?id=<%= obj.id %>" style="color:white; font-size: 1.5em; margin-right: 20px;">
-							<b><%= obj.get("Name") %></b>
+							<b><%= obj.get("Name") %></b> - <%= obj.get("Code") %>
 						</a>
 						<a href="/logtb?action=grab&id=<%= obj.id %>&cacheId=<%= cacheid %>&geocacheurId=<%= geocacheurId %>" class="button small alt">Récuperez le !</a>
 					</li>
@@ -54,7 +54,7 @@
 				<% tbsin.forEach(function(obj) { %>
 					<li>
 						<a href="/tb?id=<%= obj.id %>" style="color:white; font-size: 1.5em; margin-right: 20px;">
-							<b><%= obj.get("Name") %></b>
+							<b><%= obj.get("Name") %></b> - <%= obj.get("Code") %>
 						</a> 
 						 <a href="/logtb?action=drop&id=<%= obj.id %>&cacheId=<%= cacheid %>&geocacheurId=<%= geocacheurId %>" class="button small alt">Déposez le !</a>
 					</li>

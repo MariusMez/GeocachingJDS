@@ -84,41 +84,6 @@
 			<br />
 			<% } %>
 
-			<% if( cat=='VIRTUAL' || cat=='WEBCAM' || cat=='EARTHCACHE' || cat=='EVENT' || cat=='CITO' ) { %>
-			<section>
-				<h2>Formulaire pour valider votre trouvaille</h2>
-				<br>
-				<form ref="uploadForm" id="uploadForm" method="post" action="/found" encType="multipart/form-data">
-				<input type="hidden" name="id" id="<%= id %>" value="<%= id %>" />
-
-				Votre Email des Jeux de Sophia - <i>Nécessaire au classement de l'épreuve</i>
-				<input type="email" name="email" id="email" value="" style="border: solid 1px #82b440;" placeholder="L'email ne sera pas visible sur le site" required/>
-				<br>
-				Votre Pseudo pour l'épreuve Géocaching
-				<input type="text" name="name" id="name" value="" style="border: solid 1px #82b440;" placeholder="Ce pseudo sera visible sur le site" required/>
-				<br>
-				Un petit Message pour partager votre découverte
-				<input type="text" name="message" id="message" value="" style="border: solid 1px #82b440;" placeholder="Ce Message sera visible sur le site" maxlength="500" required/>
-				<br>		
-
-				<% if(cat!='MYSTERY') { %>
-				Une photo souvenir (sera visible sur le site) pour valider votre trouvaille
-				<input type="file" name="pic" id="pic" accept="image/*" <% if(cat=='VIRTUAL' || cat=='WEBCAM') { %>required<% } %>>
-				<br>
-				<% } %>
-
-				<br>
-				Si vous avez apprécié cette cache, attribuez lui un point favori en cochant cette case : 
-				<input type="checkbox" name="fav" value="true" /> 👍
-				<!-- <br><br><div class="g-recaptcha" data-sitekey="6LfXHyMUAAAAALaiZRR7GqvCsxQYXUNpPPKAyCmd"></div>	-->
-
-				<br><br><input type="submit" value="J'ai trouvé !" name="submit" class="button" id="submitButton" title="Clic ici pour envoyer la trouvaille" />
-				
-			</form>  	
-			</section>
-			<br />
-			<% } %>
-
 			<% if(cat=='TRADI' || cat=='MULTI' || cat=='LETTERBOX' || cat=='EVENT' || cat=='CITO' || cat=='WHERIGO' || cat=='MYSTERY' || cat=='SPECIAL') { %>
 			<section>
 				<h2>🗿 Objets Voyageurs</h2>
@@ -140,7 +105,43 @@
 
 				</details>
 			</section>
-			<br />
+			<br>
+			<% } %>
+
+			<% if( cat=='VIRTUAL' || cat=='WEBCAM' || cat=='EARTHCACHE' || cat=='EVENT' || cat=='CITO' ) { %>
+			<br>
+			<section>
+				<h2>👣 Formulaire pour valider votre participation</h2>
+				<br>
+				<form ref="uploadForm" id="uploadForm" method="post" action="/found" encType="multipart/form-data">
+					<input type="hidden" name="id" id="<%= id %>" value="<%= id %>" />
+
+					Votre Email des Jeux de Sophia - <i>Nécessaire au classement de l'épreuve</i>
+					<input type="email" name="email" id="email" value="" style="border: solid 1px #82b440;" placeholder="L'email ne sera pas visible sur le site" required/>
+					<br>
+					Votre Pseudo pour l'épreuve Géocaching
+					<input type="text" name="name" id="name" value="" style="border: solid 1px #82b440;" placeholder="Ce pseudo sera visible sur le site" required/>
+					<br>
+					Un petit Message pour partager votre découverte
+					<input type="text" name="message" id="message" value="" style="border: solid 1px #82b440;" placeholder="Ce Message sera visible sur le site" maxlength="500" required/>
+					<br>		
+
+					<% if(cat!='MYSTERY') { %>
+						Une photo souvenir (sera visible sur le site) pour valider votre participation
+						<input type="file" name="pic" id="pic" accept="image/*" <% if(cat=='VIRTUAL' || cat=='WEBCAM') { %>required<% } %>>
+						<br>
+					<% } %>
+
+					<br>
+					Si vous avez apprécié cette cache, attribuez lui un point favori en cochant cette case : 
+					<input type="checkbox" name="fav" value="true" /> 👍
+					<!-- <br><br><div class="g-recaptcha" data-sitekey="6LfXHyMUAAAAALaiZRR7GqvCsxQYXUNpPPKAyCmd"></div>	-->
+
+					<br><br><input type="submit" value="J'ai trouvé !" name="submit" class="button" id="submitButton" title="Clic ici pour envoyer la trouvaille" />
+					
+				</form>  	
+			</section>
+			<br><br>
 			<% } %>
 
 			<section>
