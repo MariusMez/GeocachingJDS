@@ -28,8 +28,8 @@
 							Mission : <i><%= mission.get("Travelbug").get("Mission") %></i>
 						</p>
 						<div style="margin-bottom: 30px;">
-							<a href="/validatemission?id=<%= mission.id %>&score=1" style="margin-right:150px;" class="button alt small">✅ Valider</a>
-							<a href="/validatemission?id=<%= mission.id %>&score=0" style="margin-left:150px;" class="button alt small">❌ Refuser</a>
+							<a href="/validatemission?id=<%= mission.id %>&score=1&key=<%= key %>" style="margin-right:150px;" class="button alt small">✅ Valider</a>
+							<a href="/validatemission?id=<%= mission.id %>&score=0&key=<%= key %>" style="margin-left:150px;" class="button alt small">❌ Refuser</a>
 						</div>
 					</div>
 				</div>

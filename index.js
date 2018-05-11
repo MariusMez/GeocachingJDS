@@ -331,39 +331,49 @@ app.get('/photostbs', function(req, res) {
 });
 
 app.get('/missionvalidator', function(req, res) {
-	var moment = require('./cloud/moment-with-locales.min.js');
-	moment.locale('fr');
-	
-	var shortDateFormat = "dddd @ HH:mm"; 
-	app.locals.moment = moment; 
-	app.locals.shortDateFormat = shortDateFormat;
-	
-	jds.getLastMissionToValidate().then(function(mission) {
-        if(mission) {
-            res.render('validatemission', { mission: mission });
-        } else {
-            res.render('error', { message:"Pas de missions à Valider" }); 
-        }
-    }, function(error) {
-        console.error("Error in getAllMissionsToValidate: " + error);
-        res.render('error', { message: error.message });
-    });
+	var accessKey = process.env.RECAPTCHA_SECRET_KEY;
+	if(req.query.key === accessKey) {
+		var moment = require('./cloud/moment-with-locales.min.js');
+		moment.locale('fr');
+		
+		var shortDateFormat = "dddd @ HH:mm"; 
+		app.locals.moment = moment; 
+		app.locals.shortDateFormat = shortDateFormat;
+		
+		jds.getLastMissionToValidate().then(function(mission) {
+	        if(mission) {
+	            res.render('validatemission', { mission: mission, key:accessKey });
+	        } else {
+	            res.render('error', { message:"Pas de missions à Valider" }); 
+	        }
+	    }, function(error) {
+	        console.error("Error in getAllMissionsToValidate: " + error);
+	        res.render('error', { message: error.message });
+	    });
+	} else {
+		res.redirect('/');
+	}
 });
 
 app.get('/validatemission', function(req, res) {
-	missionId = req.query.id;
-	validationScore = req.query.score;
+	var accessKey = process.env.RECAPTCHA_SECRET_KEY;
+	if(req.query.key === accessKey) {
+		missionId = req.query.id;
+		validationScore = req.query.score;
 
-	jds.validateMission(missionId, validationScore).then(function(result) {
-        if(result) {
-            res.redirect('/missionvalidator');
-        } else {
-            res.render('error', { message:"Mission introuvable" }); 
-        }
-    }, function(error) {
-        console.error("Error in validateMission: " + error);
-        res.render('error', { message: error.message });
-    });
+		jds.validateMission(missionId, validationScore).then(function(result) {
+	        if(result) {
+	            res.redirect('/missionvalidator?key=' + accessKey);
+	        } else {
+	            res.render('error', { message:"Mission introuvable" }); 
+	        }
+	    }, function(error) {
+	        console.error("Error in validateMission: " + error);
+	        res.render('error', { message: error.message });
+	    });
+	} else {
+		res.redirect('/');
+	}
 });
 
 app.get('/geocaching', function(req, res) {
@@ -425,7 +435,7 @@ app.get('/tbs', function(req, res) {
 	var shortDateFormat = "dddd @ HH:mm"; 
 	app.locals.moment = moment; 
 	app.locals.shortDateFormat = shortDateFormat;
-	
+
 	var Travelbug = Parse.Object.extend("Travelbug");
 	var queryTbs = new Parse.Query(Travelbug);
 	queryTbs.descending("updatedAt");

@@ -1,13 +1,12 @@
 var createThumbnail = function createThumbnail(image_buffer, maxWidth, maxHeight) {
     const sharp = require('sharp');
-    console.log("Generating Thumbnail...");
     return sharp(image_buffer).resize(maxWidth, maxHeight)
                               .max()
                               .withoutEnlargement()
                               .toFormat('jpeg')
                               .toBuffer()
                               .then(function(buffer_img) { 
-                                    console.log("Buffer returned, creating Parse File");
+                                    console.log("Generating Thumbnail...");
                                     var thumb = new Parse.File("thumbnail.jpg", { base64: buffer_img.toString('base64') });
                                     return thumb.save();
                                }).then(function(thumbnail) {
@@ -28,7 +27,6 @@ var getGeocache = function(id) {
         if(result) {
             promise.resolve(result);
         } else {
-            console.log("Geocache ID: " + id + " was not found");
             promise.resolve(null);
         }
     }, function(error) {
@@ -49,7 +47,6 @@ var getGeocacheWithCodeId = function(geocacheCodeId) {
         if(result) {
             promise.resolve(result);
         } else {
-            console.log("Geocache CodeId: " + geocacheCodeId + " was not found");
             promise.resolve(null);
         }
     }, function(error) {
@@ -72,7 +69,6 @@ var getAllPublishedGeocaches = function() {
         if(results) {
             promise.resolve(results);
         } else {
-            console.log("No Geocaches");
             promise.resolve(null);
         }
     }, function(error) {
@@ -96,7 +92,6 @@ var getLastLogs = function(limit) {
         if(results) {
             promise.resolve(results);
         } else {
-            console.log("No Logs");
             promise.resolve(null);
         }
     }, function(error) {
@@ -118,7 +113,6 @@ var getTravelbugWithTrackingCode = function(trackingCode) {
         if(result) {
             promise.resolve(result);
         } else {
-            console.log("Travelbug with tracking code: " + trackingCode + " was not found");
             promise.resolve(null);
         }
     }, function(error) {
@@ -140,7 +134,6 @@ var getInactiveTravelbugCodeWithCode = function(code) {
         if(result) {
             promise.resolve(result);
         } else {
-            console.log("TravelbugCode Code: " + code + " was not found");
             promise.resolve(null);
         }
     }, function(error) {
@@ -163,7 +156,6 @@ var getLogWithEmailAndCache = function(email, geocache) {
         if(result) {
             promise.resolve(result);
         } else {
-            console.log("Log was not found");
             promise.resolve(null);
         }
     }, function(error) {
@@ -186,7 +178,6 @@ var getAllActiveLogWithCache = function(geocache) {
         if(results) {
             promise.resolve(results);
         } else {
-            console.log("Log was not found");
             promise.resolve(null);
         }
     }, function(error) {
@@ -207,7 +198,6 @@ var getGeocacheurWithEmail = function(email) {
         if(result) {
             promise.resolve(result);
         } else {
-            console.log("Geocacheur was not found");
             promise.resolve(null);
         }
     }, function(error) {
@@ -230,7 +220,6 @@ var getAllTravelbugsInCache = function(geocache) {
         if(results) {
             promise.resolve(results);
         } else {
-            console.log("No Travelbugs in Geocache");
             promise.resolve(null);
         }
     }, function(error) {
@@ -253,7 +242,6 @@ var getAllTravelbugsWithOwnerEmail = function(email) {
         if(results) {
             promise.resolve(results);
         } else {
-            console.log("Owner " + email + " doesn't own any Travelbugs");
             promise.resolve(null);
         }
     }, function(error) {
@@ -276,7 +264,6 @@ var getAllTravelbugsInHands = function(email) {
         if(results) {
             promise.resolve(results);
         } else {
-            console.log("No Travelbugs in hands");
             promise.resolve(null);
         }
     }, function(error) {
@@ -299,7 +286,6 @@ var hasEmailFoundGeocache = function(email, geocache) {
         if(result) {
             promise.resolve(result);
         } else {
-            console.log("Email " + email + "didn't find Geocache yet");
             promise.resolve(null);
         }
     }, function(error) {
