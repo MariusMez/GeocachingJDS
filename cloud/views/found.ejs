@@ -28,16 +28,18 @@
 		<% if( cat=='TRADI' || cat=='MULTI' || cat=='LETTERBOX' || cat=='EVENT' || cat=='CITO' || cat=='MYSTERY' || cat=='WHERIGO' ) { %>
 			<section>
 			<% if(tbsout.length == 0)  { %>
-				<p class="medium">Il n'y a pas d'objet dans cette cache.</p>
+				<p class="medium"><b>Il n'y a pas d'objet dans cette cache.</b></p>
 			<% } else { %>
 				<p class="medium"><b>Vous pouvez récupérer un des objets suivants :</b></p>
 				<ul>
 				<% tbsout.forEach(function(obj) { %>
 					<li style="margin-bottom: 8px;">
 						<a href="/tb?id=<%= obj.id %>" style="color:white; font-size: 1.5em; margin-right: 20px;">
-							<%= obj.get("Name") %> - <%= obj.get("Code") %>
+							<img class="image" width="80px;" style="margin-right: 10px;" src="<%= obj.get("PhotoUrl").replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, ''); %>" />
+							<b><%= obj.get("Name") %></b>
 						</a>
 						<a href="/logtb?action=grab&id=<%= obj.id %>&cacheId=<%= cacheid %>&geocacheurId=<%= geocacheurId %>" class="button small alt">Récuperez le !</a>
+						<br>
 					</li>
 				<% }); %>
 				</ul>
@@ -51,9 +53,11 @@
 				<% tbsin.forEach(function(obj) { %>
 					<li>
 						<a href="/tb?id=<%= obj.id %>" style="color:white; font-size: 1.5em; margin-right: 20px;">
-							<%= obj.get("Name") %> - <%= obj.get("Code") %>
+							<img class="image" width="80px;" style="margin-right: 10px;" src="<%= obj.get("PhotoUrl").replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, ''); %>" />
+							<b><%= obj.get("Name") %></b>
 						</a> 
 						 <a href="/logtb?action=drop&id=<%= obj.id %>&cacheId=<%= cacheid %>&geocacheurId=<%= geocacheurId %>" class="button small alt">Déposez le !</a>
+						 <br>
 					</li>
 				<% }); %>
 				</ul>
