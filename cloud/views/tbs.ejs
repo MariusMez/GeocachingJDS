@@ -38,17 +38,22 @@
 							<th colspan=5><b>Objet</b></th>
 							<th colspan=1><b>Propriétaire</b></th>
 							<th><b>Localisation</b></th>
+							<th colspan=1><b>Dernière activité</b></th>
 						</tr>
 					</thead>
 					<tbody>
 						<% tbs.forEach(function(tb) { %>
 						<tr>
-							<td colspan=5><a href="/tb?id=<%= tb.id %>"><b> <%= tb.get("Name") %></b></a></td>
-							<td colspan=1><%= tb.get("Owner") %></td>
+							<td colspan=5>
+								<img width="40px;" style="margin-right: 10px;" align="left" src="<%= tb.get("PhotoUrl").replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, ''); %>" />
+								<a href="/tb?id=<%= tb.id %>"><b style="text-transform: capitalize;"><%= tb.get("Name") %></b></a>
+							</td>
+							<td colspan=1 style="text-transform: capitalize;"><%= tb.get("Owner") %></td>
 							<td>
 								<% if (tb.get("Holder") != null) { %> Dans les mains de <%= tb.get("Holder") %> <% } %>
 								<% if (tb.get("Holder") == null) { %> <a href="/geocache?id=<%= tb.get('cacheId') %>"><%= tb.get("cacheName") %></a> <% } %>
 							</td>
+							<td colspan=1><%= moment(tb.get("updatedAt")).utcOffset(120).fromNow() %></td>
 						</tr>
 						<% }); %>
 					</tbody>

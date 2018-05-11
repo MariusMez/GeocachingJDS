@@ -174,6 +174,29 @@ var getLogWithEmailAndCache = function(email, geocache) {
     return promise;
 }
 
+var getAllActiveLogWithCache = function(geocache) {
+    var promise = new Parse.Promise();
+    
+    var Logs = Parse.Object.extend("Log");    
+    var query = new Parse.Query(Logs);
+    query.descending("createdAt");
+    query.equalTo("Active", true);
+    query.equalTo("Geocache", geocache);
+    query.find().then(function(results) {
+        if(results) {
+            promise.resolve(results);
+        } else {
+            console.log("Log was not found");
+            promise.resolve(null);
+        }
+    }, function(error) {
+        console.error("Error searching for Log with cache: " + geocache.id + " Error: " + error);
+        promise.error(error);
+    });
+
+    return promise;
+}
+
 var getGeocacheurWithEmail = function(email) {
     var promise = new Parse.Promise();
     
@@ -447,6 +470,7 @@ module.exports.getGeocacheWithCodeId = getGeocacheWithCodeId;
 module.exports.getTravelbugWithTrackingCode = getTravelbugWithTrackingCode;
 module.exports.getInactiveTravelbugCodeWithCode = getInactiveTravelbugCodeWithCode;
 module.exports.getLogWithEmailAndCache = getLogWithEmailAndCache;
+module.exports.getAllActiveLogWithCache = getAllActiveLogWithCache;
 module.exports.getGeocacheurWithEmail = getGeocacheurWithEmail;
 module.exports.getAllTravelbugsInCache = getAllTravelbugsInCache;
 module.exports.getAllTravelbugsWithOwnerEmail = getAllTravelbugsWithOwnerEmail;

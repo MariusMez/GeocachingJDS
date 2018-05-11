@@ -6,18 +6,14 @@
 </head>
 <body class="homepage">
 	<div class="wrapper style1">
-
 		<div id="header">
 			<div class="container">
-
 				<h1><a href="/" id="logo">Géocaching</a></h1>
-
 				<nav id="nav">
 					<ul>
 						<li><a href="/tb?id=<%= id %>">Retour</a></li>
 					</ul>
 				</nav>
-
 			</div>
 		</div>
 	</div>
@@ -33,9 +29,7 @@
 				<input type="hidden" name="id" id="<%= id %>" value="<%= id %>" />
 				<select name="action" hidden>
 					<option value="drop" <% if(action=='drop') { %> selected <% } %> >Déposer dans une géocache</option>
-				   <!-- <option value="dropholder">Déposé dans les mains d'un autre géocacheur</option> -->
-				   <option value="grab" <% if(action=='grab') { %> selected <% } %> >Prendre d'une géocache</option>
-   				   <!-- <option value="grabholder">Récupérer des mains d'un autre géocacheur</option> -->
+ 					<option value="grab" <% if(action=='grab') { %> selected <% } %> >Prendre d'une géocache</option>
 				</select>
 				<br>
 				Géocache concernée : 
@@ -53,7 +47,6 @@
 					Un petit Message pour partager votre découverte avec le propriétaire de cet objet
 					<input type="text" name="message" id="message" value="" style="border: solid 1px #fff;" placeholder="Ce Message sera visible sur le site" maxlength="500" required/>
 					<br>		
-
 					Une photo souvenir (sera visible sur le site) pour aider à accomplir la mission de l'objet
 					<input type="file" name="pic" id="pic" accept="image/*">
 					<br>
@@ -74,7 +67,6 @@
 				<br>
 				<br>
 				<input type="submit" value="Envoyer" name="submit" class="button alt" id="submitButton" title="Clic ici pour envoyer la découverte" />
-				
 			</form>  				 
 		</section>
 	</div>

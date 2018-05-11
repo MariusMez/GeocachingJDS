@@ -420,7 +420,7 @@ app.get('/tb', function(req, res) {
 app.get('/tbs', function(req, res) {
 	var Travelbug = Parse.Object.extend("Travelbug");
 	var queryTbs = new Parse.Query(Travelbug);
-	queryTbs.descending("createdAt");
+	queryTbs.descending("updatedAt");
 	queryTbs.equalTo("Active", true);
 	queryTbs.find({
 		success: function(tbs) {
@@ -611,7 +611,7 @@ app.post('/myscore', function(req, res) {
 
 			var scoreTotal = scoreCaches.logs + scoreCaches.dt + scoreCaches.ftf + scoreTb.dropTB + scoreTb.dropgc + scoreTb.missions + scoreTb.fav + scoreTb.owner;
 
-			res.render('myscore', { email:email, scoresCache: scoreCaches, scoreTb: scoreTb, scoreTotal:scoreTotal});
+			res.render('myscore', { email:email, scoresCache: scoreCaches, scoreTb: scoreTb, scoreTotal:scoreTotal });
 		})
 	})
 	
@@ -911,11 +911,6 @@ app.post('/flash', function(req, res) {
 
 app.post('/found', upload.single('pic'), function (req, res, next) {
 
-	var Log = Parse.Object.extend("Log");
-	var Geocache = Parse.Object.extend("Geocache");
-	var Geocacheur = Parse.Object.extend("Geocacheur");
-	var logEntry = new Log();
-
 	var name = req.body.name;
 	var email = req.body.email.toLowerCase();
 	var message = req.body.message;
@@ -923,140 +918,126 @@ app.post('/found', upload.single('pic'), function (req, res, next) {
 	var cacheId = req.body.id;
 	var photoFile = req.file;
 
-	var parseFile;
-	if(photoFile) {
-		var filename = photoFile.originalname;
-		var photoFileBase64 = photoFile.buffer.toString('base64');
-		parseFile = new Parse.File(filename, { base64: photoFileBase64 });
-		parseFile.save().then(function () {
-			var photo_url = parseFile.url({forceSecure: true})
-			console.log("Photo saved : " + photo_url);
-			logEntry.set("PhotoUrl", photo_url);
-			logEntry.set("Photo", parseFile);
-		},
-		function (error) {
-			console.log("Photofile save error " + error.message);
-		});
-	}
+	jds.getGeocacheurWithEmail(email).then(function(geocacheur) {
 
-	if(parseFile) {
-		logEntry.set("PhotoUrl", parseFile.url({forceSecure: true}));
-		logEntry.set("Photo", parseFile);
-	}
-	logEntry.set("Pseudo", name);
-	logEntry.set("Email", email);
-	logEntry.set("Message", message);
-	logEntry.set("Date", new Date());
+        if(geocacheur) {
+			jds.getGeocache(cacheId).then(function(cache) {
+				if(cache) {
+					jds.getAllActiveLogWithCache(cache).then(function(logs) {
 
-	console.log("j'essaye de trouver le geocacheur")
-	var queryGeocacheur = new Parse.Query(Geocacheur);
-	queryGeocacheur.equalTo("Email", email);
-	queryGeocacheur.find({
-		success: function(geocacheurs) {
-			if(geocacheurs.length == 1) {
-	    		var geocacheur = geocacheurs[0];
+						jds.getAllTravelbugsInCache(cache).then(function(travelbugsInCache) {
 
-	    		console.log("le geocacheur : " + geocacheur.get("Email") );
+					        jds.getAllTravelbugsInHands(email).then(function(travelbugsInHands) {
 
-				var cache = new Geocache();
-				cache.id = cacheId;
+					        	jds.hasEmailFoundGeocache(email, cache).then(function(isGeocacheAlreadyFound) {
 
-				logEntry.set("Geocache", cache);
-				logEntry.set("Active", true);
+					        		if (isGeocacheAlreadyFound) {
+										res.render('found', { 
+											cacheid: cache.id, 
+											cat: cache.get("Category"),
+											geocacheurId:geocacheur.id, 
+											tbsout: travelbugsInCache, 
+											tbsin: travelbugsInHands, 
+											message:"La cache a déja été trouvée mais vous pouvez quand même faire voyager des objets.<br><br>"});
+					        		}
+					        		else {
+					        			var Log = Parse.Object.extend("Log");
+									    var logEntry = new Log();
+										logEntry.set("Pseudo", name);
+										logEntry.set("Email", email);
+										logEntry.set("Message", message);
+										logEntry.set("Date", new Date());
+							        	logEntry.set("Geocache", cache);
+										logEntry.set("Active", true);
 
-				logEntry.set("FTF", 0);
-				logEntry.set("STF", 0);
-				logEntry.set("TTF", 0);
-
-				var queryFTF = new Parse.Query(Log);
-				queryFTF.descending("createdAt");
-				queryFTF.equalTo("Active", true);
-				queryFTF.equalTo("Geocache", cache);
-				queryFTF.find({
-					success: function(logs) {
-						if(logs.length == 0) {
-							logEntry.set("FTF", 1);
-						} else if(logs.length == 1) {
-							logEntry.set("STF", 1);
-						} else if(logs.length == 2) {
-							logEntry.set("TTF", 1);
-						}	
-
-						if(fav == "true") {
-							logEntry.set("Fav", true);
-							cache.increment("Fav");
-							cache.save();
-						} else {
-							logEntry.set("Fav", false);
-						}
-
-						logEntry.save(null, {
-							success: function(logEntry) {
-								var Travelbug = Parse.Object.extend("Travelbug");
-								var queryTbs = new Parse.Query(Travelbug);
-								queryTbs.descending("createdAt");
-								queryTbs.equalTo("Active", true);
-								queryTbs.equalTo("cacheId", cacheId);
-								queryTbs.find({
-									success: function(travelbugsInCache) {
-										
-										var queryTbsHands = new Parse.Query(Travelbug);
-										queryTbsHands.descending("createdAt");
-										queryTbsHands.equalTo("Active", true);
-										queryTbsHands.equalTo("HolderEmail", email);
-										queryTbsHands.find({
-											success: function(travelbugsInHands) {
-								
-											res.render('found', { 
-												cacheid: cache.id, 
-												cat: cache.get("Category"),
-												geocacheurId: geocacheur.id, 
-												tbsout: travelbugsInCache, 
-												tbsin: travelbugsInHands, 
-												message:"Bravo " + name 
-													  + " !<br><br>N'oubliez pas de signer aussi le logbook ;-) <br><br>"
-													  + "<i>(lorsqu'il y a une boite physique à trouver)</i><br><br>"
-													  + "Et attention aux moldus !" });
-							  					},
-							  					error: function(object, error) {
-							  						res.render('error', { message: error.message });
-							  					}
-							  				});							
-										},
-										error: function(object, error) {
-											res.render('error', { message: error.message });
+										if(photoFile) {
+											var filename = photoFile.originalname;
+											var photoFileBase64 = photoFile.buffer.toString('base64');
+											var parseFile = new Parse.File(filename, { base64: photoFileBase64 });
+											parseFile.save().then(function () {
+												var photo_url = parseFile.url({forceSecure: true})
+												console.log("Photo saved : " + photo_url);
+												logEntry.set("PhotoUrl", photo_url);
+												logEntry.set("Photo", parseFile);
+											},
+											function (error) {
+												console.log("Photofile save error " + error.message);
+											});
 										}
-									});
-							},
-							error: function(logEntry, error) {
-								res.render('error', { message: error.message });
-							}
-						});									
-					},
-					error: function(object, error) {
-						logEntry.set("FTF", 0);
-						logEntry.set("STF", 0);
-						logEntry.set("TTF", 0);
-					}
-				});  
 
-				res.render('found', { 
-					cacheid: cache.id, 
-					cat: cache.get("Category"),
-					geocacheurId:geocacheur.id, 
-					tbsout: travelbugsInCache, 
-					tbsin: travelbugsInHands, 
-					message:"La cache a déja été trouvée mais vous pouvez quand meme faire voyager des objets.<br><br>"});
-			} 
-			else {
-	    		res.render('error', { message: "Geocacheur non trouvé" });
-	    	}
-	    }, 
-	    error: function(error) {
-  			res.render('error', { message: error.message });
-  		}
-  	});
+							        	// Becarefull with this, not always the case in the field
+							        	var ftfScore = 0;
+							        	var stfScore = 0;
+							        	var ttfScore = 0;
+										if(logs.length == 0) {
+											ftfScore = 1;
+										} else if(logs.length == 1) {
+											stfScore = 1;
+										} else if(logs.length == 2) {
+											ttfScore = 1;
+										}	
+										logEntry.set("FTF", ftfScore);
+										logEntry.set("STF", stfScore);
+										logEntry.set("TTF", ttfScore);
+										
+										if(fav == "true") {
+											logEntry.set("Fav", true);
+											cache.increment("Fav");
+											cache.save();
+										} else {
+											logEntry.set("Fav", false);
+										}
 
+										logEntry.save(null, {
+											success: function(object) {
+												res.render('found', { cacheid: cache.id, 
+																	  cat: cache.get("Category"),
+																	  geocacheurId: geocacheur.id, 
+																	  tbsout: travelbugsInCache, 
+																	  tbsin: travelbugsInHands, 
+																	  message:"Bravo " + name 
+															  		  + " !<br><br>N'oubliez pas de signer aussi le logbook ;-)<br>"
+																	  + "Et attention aux moldus !" });
+											},
+											error: function(object, error) {
+												console.error("Error in logEntry.save(): " + error);
+											  	res.render('error', { message: error.message });
+											}
+										});	
+						        	}
+							    }, function(error) {
+							    	console.error("Error in hasEmailFoundGeocache: " + error);
+							        res.render('error', { message: error.message });
+							    });
+						    }, function(error) {
+						    	console.error("Error in getAllTravelbugsInHands: " + error);
+						        res.render('error', { message: error.message });
+						    });
+					    }, function(error) {
+					    	console.error("Error in getAllTravelbugsInCache: " + error);
+					        res.render('error', { message: error.message });
+					    });								
+				    }, function(error) {
+				    	console.error("Error in getAllActiveLogWithCache: " + error);
+				    	res.render('error', { message: error.message });
+				    });
+				}
+				else {
+					console.log("Geocacheur with id: " + cacheid + " was not found");
+            		res.render('error', { message:"Géocache non trouvée !" }); 
+				}
+			}, function(error) {
+        		console.error("Error in getGeocache: " + error);
+        		res.render('error', { message: error.message });
+    		});
+        } else {
+            console.log("Geocacheur with email: " + email + " was not found");
+            res.render('error', { message:"Il n'y a pas de géocacheur activé avec l'email : " + email }); 
+        }
+    }, function(error) {
+        console.error("Error in getGeocacheurWithEmail: " + error);
+        res.render('error', { message:error.message });
+    });
 });
 
 var port = process.env.PORT || 1337;
