@@ -186,12 +186,13 @@ Parse.Cloud.job("Compute Ratio D/T", function(request, status) {
 
 	var queryGeocacheurs = new Parse.Query(Ranking);
 	queryGeocacheurs.equalTo("Active", true);
-	queryGeocacheurs.limit(10000);
+	queryGeocacheurs.limit(1000);
 	queryGeocacheurs.find().then(function(geocacheurs) {
 
 		_.each(geocacheurs, function(geocacheur) {
 			var query = new Parse.Query(Logs);
 			query.equalTo("Email", geocacheur.get("Email"));
+			query.limit(10000);
 			query.equalTo("Active", true);
 			query.include('Geocache');
 			query.find().then(function(logs) { 
@@ -239,6 +240,7 @@ Parse.Cloud.job("Compute Fav Points", function(request, status) {
 		_.each(geocaches, function(geocache) {
 			var query = new Parse.Query(Logs);
 			query.equalTo("Active", true);
+			query.limit(10000);
 			query.equalTo("Geocache", geocache);
 			query.equalTo("Fav", true);
 			query.count().then(function(counter) { 
@@ -271,6 +273,7 @@ Parse.Cloud.job("Compute Fav Ratio", function(request, status) {
 		_.each(geocaches, function(geocache) {
 			var query = new Parse.Query(Logs);
 			query.equalTo("Active", true);
+			query.limit(10000);
 			query.equalTo("Geocache", geocache);
 			query.count().then(function(counter) {
 				var nbFav = geocache.get("Fav"); 
@@ -304,12 +307,13 @@ Parse.Cloud.job("Compute Ranking", function(request, status) {
 
 	var queryGeocacheurs = new Parse.Query(Ranking);
 	queryGeocacheurs.equalTo("Active", true);
-	queryGeocacheurs.limit(10000);
+	queryGeocacheurs.limit(1000);
 	queryGeocacheurs.find().then(function(geocacheurs) {
 
 		_.each(geocacheurs, function(geocacheur) {
 			var query = new Parse.Query(Logs);
 			query.equalTo("Active", true);
+			query.limit(10000);
 			query.equalTo("Email", geocacheur.get("Email"));
 			query.count().then(function(counter) { 
 				var scoreFTFSTFTTF = geocacheur.get("FTF") * scoreFTF + geocacheur.get("STF") * scoreSTF + geocacheur.get("TTF") * scoreTTF;

@@ -210,7 +210,9 @@ app.get('/ranking', function(req, res) {
 	queryGeocacheurs.limit(1000);
 	queryGeocacheurs.find().then(function(rank) {
 		queryGeocaches.equalTo("Active", true);
+		queryGeocaches.lessThanOrEqualTo("Publication", new Date());
 		queryGeocaches.descending("RatioFav,Ratio");
+		queryGeocaches.limit(1000);
 		queryGeocaches.find().then(function(caches) {
 			queryGeocacheurs.descending("ScoreFTF");
 			queryGeocacheurs.equalTo("Active", true);
