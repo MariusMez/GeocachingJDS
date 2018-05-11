@@ -418,6 +418,14 @@ app.get('/tb', function(req, res) {
 });
 
 app.get('/tbs', function(req, res) {
+
+	var moment = require('./cloud/moment-with-locales.min.js');
+	moment.locale('fr');
+	
+	var shortDateFormat = "dddd @ HH:mm"; 
+	app.locals.moment = moment; 
+	app.locals.shortDateFormat = shortDateFormat;
+	
 	var Travelbug = Parse.Object.extend("Travelbug");
 	var queryTbs = new Parse.Query(Travelbug);
 	queryTbs.descending("updatedAt");
