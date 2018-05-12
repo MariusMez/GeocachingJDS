@@ -57,14 +57,15 @@ var getGeocacheWithCodeId = function(geocacheCodeId) {
     return promise;
 }
 
-var getAllPublishedGeocaches = function() {
+var getAllPublishedGeocaches = function(descending) {
     var promise = new Parse.Promise();
 
     var Geocaches = Parse.Object.extend("Geocache");
     var query = new Parse.Query(Geocaches);
     query.equalTo("Active",true);
     query.lessThanOrEqualTo("Publication", new Date());
-    query.descending("Publication");
+    query.descending(descending);
+    query.limit(1000);
     query.find().then(function(results) {
         if(results) {
             promise.resolve(results);
@@ -296,23 +297,90 @@ var hasEmailFoundGeocache = function(email, geocache) {
     return promise;
 }
 
+var getAllActiveRanking = function(descending) {
+    var promise = new Parse.Promise();
+    
+    var Ranking = Parse.Object.extend("Ranking");
+    var query = new Parse.Query(Ranking);
+    query.descending(descending);
+    query.equalTo("Active", true);
+    query.include("Geocacheur");
+    query.limit(1000);
+    query.find().then(function(results) {
+        if(results) {
+            promise.resolve(results);
+        } else {
+            promise.resolve(null);
+        }
+    }, function(error) {
+        promise.error(error);
+    });
+
+    return promise;
+}
+
+var saveRanking = function(geocacheur, active) {
+    var promise = new Parse.Promise();
+    
+    var Ranking = Parse.Object.extend("Ranking");
+    var ranking = new Ranking();
+    ranking.set("Geocacheur", geocacheur);
+    ranking.set("Email", geocacheur.get("Email"));
+    ranking.set("FTF", 0);
+    ranking.set("STF", 0);
+    ranking.set("TTF", 0);
+    ranking.set("ScoreFTF", 0);
+    ranking.set("ScoreTB", 0);
+    ranking.set("ScoreDT", 0);
+    ranking.set("Score", 0);
+    ranking.set("Found", 0);
+    ranking.set("Active", active);
+    ranking.save(null).then(function() {
+        promise.resolve(ranking);
+    }, function(error) {
+        promise.error(error);
+    });
+
+    return promise;
+}
+
 var saveOrUpdateGeocacheur = function(email, pseudo, active) {
     var promise = new Parse.Promise();
+
+    var Ranking = Parse.Object.extend("Ranking");
+    var queryRanking = new Parse.Query(Ranking);
 
     var Geocacheur = Parse.Object.extend("Geocacheur");
     var query = new Parse.Query(Geocacheur);
     query.equalTo('Email', email);
-    query.first().then(function(result) {
-        if(result) {
+    query.first().then(function(geocacheur) {
+        if(geocacheur) {
             console.log("Geocacheur found - Updating");
-            result.set("Pseudo", pseudo);
-            result.set("Active", active);
-            result.set("Enrollment", "updated");
-            result.save(null).then(function() {
-                promise.resolve(result)
+            geocacheur.set("Pseudo", pseudo);
+            geocacheur.set("Active", active);
+            geocacheur.set("Enrollment", "updated");
+            geocacheur.save(null).then(function() {
+                queryRanking.equalTo('Geocacheur', geocacheur);
+                queryRanking.first().then(function(rank) {
+                    if(rank) {
+                        rank.set("Active", active);
+                        rank.save(null).then(function() {
+                            promise.resolve(geocacheur);
+                        }, function(error) {
+                            promise.error(error);
+                        });
+                    } else {
+                        saveRanking(geocacheur, active).then(function() {
+                            promise.resolve(geocacheur);
+                        }, function(error) {
+                            promise.error(error);
+                        });
+                    }
+                }, function(error) {
+                    promise.error(error);
+                });
             }, function(error) {
-                console.error(error)
-                promise.resolve(null)
+                promise.error(error);
             });
         } else {
             console.log("Geocacheur was not found - Saving");
@@ -325,11 +393,14 @@ var saveOrUpdateGeocacheur = function(email, pseudo, active) {
                 Active: active
             }, {
                 success: function(geocacheur) {
-                    promise.resolve(geocacheur);
+                    saveRanking(geocacheur, active).then(function() {
+                        promise.resolve(geocacheur);
+                    }, function(error) {
+                        promise.error(error);
+                    });
                 },
                 error: function(error) {
-                    console.error(error)
-                    promise.resolve(null);
+                    promise.error(error);
                 }
             });
         }
@@ -441,11 +512,10 @@ var validateMission = function(missionId, validationScore) {
     tblog.set("MissionReviewed", true);
     tblog.set("Mission", validationScore);
     tblog.save(null).then(function() {
-            promise.resolve(tblog)
-        }, function(error) {
-            console.error(error)
-            promise.resolve(null)
-        });
+        promise.resolve(tblog);
+    }, function(error) {
+        promise.error(error);
+    });
 
     return promise;
 }
@@ -470,3 +540,5 @@ module.exports.getLastMissionToValidate = getLastMissionToValidate;
 module.exports.validateMission = validateMission;
 module.exports.getLastLogs = getLastLogs;
 module.exports.getAllPublishedGeocaches = getAllPublishedGeocaches;
+module.exports.saveRanking = saveRanking;
+module.exports.getAllActiveRanking = getAllActiveRanking;

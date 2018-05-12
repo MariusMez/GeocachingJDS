@@ -63,7 +63,10 @@
 								<b>🥉 TTF</b><br><i>(1pt / cache)</i>
 							</th>
 							<th>
-								<b>⭐ Score D/T</b><br><i>(1pt / etoile)</i>
+								<b>⭐ Score D/T</b><br><i>(1pt / étoile)</i>
+							</th>
+							<th>
+								<b>🗿 Score TB</b><br><i>(<a href="/geocaching#points">+ infos</a>)</i>
 							</th>
 						</tr>
 					</thead>
@@ -78,20 +81,22 @@
 							<td></td>
 							<td></td>
 							<td></td>
+							<td></td>
 						</tr>
 					</tfoot>
 					
 					<tbody>
-						<% geocacheurs.forEach(function(geocacheur, i) { %>
+						<% ranking.forEach(function(rank, i) { %>
 						<tr>
 							<td><%= i+1 %></td>
-							<td><%= geocacheur.get("Pseudo") %></td>
-							<td><%= geocacheur.get("Score") %></td>
-							<td><%= geocacheur.get("Found") %></td>
-							<td><%= geocacheur.get("FTF") %></td>
-							<td><%= geocacheur.get("STF") %></td>
-							<td><%= geocacheur.get("TTF") %></td>
-							<td><%= geocacheur.get("ScoreDT") %></td>
+							<td><%= rank.get("Geocacheur").get("Pseudo") %></td>
+							<td><%= rank.get("Score") %></td>
+							<td><%= rank.get("Found") %></td>
+							<td><%= rank.get("FTF") %></td>
+							<td><%= rank.get("STF") %></td>
+							<td><%= rank.get("TTF") %></td>
+							<td><%= rank.get("ScoreDT") %></td>
+							<td><%= rank.get("ScoreTB") %></td>
 						</tr>
 						<% }); %>
 					</tbody>
@@ -102,8 +107,8 @@
 			<section>
 				<h2>🏅 Classement FTF, STF, TTF</h2>
 				<ul style="list-style-type:decimal; margin-left:30px;">
-					<% geocacheursFTF.forEach(function(g, i) {  if(g.get("ScoreFTF") > 0 ) { %>
-					<li><b><%= g.get("Pseudo") %></b> avec <%= g.get("ScoreFTF") %> point<%if(g.get("ScoreFTF")>1) { %>s <% } %></li>
+					<% geocacheursFTF.forEach(function(g, i) {  if(g.get("ScoreFTF") > 0) { %>
+					<li><b><%= g.get("Geocacheur").get("Pseudo") %></b> avec <%= g.get("ScoreFTF") %> point<%if(g.get("ScoreFTF") > 1) { %>s <% } %></li>
 					<%} }); %>
 				</ul>
 			</section>

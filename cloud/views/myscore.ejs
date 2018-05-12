@@ -15,8 +15,6 @@
 					<h2>Score total de <i><%= email %></i> : <b><%= scoreTotal %></b> </h2>
 				</header>
 
-				<p class="medium"><b>Note :</b> ce score peut être différent de celui inscrit sur le <a href="/ranking">classement général</a> car il est calculé en temps réel et l'autre ne l'est pas.</p>
-
 				<h2>Score relatif aux caches trouvées</h2>
 				<ul>
 					<li>Caches trouvées (<i>20 points par cache</i>) : <b><%- scoresCache.logs %></b></li>
@@ -27,22 +25,19 @@
 				<h2>Score relatif aux objets voyageurs déplacés</h2>
 				<ul>
 					<li>Objets uniques deplacés (<i>10 points par objets différents</i>) : <b><%- scoreTb.dropTB %></b></li>
-					<li>Caches visitées en premier par un objet (<i>10 points par visite de cache par TB</i>) : <b><%- scoreTb.dropgc %></b></li>
-					<li>Missions satisfaites (<i>5 points par mission</i>): <b><%- scoreTb.missions %></b></li>
-					<li>Déplacement de mon objet (<i>2 points par deplacement</i>): <b><%- scoreTb.owner %></b></li>
-					<li>Point favori de mon objet (<i>2 points par favori</i>): <b><%- scoreTb.fav %></b></li>
+					<li>Caches visitées en premier par un objet (<i>10 points par visite de cache par objet</i>) : <b><%- scoreTb.dropgc %></b></li>
+					<li>Missions satisfaites (<i>5 points par mission</i>) : <b><%- scoreTb.missions %></b></li>
+					<li>Déplacements de mon objet (<i>2 points par déplacement</i>) : <b><%- scoreTb.owner %></b></li>
+					<li>Point favori de mon objet (<i>2 points par favori</i>) : <b><%- scoreTb.fav %></b></li>
 					
 				</ul>
 
+				<p class="medium"><b>Note :</b> ce score peut être différent de celui inscrit sur le <a href="/ranking">classement général</a> car il est calculé en temps réel en fonction de l'ordre des logs envoyés. Le classement général est géré en partie manuellement pour prendre en compte les erreurs eventuelle. N'hésitez pas à nous contacter si vous détectez des incohérences.</p>
+
+				<a href="/ranking" class="button alt">&raquo; Retourner au classement</a>
 			</section>
-			<br />
-
-			<a href="/ranking" class="button alt">Retourner au classement</a>
-
-
 		</div>
 	</div>
 	<% include ./partials/footer %>
-
 </body>
 </html>

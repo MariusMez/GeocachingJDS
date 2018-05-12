@@ -155,47 +155,47 @@ app.post('/registerTb', upload.single('pic'), function(req, res, next) {
 										        } 
 										        else {
 										            console.error("Error during creation of geocacheur : " + error.message);
-													res.render('error', {message:error.message});
+													res.render('error', { message:error.message });
 										        }
 										    }, function(error) {
 										        console.error(error.message);
-												res.render('error', {message:error.message});
+												res.render('error', { message:error.message });
 										    });				
 								        },
 						                error: function(error) {
 						                	console.error("Error TBlogEntry : " + error.message);
-											res.render('error', {message:error.message});
+											res.render('error', { message:error.message });
 						                }																									 
 									});
 								},
 								error: function(error) {
 									console.error("Error TBlogEntry : " + error.message);
-									res.render('error', {message:error.message});
+									res.render('error', { message:error.message });
 								}
 							});	
 						}, function(error) {
 							console.error("Error saving photofile " + error.message);
-							res.render('error', {message:error.message});
+							res.render('error', { message:error.message });
 						});
 					}
 					else {
 						var error = "Une photo de l'objet voyageur est requise.";
 						console.error(error);
-						res.render('error', {message:error});
+						res.render('error', { message:error });
 					}
 				}
 		    }, function(error) {
 		    	console.error(error.message);
-				res.render('error', {message:error.message});
+				res.render('error', { message:error.message });
 		    });
         } else {
    	  		var error = "Le code de suivi est incorrect ou déjà affecté à un autre objet voyageur.";
 			console.error(error);
-			res.render('error', {message:error});
+			res.render('error', { message:error });
         }
     }, function(error) {
         console.error(error.message);
-		res.render('error', {message:error.message});
+		res.render('error', { message:error.message });
     });
 });
 
@@ -205,23 +205,23 @@ app.get('/ranking', function(req, res) {
 	var queryGeocacheurs = new Parse.Query(Ranking);
 	var Geocache = Parse.Object.extend("Geocache");
 	var queryGeocaches = new Parse.Query(Geocache);
-	queryGeocacheurs.descending("Score, ScoreFTF, ScoreDT");
-	queryGeocacheurs.equalTo("Active", true);
-	queryGeocacheurs.limit(1000);
-	queryGeocacheurs.find().then(function(rank) {
-		queryGeocaches.equalTo("Active", true);
-		queryGeocaches.lessThanOrEqualTo("Publication", new Date());
-		queryGeocaches.descending("RatioFav,Ratio");
-		queryGeocaches.limit(1000);
-		queryGeocaches.find().then(function(caches) {
-			queryGeocacheurs.descending("ScoreFTF");
-			queryGeocacheurs.equalTo("Active", true);
-			queryGeocacheurs.limit(1000);
-			queryGeocacheurs.find().then(function(rankFTF) {
-				res.render('ranking', {geocacheurs:rank, geocacheursFTF:rankFTF, geocaches:caches});
-			});
-		});
-	});
+	
+	jds.getAllActiveRanking("Score, ScoreFTF, ScoreDT").then(function(ranking) {
+        jds.getAllPublishedGeocaches("RatioFav, Ratio").then(function(caches) {
+        	jds.getAllActiveRanking("ScoreFTF").then(function(rankFTF) {
+	        	res.render('ranking', { ranking:ranking, geocacheursFTF:rankFTF, geocaches:caches });
+		    }, function(error) {
+		        console.error("Error in getAllActiveRanking(ScoreFTF): " + error.message);
+		        res.render('error', { message:error.message });
+		    });
+	    }, function(error) {
+	        console.error("Error in getAllPublishedGeocaches: " + error.message);
+	        res.render('error', { message:error.message });
+	    });
+    }, function(error) {
+        console.error("Error in getAllActiveRanking: " + error.message);
+        res.render('error', { message:error.message });
+    });
 });
 
 
@@ -237,15 +237,15 @@ app.get('/geocaches', function(req, res) {
 		start = true;
 	}
 
-	jds.getAllPublishedGeocaches().then(function(geocaches) {
+	jds.getAllPublishedGeocaches("Publication").then(function(geocaches) {
         jds.getLastLogs(5).then(function(logs) {
 	        res.render('geocaches', { geocaches:geocaches, logs:logs, start:start });
 	    }, function(error) {
-	        console.error("Error in getLastLogs: " + error);
+	        console.error("Error in getLastLogs: " + error.message);
 	        res.redirect('/');
 	    });
     }, function(error) {
-        console.error("Error in getAllPublishedGeocaches: " + error);
+        console.error("Error in getAllPublishedGeocaches: " + error.message);
         res.redirect('/');
     });
 });
@@ -569,39 +569,45 @@ app.post('/myscore', function(req, res) {
 	queryCaches.equalTo("Email", email);
 	queryCaches.equalTo("Active", true);
 	queryCaches.include('Geocache');
+	queryCaches.greaterThanOrEqualTo("createdAt", new Date("2018-05-10"));
+	queryCaches.limit(10000);
 	queryCaches.find().then( function(mylogs) {
-		var scoreCaches = { logs:0, dt:0, ftf:0};
+		var scoreCaches = { logs:0, dt:0, ftf:0 };
 	
-		console.log(email+ " logged " + mylogs.length + " caches ");	
+		//console.log(email+ " logged " + mylogs.length + " caches ");	
 		var promise = Parse.Promise.as();
 		
   		mylogs.forEach(function(log) {
-			console.log(email+ " logged cache with Difficulty " + log.get("Geocache").get("Difficulty"));	
+			//console.log(email+ " logged cache with Difficulty " + log.get("Geocache").get("Difficulty"));	
   			promise = promise.then(function() {
   				scoreCaches.dt = scoreCaches.dt + log.get("Geocache").get("Difficulty") + log.get("Geocache").get("Terrain");
+  				console.log(scoreCaches.dt)
   				scoreCaches.logs = scoreCaches.logs + nbPointsFoundIt;
+  				console.log(scoreCaches.logs)
   				scoreCaches.ftf = scoreCaches.ftf + nbPointsFTF*log.get("FTF") + nbPointsSTF*log.get("STF") + nbPointsTTF*log.get("TTF"); 
+  				console.log(scoreCaches.ftf)
   				return scoreCaches;
   			});	
   		});		
 		return promise;
 	}).then(function(scoreCaches) {
-		console.log(email+ " has score of " + scoreCaches);	
+		//console.log(email + " has score of " + scoreCaches);	
 
 		var TravelbugLog = Parse.Object.extend("TravelbugLog");
 		var queryTbs = new Parse.Query(TravelbugLog);
 		queryTbs.equalTo("Active", true);
 		queryTbs.equalTo("Action", "drop");
+		queryTbs.limit(10000);
 		queryTbs.include("Travelbug");
-		queryTbs.find().then ( function(mylogs) {
+		queryTbs.find().then(function(mylogs) {
 			var scoreTb = { drop:0, dropTB:0, dropgc:0, missions:0, fav:0, owner:0};
 		
-			console.log(email + " logged " + mylogs.length + " TB ");	
+			//console.log(email + " logged " + mylogs.length + " TB ");	
 			var promise = Parse.Promise.as();
 			
 	  		mylogs.forEach(function(log) {
 				promise = promise.then(function() {
-					console.log(email+ " logged TB with owner " + log.get("Travelbug").get("OwnerEmail"));	
+					//console.log(email+ " logged TB with owner " + log.get("Travelbug").get("OwnerEmail"));	
 
 					if (log.get("Email") == email) {
 						scoreTb.dropTB = scoreTb.dropTB + nbPointsFirstCacheVisit*log.get("NewCache");
@@ -612,14 +618,14 @@ app.post('/myscore', function(req, res) {
 					}  			
 	  				if (log.get("Travelbug").get("OwnerEmail") == email) {
 		  				scoreTb.fav = scoreTb.fav + log.get("Fav") * nbPointsFavTB; 	  	
-		  				scoreTb.owner = scoreTb.owner * nbPointsTBOwnerByMove;				
+		  				scoreTb.owner = scoreTb.owner + nbPointsTBOwnerByMove;				
 	  				}
 	  				return scoreTb;
 	  			});	
 	  		});		
 			return promise;
 		}).then(function(scoreTb) {
-			console.log(email+ " has score of " + scoreTb);	
+			//console.log(email + " has score of " + scoreTb);
 
 			if (scoreCaches == undefined) {
 				scoreCaches = { logs:0, dt:0, ftf:0};
@@ -632,9 +638,8 @@ app.post('/myscore', function(req, res) {
 			var scoreTotal = scoreCaches.logs + scoreCaches.dt + scoreCaches.ftf + scoreTb.dropTB + scoreTb.dropgc + scoreTb.missions + scoreTb.fav + scoreTb.owner;
 
 			res.render('myscore', { email:email, scoresCache: scoreCaches, scoreTb: scoreTb, scoreTotal:scoreTotal });
-		})
-	})
-	
+		});
+	});
 });
 
 
