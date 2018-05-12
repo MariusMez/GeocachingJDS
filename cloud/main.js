@@ -51,7 +51,6 @@ Parse.Cloud.job("Resize all PhotoLog", function(request, response) {
 	var Log = Parse.Object.extend("Log");
 	var queryLog = new Parse.Query(Log);
 	queryLog.lessThanOrEqualTo("createdAt", new Date());
-	//queryLog.greaterThanOrEqualTo("createdAt", new Date("01/01/2018"));
 	queryLog.equalTo("Active", true);
 	queryLog.doesNotExist("PhotoResized");
 	queryLog.limit(10000);
@@ -65,7 +64,6 @@ Parse.Cloud.job("Resize all PhotoLog", function(request, response) {
 				log.set("PhotoResized", true);
 				log.save();
 			});
-
 			response.success("I just finished");
 		},
 		error: function(error) {
@@ -80,6 +78,7 @@ Parse.Cloud.job("Add Geocacheurs from CSV file", function(request, response) {
 	var obj = csv(); 
 
 	var Geocacheur = Parse.Object.extend("Geocacheur");
+	var Ranking = Parse.Object.extend("Ranking");
 
 	obj.from.path('Geocacheurs.csv').to.array(function(geocacheurs) {
 		geocacheurs.forEach(function(geocacheur) {
@@ -90,35 +89,44 @@ Parse.Cloud.job("Add Geocacheurs from CSV file", function(request, response) {
 			var query = new Parse.Query(Geocacheur);
 			query.equalTo('Email', email);
 			query.first({
-					success: function(results) {
-							// console.log(JSON.stringify(results));
-							// console.log(results)
-							if (results === undefined) {
-									var geocacheur = new Geocacheur();
-									geocacheur.save({
-											Email: email,
-											Pseudo: firstname,
-											Company: companyname,
-											Enrollment: "preload",
-											Active: false
-									}, {
-											success: function(user) {
-													// response.success("Geocacher added");
-											},
-											error: function(error) {
-													//response.error("Saving Geocacher");
-											}
-									});
-							} else {
-								// Geocacheur exist, we do nothing
-								//results.set("Active", false);
-								//results.save(null, { useMasterKey: true }).then(response.success, response.error);
-							}
-					},
-					error: function(error) {
-							error.message("Impossible to find Geocacheur - lookup failed");
-							response.error(error);
+				success: function(result) {
+					//console.log(JSON.stringify(result));
+					if (result === undefined) {
+						var geocacheur = new Geocacheur();
+						geocacheur.save({
+							Email: email,
+							Pseudo: firstname,
+							Company: companyname,
+							Enrollment: "preload",
+							Active: false
+						}, {
+							success: function(user) {
+								var queryRanking = new Parse.Query(Ranking);
+								queryRanking.equalTo('Geocacheur', user);
+								queryRanking.first({
+									success: function(res) {
+										if (res === undefined) {
+											jds.saveRanking(user, false).then(function() { }, function(error) { });
+										} else {
+											// Update ranking ?
+											console.log("Update ranking");
+										}
+									},
+									error: function(error) { console.error(error); }
+								});
+							},
+							error: function(error) { console.error(error); }
+						});						
+					} else {
+						console.log("Geocacheur exist, we do nothing");
+						//results.set("Active", false);
+						//results.save(null, { useMasterKey: true }).then(response.success, response.error);
 					}
+				},
+				error: function(error) {
+					error.message("Impossible to find Geocacheur - lookup failed");
+					response.error(error);
+				}
 			});
 		});
 	});
@@ -126,11 +134,8 @@ Parse.Cloud.job("Add Geocacheurs from CSV file", function(request, response) {
 });
 
 Parse.Cloud.job("Add TB Tracking Codes from txt file", function(request, response) {
-	response.message("I just started");
+	response.message("I just started Add TB Tracking Codes from txt file");
 	
-	var params = request.params;
-	var headers = request.headers;
-	var log = request.log;
 	var fs = require('fs');
 	var TravelbugCode = Parse.Object.extend("TravelbugCode");
 
@@ -141,65 +146,55 @@ Parse.Cloud.job("Add TB Tracking Codes from txt file", function(request, respons
 			var query = new Parse.Query("TravelbugCode");
 			query.equalTo('Code', code);
 			query.first({
-					success: function(results) {
-							// console.log(JSON.stringify(results));
-							// console.log(results)
-							if (results === undefined) {
-									var tbCode = new TravelbugCode();
-									tbCode.save({
-											Code: code,
-											Active: false
-									}, {
-											success: function(code) {
-													//response.success(results);
-											},
-											error: function(favourites, error) {
-													//response.error(error);
-											}
-									});
-							} else {
-									//results.set("Active", false);
-									results.set("Code", code);
-									results.save(null, { useMasterKey: true }).then(response.success, response.error);
-							}
-					},
-					error: function(error) {
-							error.message("favourites lookup failed");
-							response.error(error);
+				success: function(results) {
+					// console.log(JSON.stringify(results));
+					if (results === undefined) {
+						var tbCode = new TravelbugCode();
+						tbCode.save({ Code: code, Active: false }, 
+						{
+							success: function(code) { },
+							error: function(error) { }
+						});
+					} else {
+						//results.set("Active", false);
+						results.set("Code", code);
+						results.save(null, { useMasterKey: true }).then(response.success, response.error);
 					}
+				},
+				error: function(error) {
+					error.message("favourites lookup failed");
+					response.error(error);
+				}
 			});
 		});
 	});
 	response.success("I just finished");
 });
 
-Parse.Cloud.job("Compute Ratio D/T", function(request, status) {
-	var params = request.params;
-	var headers = request.headers;
-	var log = request.log;
-	var _ = require('./underscore-min.js');
+Parse.Cloud.job("First - Compute Score Ratio D/T", function(request, status) {
 
-	status.message("I just started");
+	status.message("I just started Compute Ratio D/T");
 
 	var Logs = Parse.Object.extend("Log");
 	var Ranking = Parse.Object.extend("Ranking");
 
-	var queryGeocacheurs = new Parse.Query(Ranking);
-	queryGeocacheurs.equalTo("Active", true);
-	queryGeocacheurs.limit(1000);
-	queryGeocacheurs.find().then(function(geocacheurs) {
+	var queryRanking = new Parse.Query(Ranking);
+	queryRanking.equalTo("Active", true);
+	queryRanking.limit(1000);
+	queryRanking.find().then(function(ranking) {
 
-		_.each(geocacheurs, function(geocacheur) {
+		ranking.forEach(function(rank) {
 			var query = new Parse.Query(Logs);
-			query.equalTo("Email", geocacheur.get("Email"));
-			query.limit(10000);
+			query.equalTo("Email", rank.get("Email"));
 			query.equalTo("Active", true);
+			query.greaterThanOrEqualTo("createdAt", new Date("2018-05-10"));
+			query.limit(100000);
 			query.include('Geocache');
 			query.find().then(function(logs) { 
 
 				var promise = Parse.Promise.as();
 				var scoreDT = 0;
-				_.each(logs, function(log) {
+				logs.forEach(function(log) {
 					promise = promise.then(function() {
 						scoreDT = scoreDT + log.get("Geocache").get("Difficulty") + log.get("Geocache").get("Terrain");
 						return scoreDT;
@@ -208,39 +203,34 @@ Parse.Cloud.job("Compute Ratio D/T", function(request, status) {
 				return promise;
 
 			}).then(function(scoreDT) {							    
-				geocacheur.set("ScoreDT", scoreDT);
-				geocacheur.save();
+				rank.set("ScoreDT", scoreDT);
+				rank.save();
 			});
 		});
 	}).then(function(result) {
 		status.success("I just finished");
-}, function(error) {
-		status.error("There was an error");
-})
-
+	}, function(error) {
+		status.error(error);
+	});
 });
 
 
 Parse.Cloud.job("Compute Fav Points", function(request, status) {
-	var params = request.params;
-	var headers = request.headers;
-	var log = request.log;
-	var _ = require('./underscore-min.js');
 
-	status.message("I just started");
+	status.message("I just started Compute Fav Points");
 
 	var Logs = Parse.Object.extend("Log");
 	var Geocache = Parse.Object.extend("Geocache");
 
 	var queryGeocaches = new Parse.Query(Geocache);
-	queryLog.limit(1000);
-	//queryGeocaches.equalTo("Active", true);
+	queryGeocaches.limit(1000);
+	queryGeocaches.equalTo("Active", true);
 	queryGeocaches.find().then(function(geocaches) {
 
-		_.each(geocaches, function(geocache) {
+		geocaches.forEach(function(geocache) {
 			var query = new Parse.Query(Logs);
 			query.equalTo("Active", true);
-			query.limit(10000);
+			query.limit(100000);
 			query.equalTo("Geocache", geocache);
 			query.equalTo("Fav", true);
 			query.count().then(function(counter) { 
@@ -250,19 +240,15 @@ Parse.Cloud.job("Compute Fav Points", function(request, status) {
 		});
 	}).then(function(result) {
 		status.success("I just finished");
-}, function(error) {
-		status.error("There was an error");
-})
-
+	}, function(error) {
+		status.error(error);
+	});
 });
 
 Parse.Cloud.job("Compute Fav Ratio", function(request, status) {
-	var params = request.params;
-	var headers = request.headers;
-	var log = request.log;
-	var _ = require('./underscore-min.js');
 
-	status.message("I just started");
+	status.message("I just started Compute Fav Ratio");
+	
 	var Logs = Parse.Object.extend("Log");
 	var Geocache = Parse.Object.extend("Geocache");
 
@@ -270,10 +256,10 @@ Parse.Cloud.job("Compute Fav Ratio", function(request, status) {
 	queryGeocaches.equalTo("Active", true);
 	queryGeocaches.find().then(function(geocaches) {
 
-		_.each(geocaches, function(geocache) {
+		geocaches.forEach(function(geocache) {
 			var query = new Parse.Query(Logs);
 			query.equalTo("Active", true);
-			query.limit(10000);
+			query.limit(100000);
 			query.equalTo("Geocache", geocache);
 			query.count().then(function(counter) {
 				var nbFav = geocache.get("Fav"); 
@@ -284,19 +270,77 @@ Parse.Cloud.job("Compute Fav Ratio", function(request, status) {
 		});
 	}).then(function(result) {
 		status.success("I just finished");
-}, function(error) {
-	status.error("There was an error");
-})
-
+	}, function(error) {
+		status.error(error);
+	});
 });
 
-Parse.Cloud.job("Compute Ranking", function(request, status) {
-	var params = request.params;
-	var headers = request.headers;
-	var log = request.log;
-	var _ = require('./underscore-min.js');
+Parse.Cloud.job("Second - Compute Score TB", function(request, status) {
 
-	status.message("I just started");
+	status.message("I just started Compute Score TB");
+
+	var TravelbugLog = Parse.Object.extend("TravelbugLog");
+	var queryTbs = new Parse.Query(TravelbugLog);
+
+	const nbPointsMission = 5;
+	const nbPointsNewTBDiscover = 10;
+	const nbPointsFirstCacheVisit = 10;
+	const nbPointsTBOwnerByMove = 2;
+	const nbPointsFavTB = 2;
+
+	var Ranking = Parse.Object.extend("Ranking");
+	var queryRanking = new Parse.Query(Ranking);
+	queryRanking.equalTo("Active", true);
+	queryRanking.limit(1000);
+	queryRanking.find().then(function(rankings) {
+		rankings.forEach(function(rank) {
+			queryTbs.equalTo("Active", true);
+			queryTbs.equalTo("Action", "drop");
+			queryTbs.include("Travelbug");
+			queryTbs.limit(10000);
+			queryTbs.find().then(function(mylogs) {
+				var scoreTb = { drop:0, dropTB:0, dropgc:0, missions:0, fav:0, owner:0};
+			
+				var promise = Parse.Promise.as();
+				var email = rank.get("Email");
+				
+		  		mylogs.forEach(function(log) {
+					promise = promise.then(function() {
+						if (log.get("Email") == email) {
+							scoreTb.dropTB = scoreTb.dropTB + nbPointsFirstCacheVisit*log.get("NewCache");
+							scoreTb.dropgc = scoreTb.dropgc + nbPointsNewTBDiscover*log.get("NewTB");
+							if (log.get("Mission") != undefined) {
+				  				scoreTb.missions = scoreTb.missions + nbPointsMission * log.get("Mission");													
+							}
+						}  			
+		  				if (log.get("Travelbug").get("OwnerEmail") == email) {
+			  				scoreTb.fav = scoreTb.fav + log.get("Fav") * nbPointsFavTB; 	  	
+			  				scoreTb.owner = scoreTb.owner + nbPointsTBOwnerByMove;				
+		  				}
+		  				return scoreTb;
+		  			});	
+		  		});		
+				return promise;
+			}).then(function(scoreTb) {
+				if (scoreTb == undefined) {
+					scoreTb = { dropTB:0, dropgc:0, missions:0, fav:0, owner:0};
+				}
+				var scoreTbTotal = scoreTb.dropTB + scoreTb.dropgc + scoreTb.missions + scoreTb.fav + scoreTb.owner;
+				rank.set("ScoreTB", scoreTbTotal);
+				rank.save();
+			});
+		});
+	}).then(function(result) {
+		status.success("I just finished");
+	}, function(error) {
+		status.error(error);
+	});
+});
+
+Parse.Cloud.job("Last - Compute Ranking", function(request, status) {
+
+	status.message("I just started Compute Ranking");
+
 	var scoreFoundIt = 20;
 	var scoreFTF = 3;
 	var scoreSTF = 2;
@@ -305,29 +349,29 @@ Parse.Cloud.job("Compute Ranking", function(request, status) {
 	var Logs = Parse.Object.extend("Log");
 	var Ranking = Parse.Object.extend("Ranking");
 
-	var queryGeocacheurs = new Parse.Query(Ranking);
-	queryGeocacheurs.equalTo("Active", true);
-	queryGeocacheurs.limit(1000);
-	queryGeocacheurs.find().then(function(geocacheurs) {
+	var queryRanking = new Parse.Query(Ranking);
+	queryRanking.equalTo("Active", true);
+	queryRanking.limit(1000);
+	queryRanking.find().then(function(rankings) {
 
-		_.each(geocacheurs, function(geocacheur) {
+		rankings.forEach(function(rank) {
 			var query = new Parse.Query(Logs);
+			query.equalTo("Email", rank.get("Email"));
 			query.equalTo("Active", true);
+			query.greaterThanOrEqualTo("createdAt", new Date("2018-05-10"));
 			query.limit(10000);
-			query.equalTo("Email", geocacheur.get("Email"));
 			query.count().then(function(counter) { 
-				var scoreFTFSTFTTF = geocacheur.get("FTF") * scoreFTF + geocacheur.get("STF") * scoreSTF + geocacheur.get("TTF") * scoreTTF;
-				var score = counter * scoreFoundIt + scoreFTFSTFTTF + geocacheur.get("ScoreDT");
-				geocacheur.set("Found", counter);
-				geocacheur.set("Score", score);
-				geocacheur.set("ScoreFTF", scoreFTFSTFTTF);
-				geocacheur.save();
+				var scoreFTFSTFTTF = rank.get("FTF") * scoreFTF + rank.get("STF") * scoreSTF + rank.get("TTF") * scoreTTF;
+				var score = counter * scoreFoundIt + scoreFTFSTFTTF + rank.get("ScoreDT") + rank.get("ScoreTB");
+				rank.set("Found", counter);
+				rank.set("Score", score);
+				rank.set("ScoreFTF", scoreFTFSTFTTF);
+				rank.save();
 			});
 		});
 	}).then(function(result) {
 		status.success("I just finished");
-}, function(error) {
-		status.error("There was an error");
-})
-
+	}, function(error) {
+		status.error(error);
+	});
 });
