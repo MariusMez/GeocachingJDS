@@ -1005,8 +1005,6 @@ app.post('/found', upload.single('pic'), function (req, res, next) {
 										logEntry.set("STF", stfScore);
 										logEntry.set("TTF", ttfScore);
 										
-										console.log("DEBUG : " + ftfScore + stfScore + ttfScore); 
-
 										if(fav == "true") {
 											logEntry.set("Fav", true);
 											cache.increment("Fav");
