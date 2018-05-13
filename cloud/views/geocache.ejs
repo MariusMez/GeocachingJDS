@@ -107,7 +107,7 @@
 			<br>
 			<% } %>
 
-			<% if( cat=='VIRTUAL' || cat=='WEBCAM' || cat=='EARTHCACHE' || cat=='EVENT' || cat=='CITO' ) { %>
+			<% if( cat=='VIRTUAL' || cat=='WEBCAM' || cat=='EARTHCACHE' || cat=='EVENT' || cat=='SPECIAL' || cat=='CITO' ) { %>
 			<section>
 				<h2>👣 Formulaire pour valider votre participation</h2>
 				<form ref="uploadForm" id="uploadForm" method="post" action="/found" encType="multipart/form-data">
@@ -123,7 +123,7 @@
 					<input type="text" name="message" id="message" value="" style="border: solid 1px #82b440;" placeholder="Ce Message sera visible sur le site" maxlength="500" required/>
 					<br>		
 
-					<% if(cat!='MYSTERY') { %>
+					<% if(cat!='MYSTERY' || cat!='SPECIAL' ) { %>
 						Une photo souvenir (sera visible sur le site) pour valider votre participation
 						<input type="file" name="pic" id="pic" accept="image/*" <% if(cat=='VIRTUAL' || cat=='WEBCAM') { %>required<% } %>>
 						<br>
