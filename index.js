@@ -1057,7 +1057,7 @@ app.post('/found', upload.single('pic'), function (req, res, next) {
     		});
         } else {
             console.log("Geocacheur with email: " + email + " was not found");
-            res.render('error', { message:"Il n'y a pas de géocacheur activé avec l'email : " + email + "<br><a href=\"/register\">Rendez-vous ici pour enregistrer un objet voyageur</a>"}); 
+            res.render('error', { message:"Il n'y a pas de géocacheur activé avec l'email : " + email + "<br><br><a href=\"/register\"><u>Rendez-vous ici pour enregistrer un objet voyageur</u></a>"}); 
         }
     }, function(error) {
         console.error("Error in getGeocacheurWithEmail: " + error);
