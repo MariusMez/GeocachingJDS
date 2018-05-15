@@ -35,9 +35,10 @@
 				<table class="zebra">
 					<thead>
 						<tr>
-							<th colspan=5><b>Objet</b></th>
+							<th colspan=1><b>Objet Voyageur</b></th>
+							<th colspan=2></th>
 							<th colspan=1><b>Propriétaire</b></th>
-							<th><b>Localisation</b></th>
+							<th colspan=3><b>Localisation</b></th>
 							<th colspan=1><b>Dernière activité</b></th>
 							<th colspan=1><b>Fav 👍</b></th>
 						</tr>
@@ -45,13 +46,15 @@
 					<tbody>
 						<% tbs.forEach(function(tb) { %>
 						<tr>
-							<td colspan=5>
-								<img width="60px;" style="margin-right: 10px; float: left;" align="left" src="<%= tb.get("Photo").url().replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, ''); %>" />
+							<td colspan=1 style="vertical-align: middle;">
+								<img width="70px;" class="image" style="alignment-baseline: central;" src="<%= tb.get("Photo").url().replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, ''); %>" />
+							</td>
+							<td colspan=2>
 								<a href="/tb?id=<%= tb.id %>"><b style="text-transform: capitalize;"><%= tb.get("Name") %></b></a>
 								<p class="small"><i><%= tb.get("Mission") %></i></p>
 							</td>
 							<td colspan=1 style="text-transform: capitalize;"><%= tb.get("Owner") %></td>
-							<td>
+							<td colspan=3>
 								<% if (tb.get("Holder") != null) { %> Dans les mains de <%= tb.get("Holder") %> <% } %>
 								<% if (tb.get("Holder") == null) { %> <a href="/geocache?id=<%= tb.get('cacheId') %>"><%= tb.get("cacheName") %></a> <% } %>
 							</td>
