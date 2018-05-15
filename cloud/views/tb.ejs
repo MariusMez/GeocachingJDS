@@ -14,8 +14,8 @@
 		<div id="content" class="container">
 			<section>
 				<header class="major">
-					<img width="420px;" align="right" src="<%= photo %>" alt="<%= nom %>" style="margin-bottom:20px;">
-					<img width="70px;" align="left" src="public/images/tb.jpg" style="margin-right:60px;"/>
+					<img width="410" align="right" src="<%= photo %>" alt="<%= nom %>" style="margin-bottom:20px;">
+					<img width="70" align="left" src="public/images/tb.jpg" style="margin-right:60px;"/>
 					<h2 ><%= nom %></h2>
 					<span class="byline"><%= fav %> 👍</span>
 					<% if (holder != null) { %>
@@ -32,12 +32,14 @@
 
 				<h2>Objet Voyageur de <i style="text-transform: capitalize;"><%= owner %></i></h2>
 				<h3>Description</h3>
-				<p><%- description %></p>
+				<p class="medium"><%- description %></p>
 				<h3>Mission</h3>
-				<p><%- mission %></p>
+				<p class="medium"><%- mission %></p>
 
 			</section>
-			<br />
+			<br>
+			<br>
+			<br>
 
 			<section>
 				<h2>🌍 Historique des déplacements (<span id="distance">0</span> km)</h2>
