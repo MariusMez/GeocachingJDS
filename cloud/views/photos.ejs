@@ -18,8 +18,8 @@
 				<div style="display:flex; flex-wrap:wrap; justify-content:space-evenly; align-items: baseline;" class="clearfix">
 					<% logs.forEach(function(log) { %>
 						<div style="margin-right: 50px; margin-bottom: 15px; text-align: center;">
-							<a href="<%= log.get("PhotoUrl").replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, '') %>">
-								<img width="250px;" class="border" src="<%= log.get("PhotoUrl").replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, '') %>" />
+							<a href="<%= log.get("Photo").url().replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, '') %>">
+								<img width="250px;" class="border" src="<%= log.get("Photo").url().replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, '') %>" />
 							</a>
 							<p>
 								<a href="/geocache?id=<%= log.get("Geocache").id %>"><b><%= log.get("Geocache").get("Nom") %></b></a>

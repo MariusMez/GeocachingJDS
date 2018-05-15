@@ -19,8 +19,8 @@
 
 				<div style="display:flex; flex-wrap:wrap; justify-content:space-evenly; align-items: baseline;" class="clearfix">
 					<div class="border" style="margin-bottom: 15px; text-align: center;">
-						<a href="<%= mission.get("PhotoUrl").replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, '') %>">
-							<img width="600px;" class="border image" src="<%= mission.get("PhotoUrl").replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, '') %>" />
+						<a href="<%= mission.get("Photo").url().replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, '') %>">
+							<img width="600px;" class="border image" src="<%= mission.get("Photo").url().replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, '') %>" />
 						</a>
 						<p style="margin-top: 10px;">
 							<a href="/tb?id=<%= mission.get("Travelbug").id %>"><b><%= mission.get("TravelbugName") %></b></a> - <%= mission.get("Pseudo") %>, le <%= moment(mission.get("Date")).utcOffset(120).format("LL [à] LT") %> a écrit : <i><%= mission.get("Message") %></i> 
