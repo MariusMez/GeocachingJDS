@@ -551,95 +551,41 @@ app.get('/flashit', function(req, res) {
     });
 });
 
+
+
 app.post('/myscore', function(req, res) {
 	var email = req.body.email.toLowerCase();
-	var Logs = Parse.Object.extend("Log");
 
-	const nbPointsFoundIt = 20;
-	const nbPointsFTF = 3;
-	const nbPointsSTF = 2;
-	const nbPointsTTF = 1;
-	const nbPointsFavTB = 2;
-	const nbPointsMission = 5;
-	const nbPointsNewTBDiscover = 10;
-	const nbPointsFirstCacheVisit = 10;
-	const nbPointsTBOwnerByMove = 2;
+	var promiseGeocacheur = jds.getGeocacheurWithEmail(email);
+	var promiseTbOfGeocacheur = jds.getTbOfGeocacheur(email);
+	var promiseScore = jds.computeScoreForGeocacheur(email);
 	
-	var queryCaches = new Parse.Query(Logs);
-	queryCaches.equalTo("Email", email);
-	queryCaches.equalTo("Active", true);
-	queryCaches.include('Geocache');
-	queryCaches.greaterThanOrEqualTo("createdAt", new Date("2018-05-10"));
-	queryCaches.limit(10000);
-	queryCaches.find().then( function(mylogs) {
-		var scoreCaches = { logs:0, dt:0, ftf:0 };
-	
-		//console.log(email+ " logged " + mylogs.length + " caches ");	
-		var promise = Parse.Promise.as();
-		
-  		mylogs.forEach(function(log) {
-			//console.log(email+ " logged cache with Difficulty " + log.get("Geocache").get("Difficulty"));	
-  			promise = promise.then(function() {
-  				scoreCaches.dt = scoreCaches.dt + log.get("Geocache").get("Difficulty") + log.get("Geocache").get("Terrain");
-  				console.log(scoreCaches.dt)
-  				scoreCaches.logs = scoreCaches.logs + nbPointsFoundIt;
-  				console.log(scoreCaches.logs)
-  				scoreCaches.ftf = scoreCaches.ftf + nbPointsFTF*log.get("FTF") + nbPointsSTF*log.get("STF") + nbPointsTTF*log.get("TTF"); 
-  				console.log(scoreCaches.ftf)
-  				return scoreCaches;
-  			});	
-  		});		
-		return promise;
-	}).then(function(scoreCaches) {
-		//console.log(email + " has score of " + scoreCaches);	
+	Promise.all([promiseScore,promiseGeocacheur,promiseTbOfGeocacheur])
+    .then(
+        function(values) { 
+        	var score = values[0];
+        	var geocacheur = values[1];
+        	if (geocacheur == undefined) {
+                throw "Geocacheur " + email + " non trouvé";
+            }
+            var tbOwned = values[2];
 
-		var TravelbugLog = Parse.Object.extend("TravelbugLog");
-		var queryTbs = new Parse.Query(TravelbugLog);
-		queryTbs.equalTo("Active", true);
-		queryTbs.equalTo("Action", "drop");
-		queryTbs.limit(10000);
-		queryTbs.include("Travelbug");
-		queryTbs.find().then(function(mylogs) {
-			var scoreTb = { drop:0, dropTB:0, dropgc:0, missions:0, fav:0, owner:0};
-		
-			//console.log(email + " logged " + mylogs.length + " TB ");	
-			var promise = Parse.Promise.as();
 			
-	  		mylogs.forEach(function(log) {
-				promise = promise.then(function() {
-					//console.log(email+ " logged TB with owner " + log.get("Travelbug").get("OwnerEmail"));	
+			if (score == undefined) {
+				console.log("score null");
+				res.render('error', { message:error });
+			} else {
+				console.log("score not null : " + score);
+				res.render('myscore', { email:email, pseudo: geocacheur.get("Pseudo") , scoresCache: score.scoreCaches, scoreTb: score.scoreTb, scoreMyTb: score.scoreMyTb , mytb: {id: tbOwned.id, name: tbOwned.get("Name")}});		
+			}	
+		})
+    .catch(
+        function(error) {
+            console.error(error);
+            res.render('error', { message:error });
+        }
+    );
 
-					if (log.get("Email") == email) {
-						scoreTb.dropTB = scoreTb.dropTB + nbPointsFirstCacheVisit*log.get("NewCache");
-						scoreTb.dropgc = scoreTb.dropgc + nbPointsNewTBDiscover*log.get("NewTB");
-						if (log.get("Mission") != undefined) {
-			  				scoreTb.missions = scoreTb.missions + nbPointsMission * log.get("Mission");													
-						}
-					}  			
-	  				if (log.get("Travelbug").get("OwnerEmail") == email) {
-		  				scoreTb.fav = scoreTb.fav + log.get("Fav") * nbPointsFavTB; 	  	
-		  				scoreTb.owner = scoreTb.owner + nbPointsTBOwnerByMove;				
-	  				}
-	  				return scoreTb;
-	  			});	
-	  		});		
-			return promise;
-		}).then(function(scoreTb) {
-			//console.log(email + " has score of " + scoreTb);
-
-			if (scoreCaches == undefined) {
-				scoreCaches = { logs:0, dt:0, ftf:0};
-			}
-
-			if (scoreTb == undefined) {
-				scoreTb = { dropTB:0, dropgc:0, missions:0, fav:0, owner:0};
-			}
-
-			var scoreTotal = scoreCaches.logs + scoreCaches.dt + scoreCaches.ftf + scoreTb.dropTB + scoreTb.dropgc + scoreTb.missions + scoreTb.fav + scoreTb.owner;
-
-			res.render('myscore', { email:email, scoresCache: scoreCaches, scoreTb: scoreTb, scoreTotal:scoreTotal });
-		});
-	});
 });
 
 

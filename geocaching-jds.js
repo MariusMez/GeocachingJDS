@@ -190,6 +190,7 @@ var getAllActiveLogWithCache = function(geocache) {
 }
 
 var getGeocacheurWithEmail = function(email) {
+    console.log("getGeocacheurWithEmail " + email);
     var promise = new Parse.Promise();
     
     var Geocacheur = Parse.Object.extend("Geocacheur");    
@@ -337,6 +338,199 @@ var saveRanking = function(geocacheur, active) {
     ranking.set("Active", active);
     ranking.save(null).then(function() {
         promise.resolve(ranking);
+    }, function(error) {
+        promise.error(error);
+    });
+
+    return promise;
+}
+
+var computeScoreForGeocacheur = function(email) {
+
+    console.log("computeScoreForGeocacheur " + email );
+
+    var promise = new Parse.Promise();
+
+    const nbPointsFoundIt = 20;
+    const nbPointsFTF = 3;
+    const nbPointsSTF = 2;
+    const nbPointsTTF = 1;
+    const nbPointsFavTB = 2;
+    const nbPointsMission = 5;
+    const nbPointsNewTBDiscover = 10;
+    const nbPointsFirstCacheVisit = 10;
+    const nbPointsTBOwnerByMove = 2;
+
+    var promiseGeocacheur = getGeocacheurWithEmail(email);
+    var promiseLogs = getLogsByEmail(email);
+    var promiseTbLogsByEmail = getTbLogsByEmail(email);
+    var promiseTbOfGeocacheur = getTbOfGeocacheur(email);
+
+    Parse.Promise.all([promiseGeocacheur, promiseLogs, promiseTbLogsByEmail, promiseTbOfGeocacheur])
+    .then(
+        function(values) { 
+
+            var geocacheur = values[0];
+            var mylogs = values[1];
+            var tbLogs = values[2];
+            var tbOwned = values[3];
+            console.log("tb trouvé :" + tbOwned.id)
+            console.log("iciiiii");
+
+            var scoreCaches = { found:0, FTF:0, STF:0, TTF:0, ScoreFTF:0, ScoreDT:0, ScoreFound:0, total:0, caches:[]};
+            var scoreTb = { newVisits:0, newTbs:0, missions:0, total:0, tbs: {}};
+            var scoreMyTb = { fav: 0, moves: 0, totalMoves:0, total:0, drops: {}}
+
+            // logs caches
+            mylogs.forEach(function(log) {
+                //console.log(email+ " logged cache with Difficulty " + log.get("Geocache").get("Difficulty")); 
+
+                var cache = {id: log.get("Geocache").id, name: log.get("Geocache").get("Nom"), diff: log.get("Geocache").get("Difficulty"), terrain: log.get("Geocache").get("Terrain") };
+                scoreCaches.ScoreDT = scoreCaches.ScoreDT + log.get("Geocache").get("Difficulty") + log.get("Geocache").get("Terrain");
+                scoreCaches.found = scoreCaches.found + 1;
+                scoreCaches.ScoreFound = scoreCaches.ScoreFound + nbPointsFoundIt;
+                if (log.get("FTF") > 0) {
+                    cache.ftf = "FTF";
+                    scoreCaches.FTF = scoreCaches.FTF + 1;
+                    scoreCaches.ScoreFTF = scoreCaches.ScoreFTF + nbPointsFTF;
+                } else if (log.get("STF") > 0) {
+                    cache.ftf = "STF";
+                    scoreCaches.STF = scoreCaches.STF + 1;
+                    scoreCaches.ScoreFTF = scoreCaches.ScoreFTF + nbPointsSTF;
+                } else if (log.get("TTF") > 0) {
+                    cache.ftf = "TTF";
+                    scoreCaches.TTF = scoreCaches.TTF + 1;
+                    scoreCaches.ScoreFTF = scoreCaches.ScoreFTF + nbPointsTTF;
+                } else {
+                    cache.ftf = "pas dans le top 3";
+                }
+
+                //console.log(cache);
+                scoreCaches.caches.push( cache);
+            });
+
+            // TB 
+            tbLogs.forEach(function(log) {
+            var tb = {id : log.get("Travelbug").id, name: log.get("Travelbug").get("Name")}
+
+
+            if (scoreTb.tbs[tb.id] == undefined) {
+            // premiere visite
+            //premiere visite?
+            if (log.get("NewCache") > 0) {
+                tb.newCache = "Premiere visite dans " + log.get("cacheName");
+            } else {
+                tb.newCache = "Pas une premiere visite de la cache " + log.get("cacheName");
+            }
+            scoreTb.newVisits = scoreTb.newVisits + nbPointsFirstCacheVisit*log.get("NewCache");
+
+            // mission
+            if (log.get("Mission") != undefined) {
+                scoreTb.missions = scoreTb.missions + nbPointsMission * log.get("Mission");   
+                tb.mission = "Réalisée";                      
+            } else {
+                tb.mission = "Non réalisée";
+            }
+
+            tb.visites = 1;
+            scoreTb.newTbs = scoreTb.newTbs + nbPointsNewTBDiscover*log.get("NewTB");
+            scoreTb.tbs[tb.id] = tb;
+            } else {
+                scoreTb.tbs[tb.id].visites = scoreTb.tbs[tb.id].visites + 1;
+            }       
+
+            }); 
+
+            var promiseOwnedTbLogsByEmail = getLogsForTB(tbOwned.id);
+            Parse.Promise.when([promiseOwnedTbLogsByEmail])
+            .then(
+                function(result) {
+                    var ownedLogs = result[0]; 
+                    
+                    // TB owned
+                    ownedLogs.forEach(function(log) {
+                        var drop = {id : log.get("Travelbug").id, email: log.get("Email")}
+
+                        if (scoreMyTb.drops[drop.email] == undefined) {
+                            // on prend que le premier log par qqun du tb
+
+                            scoreMyTb.moves = scoreMyTb.moves + nbPointsTBOwnerByMove;
+                            scoreMyTb.fav = scoreMyTb.fav + log.get("Fav") * nbPointsFavTB; 
+                            scoreMyTb.drops[drop.email] = drop;
+                        } 
+                        scoreMyTb.totalMoves =  scoreMyTb.totalMoves + 1;   
+                    }); 
+
+                    scoreCaches.total = scoreCaches.ScoreFTF + scoreCaches.ScoreDT + scoreCaches.ScoreFound;
+                    scoreTb.total = scoreTb.newTbs + scoreTb.newVisits + scoreTb.missions;
+                    scoreMyTb.total = scoreMyTb.moves + scoreMyTb.fav;
+
+                    var result = {geocacheur:geocacheur, scoreCaches: scoreCaches, scoreTb: scoreTb, scoreMyTb: scoreMyTb};
+                    //console.log(result);
+
+
+                    promise.resolve(result);
+
+                }
+            )
+            .catch(
+                function(error) {
+                    console.error(error);
+                    throw error;
+                }  
+            );
+        })
+    .catch(
+        function(error) {
+            console.error(error);
+            throw error;
+        }
+    );
+
+    return promise;
+
+}
+
+var saveOrUpdateRanking2 = function(score) {
+    var promise = new Parse.Promise();
+    
+    var Ranking = Parse.Object.extend("Ranking");
+
+    var query = new Parse.Query(Ranking);
+    query.equalTo('Email', score.geocacheur.get("Email"));
+    query.first().then(function(ranking) {
+        if(ranking == null) {
+            console.log("New ranking for " + score.geocacheur.get("Email"));
+
+            var ranking = new Ranking();
+
+            ranking.save({
+                Geocacheur: score.geocacheur,
+                Email: score.geocacheur.get("Email"),
+                Active: true
+            });
+
+
+            console.log("Created ranking for " + score.geocacheur.get("Email"));
+
+            promise.resolve(ranking);
+
+        } else {
+            console.log("Ranking found - Updating");
+           
+            ranking.set("FTF", score.scoreCaches.FTF);
+            ranking.set("STF", score.scoreCaches.STF);
+            ranking.set("TTF", score.scoreCaches.TTF);
+            ranking.set("ScoreFTF", score.scoreCaches.ScoreFTF);
+            ranking.set("ScoreTB", score.scoreTb.total + score.scoreMyTb.total);
+            ranking.set("ScoreDT", score.scoreCaches.ScoreDT);
+            ranking.set("Score", score.scoreCaches.total + score.scoreTb.total + score.scoreMyTb.total);
+            ranking.set("Found", score.scoreCaches.found);
+
+            
+            ranking.save();
+            promise.resolve(ranking);
+        }
     }, function(error) {
         promise.error(error);
     });
@@ -520,6 +714,114 @@ var validateMission = function(missionId, validationScore) {
     return promise;
 }
 
+
+function getTbOfGeocacheur(emailString) {
+    console.log("getTbOfGeocacheur : " + emailString);
+    var promise = new Parse.Promise();
+
+    
+    var email = emailString.toLowerCase();
+    var Travelbug = Parse.Object.extend("Travelbug");
+    var queryTb = new Parse.Query(Travelbug);
+    queryTb.equalTo("OwnerEmail", email);
+    queryTb.equalTo("Active", true);
+    queryTb.first({
+        success: function(tb) {
+            console.log("TB trouvé avec email " + emailString + " -- " + tb.id);
+            promise.resolve(tb);
+        }, 
+        error: function(error) {
+            console.log("TB n'existe pas avec email " + emailString) ;
+            promise.error(error);
+        }
+    });
+    
+    return promise;
+}
+
+function getLogsByEmail(emailString) {
+    console.log("getLogsByEmail : " + emailString);
+    var promise = new Parse.Promise();
+
+    
+    var email = emailString.toLowerCase();
+    var Logs = Parse.Object.extend("Log");
+    var queryCaches = new Parse.Query(Logs);
+    queryCaches.equalTo("Email", email);
+    queryCaches.ascending("createdAt");
+    queryCaches.equalTo("Active", true);
+    queryCaches.include('Geocache');
+    queryCaches.greaterThanOrEqualTo("createdAt", new Date("2018-05-01"));
+    queryCaches.limit(10000);
+    queryCaches.find({
+        success: function(logs) {
+            console.log("getLogsByEmail trouvés : " + logs.length);
+            promise.resolve(logs);
+        }, 
+        error: function(error) {
+            console.log("Erreur pendant recherche logs " + emailString) ;
+            promise.error(error);
+        }
+    });
+
+    return promise;
+}
+
+function getTbLogsByEmail(emailString) {
+    console.log("getTbLogsByEmail : " + emailString);
+    var promise = new Parse.Promise();
+
+    var email = emailString.toLowerCase();
+
+    var TravelbugLog = Parse.Object.extend("TravelbugLog");
+    var queryTbs = new Parse.Query(TravelbugLog);
+    queryTbs.equalTo("Active", true);
+    queryTbs.equalTo("Action", "drop");
+    queryTbs.ascending("createdAt");
+    queryTbs.limit(10000);
+    queryTbs.equalTo("Email", email);
+    queryTbs.include("Travelbug");
+    queryTbs.find( {
+    
+        success: function(logs) {
+            console.log("getTbLogsByEmail trouvés : "+ logs.length);
+            promise.resolve(logs);
+        }, 
+        error: function(error) {
+            console.log("Erreur pendant recherche logs TB " + emailString) ;
+            promise.error(error);
+        }
+    });
+    return promise;
+
+}
+
+function getLogsForTB(tbId) {
+    console.log("getLogsForTB : " + tbId);
+    var promise = new Parse.Promise();
+
+    var TravelbugLog = Parse.Object.extend("TravelbugLog");
+    var queryTbs = new Parse.Query(TravelbugLog);
+    queryTbs.equalTo("Active", true);
+    queryTbs.equalTo("Action", "drop");
+    queryTbs.equalTo("TravelbugId", tbId);
+    queryTbs.ascending("createdAt");
+    queryTbs.include("Travelbug");
+    queryTbs.find( {
+    
+        success: function(logs) {
+            console.log("getLogsForTB : " + tbId + " : " + logs.length);
+            promise.resolve(logs);
+        }, 
+        error: function(error) {
+            console.log("Erreur pendant recherche logs TB " + tbId) ;
+            promise.error(error);
+        }
+    });
+    
+    return promise;
+}
+
 module.exports.createThumbnail = createThumbnail;
 module.exports.getGeocache = getGeocache;
 module.exports.getGeocacheWithCodeId = getGeocacheWithCodeId;
@@ -542,3 +844,9 @@ module.exports.getLastLogs = getLastLogs;
 module.exports.getAllPublishedGeocaches = getAllPublishedGeocaches;
 module.exports.saveRanking = saveRanking;
 module.exports.getAllActiveRanking = getAllActiveRanking;
+module.exports.getTbOfGeocacheur = getTbOfGeocacheur;
+module.exports.getLogsByEmail = getLogsByEmail;
+module.exports.getTbLogsByEmail = getTbLogsByEmail;
+module.exports.getLogsForTB = getLogsForTB;
+module.exports.saveOrUpdateRanking2 = saveOrUpdateRanking2;
+module.exports.computeScoreForGeocacheur = computeScoreForGeocacheur;
