@@ -337,6 +337,73 @@ Parse.Cloud.job("Second - Compute Score TB", function(request, status) {
 	});
 });
 
+
+Parse.Cloud.job("Compute All rankings", function(request, status) {
+  status.message("I just started Compute All Rankings");
+
+  var Geocacheur = Parse.Object.extend("Geocacheur");
+  
+  
+  
+
+  var queryGeocacheurs = new Parse.Query(Geocacheur);
+  queryGeocacheurs.equalTo("Active", true);
+  queryGeocacheurs.limit(1000);
+  queryGeocacheurs.find()
+    .then(
+      function(geocacheurs) {
+
+        var promisesScores = [];
+        var counter = 0;
+
+        geocacheurs.forEach(
+          function(geocacheur) {
+
+            counter = counter + 1;
+            var email = geocacheur.get("Email");
+
+            status.message("Processing " + email + " " + counter + "/" + geocacheurs.length);
+            console.log("Processing " + email + " " + counter + "/" + geocacheurs.length);
+
+
+            promisesScores.push(jds.computeScoreForGeocacheur(email));
+          }
+        );
+
+        return Parse.Promise.all(promisesScores);
+      }
+    )
+.then(
+  function(scores) {
+    console.log("in function with " + scores.length + " scores ");
+    var promisesStore = [];
+    var counter = 0;
+
+    scores.forEach(
+      function(score) {
+            counter = counter + 1;
+            var email = score.geocacheur.get("Email");
+
+            status.message("Storing " + email + " - " + counter + "/" + scores.length);
+            console.log("Storing " + email + " - " + counter + "/" + scores.length);
+
+
+            promisesStore.push(jds.saveOrUpdateRanking2(score));
+      }
+    );
+
+    return Parse.Promise.all(promisesStore);
+
+  })
+.then(function(results) {
+  console.log("termine with " + results.length);
+  status.success("I just finished");
+  }, function(error) {
+  status.error(error);
+  });
+
+});
+
 Parse.Cloud.job("Last - Compute Ranking", function(request, status) {
 
 	status.message("I just started Compute Ranking");
