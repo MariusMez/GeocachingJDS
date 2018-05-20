@@ -97,7 +97,7 @@
 					<summary>Cliquez pour voir les objets ayant deja transité dans cette cache</summary>
 					<ul>
 					<% objetsLogged.forEach(function(obj) { %>
-						<li> <a href="/tb?id=<%= obj.get("TravelbugId") %>"><b> <%= obj.get("TravelbugName") %></b></a>  <b><%= moment(obj.get("Date")).utcOffset(120).fromNow() %> le <%= moment(obj.get("Date")).utcOffset(120).format("LL [à] LT") %> </b>- <%= obj.get("Pseudo") %> : <i><%= obj.get("Message") %></i><% if(obj.get("PhotoUrl"))  { %> - <a href="<%= obj.get("PhotoUrl").replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, '') %>">photo</a><% } %></li>
+						<li> <a href="/tb?id=<%= obj.get("TravelbugId") %>"><b> <%= obj.get("TravelbugName") %></b></a>  <b><%= moment(obj.get("Date")).utcOffset(120).fromNow() %> le <%= moment(obj.get("Date")).utcOffset(120).format("LL [à] LT") %> </b>- <%= obj.get("Pseudo") %> : <i><%= obj.get("Message") %></i><% if(obj.get("Photo"))  { %> - <a href="<%= obj.get("Photo").url().replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, '') %>">photo</a><% } %></li>
 					<% }); %>
 					</ul>
 
@@ -149,7 +149,7 @@
 					<% logs.forEach(function(log) { %>
 						<li>
 							<b><%= moment(log.get("Date")).utcOffset(120).fromNow() %> le <%= moment(log.get("Date")).utcOffset(120).format("LL [à] LT") %></b> - <%= log.get("Pseudo") %> : <i><%= log.get("Message") %></i>
-							<% if(log.get("PhotoUrl"))  { %> - <a href="<%= log.get("PhotoUrl").replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, '') %>">photo</a><% } %>
+							<% if(log.get("Photo"))  { %> - <a href="<%= log.get("Photo").url().replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, '') %>">photo</a><% } %>
 							<% if(log.get("Fav") == true)  { %> - 👍 <% } %>
 						</li>
 					<% }); %>
