@@ -680,7 +680,7 @@ var getLastMissionToValidate = function() {
     var query = new Parse.Query(TravelbugLog);
     query.equalTo("Active", true);
     query.equalTo("MissionReviewed", false);
-    query.exists("PhotoUrl");
+    query.exists("Photo");
     query.include("Travelbug");
     query.ascending("createdAt");
     query.first().then(function(result) {
