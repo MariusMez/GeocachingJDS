@@ -708,75 +708,90 @@ app.post('/foundtb', upload.single('pic'), function (req, res, next) {
 									});
 								}
 
-								if (action == 'grab') {
-									logEntry.set("Action", "grab");
-									tb.set("cacheId", null);
-									tb.set("cacheName", null);
-									tb.set("Holder", name);
-									tb.set("HolderEmail", email);
-								}
+								
+								var promiseFirstTbDropOnGeocache = jds.isFirstTbDropOnGeocache(tb, cache);
+    							var promiseFirstTbDropByEmail = jds.isFirstTbDropByEmail(tb, email);
+    							var promiseTbByEmail = jds.countTravelBugHoldByEmail(email);
+    							
 
-								if (action == 'drop') {
-									logEntry.set("Action", "drop");
-									tb.set("cacheId", cache.id);
-									tb.set("cacheName", cache.get("Nom"));
-									tb.set("Holder", null);
-									tb.set("HolderEmail", null);
-								}
+							    Parse.Promise.all([promiseFirstTbDropOnGeocache, promiseFirstTbDropByEmail, promiseTbByEmail])
+							    .then(
+							        function(values) { 
 
-								if (fav == "true") {
-									logEntry.set("Fav", true);
-									tb.increment("Fav");
-								} else {
-									logEntry.set("Fav", false);
-								}
+							            var firstimeTbDropInGeocache = values[0];
+							            var firstimeTbDropByEmail = values[1];
+							            var nbTbs = values[2];
 
-								jds.isFirstTbDropOnGeocache(tb, cache).then(function(firstimeTbDropInGeocache) {
-									if(firstimeTbDropInGeocache) {
-										logEntry.set("NewCache", 1);
-									} else {
-										logEntry.set("NewCache", 0);
-									}
+							            console.log("firstimeTbDropInGeocache = " + firstimeTbDropInGeocache)
+										console.log("firstimeTbDropByEmail = " + firstimeTbDropByEmail)
+							            console.log("nbTbs = " + nbTbs)
 
-									jds.isFirstTbDropByEmail(tb, email).then(function(firstimeTbDropByEmail) {
-										if(firstimeTbDropByEmail) {
-											logEntry.set("NewTB", 1);
+
+							            if (action == 'grab' && nbTbs > 3) {
+											res.render("error", { message: "Il n'est pas possible de détenir plus de 3 objets voyageurs en même temps." });
 										} else {
-											logEntry.set("NewTB", 0);
-										}
 
-										jds.countTravelBugHoldByEmail(email).then(function(nbTbs) {
-											if (nbTbs > 3) {
-												res.render("error", { message: "Il n'est pas possible de détenir plus de 3 objets voyageurs en même temps." });
+								            if(firstimeTbDropByEmail) {
+												logEntry.set("NewTB", 1);
+												if(firstimeTbDropInGeocache) {
+													logEntry.set("NewCache", 1);
+												} else {
+													logEntry.set("NewCache", 0);
+												}
 											} else {
-												tb.save();
-												//cache.save();
-												logEntry.save(null, {
-													success: function (logEntry) {
-														res.render('foundtb', { tbid: travelBugId, 
-															message: "Super " + name + " !<br><br>Votre action sur l'objet voyageur "
-															+ tb.get("Name") + " est bien enregistrée. <br><br><br>"
-															+ "Merci de contribuer à la réussite de sa mission !"
-														});
-													},
-													error: function (error) {
-														console.error("Error TB LogEntry : " + error.message);
-														res.render('error', { message: error.message });
-													}
-												});
+												logEntry.set("NewTB", 0);
+												logEntry.set("NewCache", 0);
 											}
-									    }, function(error) {
-									        console.error("Error countTravelBugHoldByEmail : " + error.message);
-											res.render('error', { message: error.message });
-									    });
-								    }, function(error) {
-								        console.error("Error isFirstTbDropByEmail : " + error.message);
-										res.render('error', { message: error.message });
-								    });
-							    }, function(error) {
-							        console.error("Error isFirstTbDropOnGeocache : " + error.message);
-									res.render('error', { message: error.message });
-							    });
+
+											if (action == 'grab') {
+												logEntry.set("Action", "grab");
+												tb.set("cacheId", null);
+												tb.set("cacheName", null);
+												tb.set("Holder", name);
+												tb.set("HolderEmail", email);
+											}
+
+											if (action == 'drop') {
+												logEntry.set("Action", "drop");
+												tb.set("cacheId", cache.id);
+												tb.set("cacheName", cache.get("Nom"));
+												tb.set("Holder", null);
+												tb.set("HolderEmail", null);
+											}
+
+											if (fav == "true") {
+												logEntry.set("Fav", true);
+												tb.increment("Fav");
+											} else {
+												logEntry.set("Fav", false);
+											}
+
+
+												
+											tb.save();
+											//cache.save();
+											logEntry.save(null, {
+												success: function (logEntry) {
+													res.render('foundtb', { tbid: travelBugId, 
+														message: "Super " + name + " !<br><br>Votre action sur l'objet voyageur "
+														+ tb.get("Name") + " est bien enregistrée. <br><br><br>"
+														+ "Merci de contribuer à la réussite de sa mission !"
+													});
+												},
+												error: function (error) {
+													console.error("Error TB LogEntry : " + error.message);
+													res.render('error', { message: error.message });
+												}
+											});
+										}
+									}
+								)
+								.catch(
+					                function(error) {
+					                    console.error(error);
+					                    throw error;
+					                }  
+				            	);
 							}
 							else {
 								console.error("Identifiant de TB invalide ! : " + travelBugId + ' - ' + tb.id);

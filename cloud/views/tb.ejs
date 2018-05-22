@@ -124,13 +124,19 @@
 					<% if (obj.get("Action") == "Created") { %>
 						<li> <b><%= moment(obj.get("Date")).utcOffset(120).fromNow() %> le <%= moment(obj.get("Date")).utcOffset(120).format("LL [à] LT") %></b> - <%= obj.get("Pseudo") %> a créé l'objet voyageur </i><% if(obj.get("Photo"))  { %> - <a href="<%= obj.get("Photo").url().replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, ''); %>">photo</a><% } %></li>					
 					<% } else if (obj.get("Action") == "drop") { %>
-						<li> <b><%= moment(obj.get("Date")).utcOffset(120).fromNow() %> le <%= moment(obj.get("Date")).utcOffset(120).format("LL [à] LT") %></b> - <%= obj.get("Pseudo") %> <%= obj.get("Action") %> dans la cache <a href="/geocache?id=<%= obj.get("cacheId") %>"><b><%= obj.get("cacheName") %></b></a> : <i><%= obj.get("Message") %></i><% if(obj.get("Photo"))  { %> - <a href="<%= obj.get("Photo").url().replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, ''); %>">photo</a><% } %>
-						<% if(obj.get("Fav") == true)  { %> - 👍 <% } %></li>
+						<li> <b><%= moment(obj.get("Date")).utcOffset(120).fromNow() %> le <%= moment(obj.get("Date")).utcOffset(120).format("LL [à] LT") %></b> - <% if(obj.get("NewCache") == true)  { %>🥇  <% } %>  <% if(obj.get("NewTB") == false)  { %> 👽 <% } %>  <%= obj.get("Pseudo") %> <%= obj.get("Action") %> dans la cache <a href="/geocache?id=<%= obj.get("cacheId") %>"><b><%= obj.get("cacheName") %></b></a> : <i><%= obj.get("Message") %></i><% if(obj.get("Photo"))  { %> - <a href="<%= obj.get("Photo").url().replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, ''); %>">photo</a><% } %>
+						<% if(obj.get("Fav") == true)  { %> - 👍 <% } %>     </li>
 					<% } else { %>	
 						<li> <b><%= moment(obj.get("Date")).utcOffset(120).fromNow() %> le <%= moment(obj.get("Date")).utcOffset(120).format("LL [à] LT") %></b> - <%= obj.get("Pseudo") %> <%= obj.get("Action") %> a partir de la cache <a href="/geocache?id=<%= obj.get("cacheId") %>"><b><%= obj.get("cacheName") %></b></a> : <i><%= obj.get("Message") %></i><% if(obj.get("Photo"))  { %> - <a href="<%= obj.get("Photo").url().replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, ''); %>">photo</a><% } %>
 						<% if(obj.get("Fav") == true)  { %> - 👍 <% } %></li>
 					<% } %> 
 				<% }); %>
+				</ul>
+				Legende : 
+				<ul>
+					<li>👽 signifie qu'il s'agit d'un drop fantôme; à savoir qu'il ne s'agit pas du premier déplacement de l'objet par un participant et donc que ce déplacement ne comptabilise aucun point. </li>
+					<li>🥇 signifie que ce drop a été fait pour la première fois dans cette cache (en ne comptant pas les drop fantômes). </li>
+					<li>👍 signifie qu'un favori a été notifié</li>
 				</ul>
 			</section>
 			<br />

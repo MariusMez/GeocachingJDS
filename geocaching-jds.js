@@ -616,6 +616,7 @@ var isFirstTbDropOnGeocache = function(tb, geocache) {
     query.equalTo("cacheId", geocache.id);
     query.equalTo("TravelbugId", tb.id);
     query.equalTo("Action", "drop");
+    query.equalTo("NewTB",1);
     query.count().then(function(result) {
         if(result > 0) {
             promise.resolve(false);
