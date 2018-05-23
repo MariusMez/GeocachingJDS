@@ -422,18 +422,18 @@ var computeScoreForGeocacheur = function(email) {
             } else {
                 tb.newCache = "Pas une premiere visite de la cache " + log.get("cacheName");
             }
-            scoreTb.newVisits = scoreTb.newVisits + nbPointsFirstCacheVisit*log.get("NewCache");
+            scoreTb.newVisits = scoreTb.newVisits + log.get("NewCache");
 
             // mission
             if (log.get("Mission") != undefined) {
-                scoreTb.missions = scoreTb.missions + nbPointsMission * log.get("Mission");   
+                scoreTb.missions = scoreTb.missions + log.get("Mission");   
                 tb.mission = "Réalisée";                      
             } else {
                 tb.mission = "Non réalisée";
             }
 
             tb.visites = 1;
-            scoreTb.newTbs = scoreTb.newTbs + nbPointsNewTBDiscover*log.get("NewTB");
+            scoreTb.newTbs = scoreTb.newTbs + log.get("NewTB");
             scoreTb.tbs[tb.id] = tb;
             } else {
                 scoreTb.tbs[tb.id].visites = scoreTb.tbs[tb.id].visites + 1;
@@ -462,7 +462,7 @@ var computeScoreForGeocacheur = function(email) {
                     }); 
 
                     scoreCaches.total = scoreCaches.ScoreFTF + scoreCaches.ScoreDT + scoreCaches.ScoreFound;
-                    scoreTb.total = scoreTb.newTbs + scoreTb.newVisits + scoreTb.missions;
+                    scoreTb.total = scoreTb.newTbs*nbPointsNewTBDiscover + scoreTb.newVisits*nbPointsFirstCacheVisit + scoreTb.missions * nbPointsMission;
                     scoreMyTb.total = scoreMyTb.moves + scoreMyTb.fav;
 
                     var result = {geocacheur:geocacheur, scoreCaches: scoreCaches, scoreTb: scoreTb, scoreMyTb: scoreMyTb};
@@ -526,6 +526,9 @@ var saveOrUpdateRanking2 = function(score) {
             ranking.set("ScoreDT", score.scoreCaches.ScoreDT);
             ranking.set("Score", score.scoreCaches.total + score.scoreTb.total + score.scoreMyTb.total);
             ranking.set("Found", score.scoreCaches.found);
+            ranking.set("NbTB", score.scoreTb.newTbs);
+            ranking.set("Missions", score.scoreTb.missions);
+            ranking.set("TbNewCaches", score.scoreTb.newVisits);
 
             
             ranking.save();

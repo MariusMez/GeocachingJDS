@@ -444,7 +444,13 @@ app.get('/tbs', function(req, res) {
 	queryTbs.equalTo("Active", true);
 	queryTbs.find({
 		success: function(tbs) {
-			res.render('tbs', { message: 'Les objets à trouver', tbs:tbs });
+			var missing = []
+			tbs.forEach(function(tb) {
+				if (tb.get("Missing")) {
+					missing.push(tb)
+				}
+			});
+			res.render('tbs', { message: 'Les objets à trouver', tbs:tbs, missing:missing });
 		}
 	});
 });
