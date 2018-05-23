@@ -77,9 +77,9 @@
 					</tbody>
 				</table>
 				<ul>
-					<li>Objets uniques deplacés (<i>10 points par objets différents</i>) : <b><%- scoreTb.newTbs %></b></li>
-					<li>Caches visitées en premier par un objet (<i>10 points par visite de cache par objet</i>) : <b><%- scoreTb.newVisits %></b></li>
-					<li>Missions satisfaites (<i>5 points par mission</i>) : <b><%- scoreTb.missions %></b></li>
+					<li>Objets uniques deplacés (<i>10 points par objets différents</i>) : <b><%- scoreTb.newTbs * 10 %></b></li>
+					<li>Caches visitées en premier par un objet (<i>10 points par visite de cache par objet</i>) : <b><%- scoreTb.newVisits * 10 %></b></li>
+					<li>Missions satisfaites (<i>5 points par mission</i>) : <b><%- scoreTb.missions * 5 %></b></li>
 				</ul>
 
 				<h2>Mon objet voyageur : <%= scoreMyTb.total  %> </h2>

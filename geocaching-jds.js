@@ -425,8 +425,8 @@ var computeScoreForGeocacheur = function(email) {
             scoreTb.newVisits = scoreTb.newVisits + log.get("NewCache");
 
             // mission
-            if (log.get("Mission") != undefined) {
-                scoreTb.missions = scoreTb.missions + log.get("Mission");   
+            if (log.get("Mission") != undefined && log.get("Mission") == "1") {
+                scoreTb.missions = scoreTb.missions + 1*log.get("Mission");   
                 tb.mission = "Réalisée";                      
             } else {
                 tb.mission = "Non réalisée";
