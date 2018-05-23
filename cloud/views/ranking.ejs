@@ -36,7 +36,7 @@
 					<h2>Classement Général</h2>
 				</header>
 
-				<p><b>Note :</b> le classement général n'est pas calculé en temps réel tandis que le <a href="#classement_individuel">classement individuel</a> l'est ! Attendez un recalcul pour que les deux soient alignés.</p>
+				<p><b>Note :</b> le classement général n'est pas calculé en temps réel tandis que le <a href="#classement_individuel">classement individuel</a> l'est ! Attendez un recalcul pour que les deux soient alignés. Plus de details sur la méthode de calcul des points <a href="/geocaching#points">ici</a></p>
 				
 				<table class="zebra">
 					<thead>
@@ -51,28 +51,32 @@
 								<b>Points</b>
 							</th>
 							<th>
-								<b>Caches trouvées</b><br><i>(20pt / cache)</i>
+								<b>🎁 Nb caches</b>
 							</th>
 							<th>
-								<b>🥇 FTF</b><br><i>(3pt / cache)</i>
+								<b>🥇 FTF</b>
 							</th>
 							<th>
-								<b>🥈 STF</b><br><i>(2pt / cache)</i>
+								<b>🥈 STF</b>
 							</th>
 							<th>
-								<b>🥉 TTF</b><br><i>(1pt / cache)</i>
+								<b>🥉 TTF</b>
 							</th>
 							<th>
-								<b>⭐ Score D/T</b><br><i>(1pt / étoile)</i>
+								<b>🗿 Nb TB</b>
 							</th>
 							<th>
-								<b>🗿 Score TB</b><br><i>(<a href="/geocaching#points">+ infos</a>)</i>
+								<b>✅ Missions</b>
+							</th>
+							<th>
+								<b>⛪ Visites TB</b>
 							</th>
 						</tr>
 					</thead>
 
 					<tfoot>
 						<tr>
+							<td></td>
 							<td></td>
 							<td></td>
 							<td></td>
@@ -95,8 +99,10 @@
 							<td><%= rank.get("FTF") %></td>
 							<td><%= rank.get("STF") %></td>
 							<td><%= rank.get("TTF") %></td>
-							<td><%= rank.get("ScoreDT") %></td>
-							<td><%= rank.get("ScoreTB") %></td>
+							<td><%= rank.get("NbTB") %></td>
+							<td><%= rank.get("Missions") %></td>
+							<td><%= rank.get("TbNewCaches") %></td>
+
 						</tr>
 						<% }); %>
 					</tbody>
