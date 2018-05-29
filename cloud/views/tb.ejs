@@ -41,7 +41,32 @@
 			<br>
 			<br>
 			<br>
-
+			<section>
+				<h2>📸 Photos des missions</h2>
+				<div style="display:flex; flex-wrap:wrap; align-items: baseline;" class="clearfix">
+					<% objetsLogged.forEach(function(obj) { %>
+						<% if (obj.get("Action") == "drop") { %>	
+							<% if(obj.get("Photo"))  { %> 
+							<a href="<%= obj.get('Photo').url().replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, ''); %>" title="<%= obj.get('Pseudo') %> - <%= obj.get('Message') %>">
+								<div style="position: relative; text-align: center; color: white;">
+									<img class="smallborder" style="margin-left: 5px; margin-top: 5px;" width="100px" alt="<%= obj.get('Pseudo') %> - <%= obj.get('Message') %>" src="<%= obj.get('Photo').url().replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, ''); %>">
+									<div style="position: absolute; bottom: 5px; right: 5px; font-size: 0.6em;">
+										<%= obj.get('Pseudo') %>%>
+										<% if(obj.get("Mission") == "1") { %> 
+											 - ✔️
+										<% } else { %>
+											- ❌
+										<% } %>
+									</div>
+								</div>
+							</a>
+							<% } %>
+						<% } %> 
+					<% }); %>
+				</div>
+			</section>
+			<br>
+			<br>
 			<section>
 				<h2>🌍 Historique des déplacements (<span id="distance">0</span> km)</h2>
 				<div id="map"></div>
@@ -133,12 +158,14 @@
 					<% } %> 
 				<% }); %>
 				</ul>
-				Legende : 
-				<ul>
+				<u>Légende :</u> 
+				<span style="font-size: 0.9em;">
+					<ul>
 					<li>👽 signifie qu'il s'agit d'un drop fantôme; à savoir qu'il ne s'agit pas du premier déplacement de l'objet par un participant et donc que ce déplacement ne comptabilise aucun point. </li>
 					<li>🥇 signifie que ce drop a été fait pour la première fois dans cette cache (en ne comptant pas les drop fantômes). </li>
 					<li>👍 signifie qu'un favori a été notifié</li>
-				</ul>
+					</ul>
+				</span>
 
 			</section>
 			<br />

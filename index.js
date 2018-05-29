@@ -367,7 +367,7 @@ app.get('/validatemission', function(req, res) {
 	        if(result) {
 	            res.redirect('/missionvalidator?key=' + accessKey);
 	        } else {
-	            res.render('error', { message:"Mission introuvable" }); 
+	            res.render('error', { message: "Mission introuvable" }); 
 	        }
 	    }, function(error) {
 	        console.error("Error in validateMission: " + error);

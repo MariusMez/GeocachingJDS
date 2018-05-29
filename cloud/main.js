@@ -342,9 +342,6 @@ Parse.Cloud.job("Compute All rankings", function(request, status) {
   status.message("I just started Compute All Rankings");
 
   var Geocacheur = Parse.Object.extend("Geocacheur");
-  
-  
-  
 
   var queryGeocacheurs = new Parse.Query(Geocacheur);
   queryGeocacheurs.equalTo("Active", true);
