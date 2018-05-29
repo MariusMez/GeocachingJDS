@@ -27,19 +27,21 @@
 
 	<div id="main" class="wrapper style4">
 		<div id="intro" class="container">
-			<section>
-				<% if (missing.length > 0) {
-				%>
-				<div style="position: relative; padding: 0.75rem 1.25rem;margin-bottom: 1rem;border: 1px solid transparent;border-radius: 0.25rem;color: #721c24;background-color: #f8d7da;border-color: #f5c6cb;">
-  					<strong>Alerte enlèvement!</strong>  Merci de régulariser la situation de <% missing.forEach(function(tb) { %> <a href="/tb?id=<%= tb.id %>"><b style="text-transform: capitalize;"><%= tb.get("Name") %></b></a> <% }); %>
-				</div>
-			</section>
-				<% } %>
+			<% if (missing.length > 0) { %>
+				<section>
+					<div style="position: relative; padding: 0.75rem 1.25rem;margin-bottom: 1rem;border: 1px solid transparent;border-radius: 0.25rem;color: #721c24;background-color: #f8d7da;border-color: #f5c6cb;">
+	  					<strong>Alerte enlèvement !</strong>  Merci de régulariser la situation de <% missing.forEach(function(tb) { %> <a href="/tb?id=<%= tb.id %>"><b style="text-transform: capitalize;"><%= tb.get("Name") %></b></a> <% }); %>
+					</div>
+				</section>
+			<% } %>
 			<section>
 				<img width="120px;" align="left" src="public/images/dwarf-racing.png" style="margin-right:60px;"/>
 				<h2><%= tbs.length %> Objets Voyageurs dans la course !</h2>
-				<span class="byline">Important : <b>les codes de suivi ne doivent pas être visibles sur les photos</b>
-					<br>Pensez à shooter le QR code à chaque action de grab/drop d'un objet</span>
+				<span class="byline">
+					Important : <b>les codes de suivi ne doivent pas être visibles sur les photos</b>
+					<br>Pensez à shooter le QR code à chaque action de grab/drop d'un objet
+					<br>Vous pouvez nous envoyer par email les photos de vos missions qui ne sont pas passées
+				</span>
 				<a href="/register" alt="Enregistrer son objet" style="float:right;" class="button small">&raquo; Enregister son objet voyageur 🗿</a>
 				
 				<table class="zebra">
