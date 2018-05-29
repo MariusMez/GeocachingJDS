@@ -8,8 +8,8 @@ Parse.Cloud.define("hello", function(request, response) {
 
 function processPhoto(request, response) {
 	const sharp = require('sharp');
-	const maxWidth = 1280;
-	const maxHeight = 1280;
+	const maxWidth = 1000;
+	const maxHeight = 1000;
 	
 	var photo = request.object.get("Photo");
     if(photo === undefined) {
