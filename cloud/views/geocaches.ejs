@@ -35,24 +35,24 @@
 		<div id="intro" class="container">
 			<section>
 				<header class="major">
-				<% if(start) { %>
+				<% if (!start) { %>
 					<h2>Entrez dans la Course aux Objets Voyageurs !</h2>
 					<span class="byline">🏁 A vous de jouer, les caches sont accessibles 7j/7 et 24h/24 !</span>
 					<br>
 				<% } else { %>
 					<script language="JavaScript">
-						TargetDate = "05/19/2018 08:00 AM";
+						TargetDate = "06/09/2018 00:00 AM";
 						BackColor = "none";
 						ForeColor = "none";
 						CountActive = true;
 						CountStepper = -1;
 						LeadingZero = true;
-						DisplayFormat = "🏁 Lancement de la Course aux Objets Voyageurs dans %%D%% Jours, %%H%% Heures, %%M%% Minutes, %%S%% Secondes";
-						FinishMessage = "C'est parti !";
+						DisplayFormat = "<h3>🏁 La Course se termine dans %%D%% Jours, %%H%% Heures, %%M%% Minutes, %%S%% Secondes</h3>";
+						FinishMessage = "<h2>C'est fini !</h2>";
 					</script>
 					<script language="JavaScript" src="public/js/compteur.js"></script>
-					<br><br>
-					<img src="public/images/course_aux_objets_voyageurs.jpg" alt="La Course aux Objets Voyageurs">
+					<!-- <br><br>
+					<img src="public/images/course_aux_objets_voyageurs.jpg" alt="La Course aux Objets Voyageurs"> -->
 						<!--<br>
 						<h2>Prochaine publication le 7 juin à 22h, soyez prêt ;-)</h2>
 						<div style="position:relative;height:0;padding-bottom:56.25%"><iframe src="https://www.youtube.com/embed/CCql9JInTBc?rel=0&amp;controls=0?ecver=2" width="640" height="360" frameborder="0" style="position:absolute;width:100%;height:100%;left:0" allowfullscreen></iframe></div>
