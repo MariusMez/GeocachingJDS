@@ -374,8 +374,6 @@ var computeScoreForGeocacheur = function(email) {
             var mylogs = values[1];
             var tbLogs = values[2];
             var tbOwned = values[3];
-            console.log("tb trouvé :" + tbOwned.id)
-            console.log("iciiiii");
 
             var scoreCaches = { found:0, FTF:0, STF:0, TTF:0, ScoreFTF:0, ScoreDT:0, ScoreFound:0, total:0, caches:[]};
             var scoreTb = { newVisits:0, newTbs:0, missions:0, total:0, tbs: {}};
@@ -383,26 +381,24 @@ var computeScoreForGeocacheur = function(email) {
 
             // logs caches
             mylogs.forEach(function(log) {
-                //console.log(email+ " logged cache with Difficulty " + log.get("Geocache").get("Difficulty")); 
-
                 var cache = {id: log.get("Geocache").id, name: log.get("Geocache").get("Nom"), diff: log.get("Geocache").get("Difficulty"), terrain: log.get("Geocache").get("Terrain") };
                 scoreCaches.ScoreDT = scoreCaches.ScoreDT + log.get("Geocache").get("Difficulty") + log.get("Geocache").get("Terrain");
                 scoreCaches.found = scoreCaches.found + 1;
                 scoreCaches.ScoreFound = scoreCaches.ScoreFound + nbPointsFoundIt;
                 if (log.get("FTF") > 0) {
-                    cache.ftf = "FTF";
+                    cache.ftf = "🥇 FTF";
                     scoreCaches.FTF = scoreCaches.FTF + 1;
                     scoreCaches.ScoreFTF = scoreCaches.ScoreFTF + nbPointsFTF;
                 } else if (log.get("STF") > 0) {
-                    cache.ftf = "STF";
+                    cache.ftf = "🥈 STF";
                     scoreCaches.STF = scoreCaches.STF + 1;
                     scoreCaches.ScoreFTF = scoreCaches.ScoreFTF + nbPointsSTF;
                 } else if (log.get("TTF") > 0) {
-                    cache.ftf = "TTF";
+                    cache.ftf = "🥉 TTF";
                     scoreCaches.TTF = scoreCaches.TTF + 1;
                     scoreCaches.ScoreFTF = scoreCaches.ScoreFTF + nbPointsTTF;
                 } else {
-                    cache.ftf = "pas dans le top 3";
+                    cache.ftf = "Pas dans le top 3";
                 }
 
                 //console.log(cache);
@@ -411,33 +407,31 @@ var computeScoreForGeocacheur = function(email) {
 
             // TB 
             tbLogs.forEach(function(log) {
-            var tb = {id : log.get("Travelbug").id, name: log.get("Travelbug").get("Name")}
+                var tb = {id : log.get("Travelbug").id, name: log.get("Travelbug").get("Name")}
 
+                if (scoreTb.tbs[tb.id] == undefined) {
+                    //premiere visite?
+                    if (log.get("NewCache") > 0) {
+                        tb.newCache = "Premiere visite dans " + log.get("cacheName");
+                    } else {
+                        tb.newCache = "Pas une premiere visite de la cache " + log.get("cacheName");
+                    }
+                    scoreTb.newVisits = scoreTb.newVisits + log.get("NewCache");
 
-            if (scoreTb.tbs[tb.id] == undefined) {
-            // premiere visite
-            //premiere visite?
-            if (log.get("NewCache") > 0) {
-                tb.newCache = "Premiere visite dans " + log.get("cacheName");
-            } else {
-                tb.newCache = "Pas une premiere visite de la cache " + log.get("cacheName");
-            }
-            scoreTb.newVisits = scoreTb.newVisits + log.get("NewCache");
+                    // mission
+                    if (log.get("Mission") != undefined && log.get("Mission") == "1") {
+                        scoreTb.missions = scoreTb.missions + 1*log.get("Mission");   
+                        tb.mission = "✔️ Réalisée";                      
+                    } else {
+                        tb.mission = "❌ Non réalisée";
+                    }
 
-            // mission
-            if (log.get("Mission") != undefined && log.get("Mission") == "1") {
-                scoreTb.missions = scoreTb.missions + 1*log.get("Mission");   
-                tb.mission = "Réalisée";                      
-            } else {
-                tb.mission = "Non réalisée";
-            }
-
-            tb.visites = 1;
-            scoreTb.newTbs = scoreTb.newTbs + log.get("NewTB");
-            scoreTb.tbs[tb.id] = tb;
-            } else {
-                scoreTb.tbs[tb.id].visites = scoreTb.tbs[tb.id].visites + 1;
-            }       
+                    tb.visites = 1;
+                    scoreTb.newTbs = scoreTb.newTbs + log.get("NewTB");
+                    scoreTb.tbs[tb.id] = tb;
+                } else {
+                    scoreTb.tbs[tb.id].visites = scoreTb.tbs[tb.id].visites + 1;
+                }       
 
             }); 
 
@@ -453,7 +447,6 @@ var computeScoreForGeocacheur = function(email) {
 
                         if (scoreMyTb.drops[drop.email] == undefined) {
                             // on prend que le premier log par qqun du tb
-
                             scoreMyTb.moves = scoreMyTb.moves + nbPointsTBOwnerByMove;
                             scoreMyTb.fav = scoreMyTb.fav + log.get("Fav") * nbPointsFavTB; 
                             scoreMyTb.drops[drop.email] = drop;
@@ -466,8 +459,6 @@ var computeScoreForGeocacheur = function(email) {
                     scoreMyTb.total = scoreMyTb.moves + scoreMyTb.fav;
 
                     var result = {geocacheur:geocacheur, scoreCaches: scoreCaches, scoreTb: scoreTb, scoreMyTb: scoreMyTb};
-                    //console.log(result);
-
 
                     promise.resolve(result);
 

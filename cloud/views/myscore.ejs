@@ -13,10 +13,7 @@
 		<div id="content" class="container">
 			<section>
 				<header class="major">
-					<h2>Situation de <i><%= pseudo %></i>  </h2>
-					<h7>Email : <%= email %> </h7>
-					<p/>
-					<h7>Score total : <%= scoresCache.total + scoreMyTb.total + scoreTb.total %> </h7>
+					<h2>Score total de <i><%= pseudo %></i> : <%= scoresCache.total + scoreMyTb.total + scoreTb.total %></h2>
 				</header>
 
 				<h2>Mes caches trouvées : <%= scoresCache.total  %> </h2>
@@ -57,7 +54,7 @@
 						<tr>
 							<th colspan=1><b>Objet</b></th>
 							<th colspan=1><b>Mission</b></th>
-							<th colspan=1><b>Premiere visite de cache</b></th>
+							<th colspan=1><b>Première visite de cache</b></th>
 							<th colspan=3><b>Nombre de drop</b></th>
 						</tr>
 					</thead>
@@ -86,7 +83,7 @@
 				<ul>
 					<li>Mon objet : <a href="/tb?id=<%= mytb.id %>"><b> <%= mytb.name %></b></a></li>
 					<li>Nombre de drop de mon objet : <b><%- scoreMyTb.totalMoves %></b></li>
-					<li>Déplacements de mon objet (<i>2 points par participant different</i>) : <b><%- scoreMyTb.moves %></b></li>
+					<li>Déplacements de mon objet (<i>2 points par participant différent</i>) : <b><%- scoreMyTb.moves %></b></li>
 					<li>Point favori de mon objet (<i>2 points par favori par participant</i>) : <b><%- scoreMyTb.fav %></b></li>
 					
 				</ul>
