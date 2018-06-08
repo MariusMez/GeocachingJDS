@@ -1,0 +1,48 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>PHOTOS DE LA COURSE AUX OBJETS VOYAGEURS - Géocaching Jeux de Sophia 2018</title>
+	<% include ./partials/head %>
+</head>
+<body>
+
+	<% include ./partials/menu %>
+	
+	<div id="main" class="wrapper style4">
+
+		<div id="intro" class="container">
+			<section>
+				<header class="major">
+					<h2>Toutes les photos de la course</h2>
+					<span class="byline">Photos des Logs des Objets Voyageurs</span>				
+				</header>
+
+				<div style="display:flex; flex-wrap:wrap; justify-content:space-evenly; align-items: baseline;" class="clearfix">
+					<% logs.forEach(function(log) { %>
+						<div style="margin-right: 50px; margin-bottom: 15px; text-align: center;">
+							<a href="<%= log.get("Photo").url().replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, '') %>">
+								<img width="250px;" class="border" src="<%= log.get("Photo").url().replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, '') %>" />
+							</a>
+							<p>
+								<a href="/tb?id=<%= log.get("Travelbug").id %>"><b><%= log.get("TravelbugName") %></b></a>
+								<br> 
+								<i><%= log.get("Pseudo") %></i>
+							</p>
+						</div>
+					<% }); %>
+				</div>
+
+				<%  for (var i = 1; i <= pages; i++) { 
+				    if(page==i) { %>
+						&raquo; Page <%= i %>&nbsp;&nbsp;
+					<% } else { %>
+						<a href="/photostbs?page=<%= i %>">Page <%= i %></a>&nbsp;&nbsp;
+					<% } %>
+				<% } %>
+
+			</section>
+		</div>
+	</div>
+	<% include ./partials/footer %>
+</body>
+</html>

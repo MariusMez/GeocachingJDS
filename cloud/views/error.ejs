@@ -1,0 +1,36 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>ERROR PAGE - Geocaching Jeux de Sophia 2018</title>
+	<% include ./partials/head %>
+</head>
+<body class="homepage">
+	<div class="wrapper style1">
+		<div id="header">
+			<div class="container">
+				<h1><a href="/" id="logo">Géocaching</a></h1>
+				<nav id="nav">
+					<ul>
+						<li><a href="/">Accueil</a></li>
+					</ul>
+				</nav>
+			</div>
+		</div>
+	</div>
+
+	<div class="wrapper style3">
+		<section class="container">
+			<header class="major">
+				<h2><%- message %></h2>
+			</header>
+			<a href="javascript:history.go(-1)" class="button alt">Retour</a>
+		</section>
+	</div>
+	<div id="footer">
+		<ul class="icons">
+			Un problème ? <br> Contactez-nous : 
+			<li><a href="mailto:geocaching@jeuxdesophia.com?subject=<%= message %>" class="fa fa-envelope"><span>Email</span></a></li>
+		</ul>
+	</div>
+</body>
+</html>

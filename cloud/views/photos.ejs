@@ -1,58 +1,46 @@
-	<!DOCTYPE HTML>
-	<html>
-	<head>
-		<title>PHOTOS DE LA COURSE AUX ICONES - Géocaching Jeux de Sophia 2017</title>
-		<% include ./partials/head %>
-		<link rel="stylesheet" href="css/grid.css" />
-	</head>
-	<body>
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>PHOTOS DES LOG DES CACHES - Géocaching Jeux de Sophia 2018</title>
+	<% include ./partials/head %>
+</head>
+<body>
+	<% include ./partials/menu %>
+	<div id="main" class="wrapper style4">
 
-		<div class="wrapper style1">
+		<div id="intro" class="container">
+			<section>
+				<header class="major">
+					<h2>Toutes les photos de l'épreuve</h2>
+					<span class="byline">A vous de jouer, les caches sont accessibles 7j/7 et 24h/24 !</span>				
+				</header>
 
-			<div id="header">
-				<div class="container">
-
-					<h1><a href="/" id="logo">Géocaching</a></h1>
-
-					<nav id="nav">
-						<ul>
-							<li><a href="/">Accueil</a></li>
-							<li class="active"><a href="/geocaches">Les Caches à trouver</a></li>
-							<li><a href="/geocaching">Règles du jeu</a></li>
-							<li><a href="/tools">Les Outils</a></li>
-							<li><a href="/ranking">Classement</a></li>
-						</ul>
-					</nav>
-
-				</div>
-			</div>
-		</div>
-
-		<div id="main" class="wrapper style4">
-
-			<div id="intro" class="container">
-				<section>
-					<header class="major">
-						<h2>Toutes les photos de l'épreuve</h2>
-						<span class="byline">A vous de jouer, les caches sont accessibles 7j/7 et 24h/24 !</span>				
-					</header>
-
-					<div id="gridsalv" data-columns>
-
-						<% logs.forEach(function(log) { %>
-
-						<div>
-							<a href="<%= log.get("PhotoUrl") %>"><img width="250px;" class="border" src="<%= log.get("PhotoUrl") %>" /><p class="medium"><%= log.get("Geocache").get("Nom") %> - <b><%= log.get("Pseudo") %></b></p>
+				<div style="display:flex; flex-wrap:wrap; justify-content:space-evenly; align-items: baseline;" class="clearfix">
+					<% logs.forEach(function(log) { %>
+						<div style="margin-right: 50px; margin-bottom: 15px; text-align: center;">
+							<a href="<%= log.get("Photo").url().replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, '') %>">
+								<img width="250px;" class="border" src="<%= log.get("Photo").url().replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, '') %>" />
 							</a>
+							<p>
+								<a href="/geocache?id=<%= log.get("Geocache").id %>"><b><%= log.get("Geocache").get("Nom") %></b></a>
+								<br>
+								<i><%= log.get("Pseudo") %></i>
+							</p>
 						</div>
-						<% }); %>
+					<% }); %>
+				</div>
 
-					</div>
-				</section>
-			</div>
+				<%  for (var i = 1; i <= pages; i++) { 
+				    if(page==i) { %>
+						&raquo; Page <%= i %>&nbsp;&nbsp;
+					<% } else { %>
+						<a href="/photoscaches?page=<%= i %>">Page <%= i %></a>&nbsp;&nbsp;
+					<% } %>
+				<% } %>
+
+			</section>
 		</div>
-
-		<% include ./partials/footer %>
-		<script src="public/js/salvattore.min.js"></script>
-	</body>
-	</html>
+	</div>
+	<% include ./partials/footer %>
+</body>
+</html>

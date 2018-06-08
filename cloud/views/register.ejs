@@ -1,0 +1,61 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>REGISTER TB - Geocaching Jeux de Sophia 2018</title>
+	<% include ./partials/head %>
+</head>
+<body class="homepage">
+	<% include ./partials/menu %>
+
+	<div class="wrapper style3">
+		<section class="container">
+			<header class="major">
+				<h2>Enregistrement de votre Objet Voyageur</h2>
+			</header>
+			<form ref="uploadForm" id="uploadForm" method="post" action="/registerTb" encType="multipart/form-data">
+				
+				<label for="name"><b>Nom</b> de votre objet</label>
+				<input type="text" size="50" maxlength="50" name="name" id="name" value="" style="border: solid 1px #fff;" placeholder="Le nom sera visible sur le site" required/>
+				<br>
+				<label for="code"><b>Code de suivi</b> situé sur le tag en bois à attacher à votre objet, à récupérer <a href="/geocache?id=SAg9v68wGD" style="color: white;">ici</a></label>
+				<input type="text" size="4" maxlength="4" name="code" id="code" value="" style="border: solid 1px #fff;" placeholder="Le code ne sera pas visible sur le site mais il permet d'identifier uniquement l'objet au moment des voyages" required/>
+				<br>
+				
+				<label for="description"><b>Description</b> de votre objet</label>
+				<input type="text" name="description" id="description" value="" style="border: solid 1px #fff; " placeholder="La description sera visible sur le site" maxlength="1000" required/>
+				<br>
+				
+				<label for="email"><b>Email</b> des Jeux de Sophia - <i>Nécessaire pour vous identifier, ne sera pas visible sur le site</i></label>
+				<input type="email" name="email" id="email" value="" style="border: solid 1px #fff;" placeholder="L'email ne sera pas visible sur le site" required/>
+				<br>
+				<label for="pseudo"><b>Pseudo</b> pour l'épreuve Géocaching - <i>Sera affiché sur le site pour vous représenter</i></label>
+				<input type="text" name="pseudo" id="pseudo" value="" style="border: solid 1px #fff;" placeholder="Ce pseudo sera visible sur le site" required/>
+				<br>
+				<label for="mission"><b>🚀 La mission de votre Objet Voyageur</b></label>
+				<div><i>Veillez à bien choisir la mission pour qu'elle soit réalisable par les participants par le biais de photos. <br>Pensez à quelque chose de faisable et de rigolo pour le plus grand plaisir de tous. Voici quelques exemples : </i><br> 
+				<ul>
+					<li>- Etre pris en photo avec un membre du Staff des JDS</li> 
+					<li>- Parcourir une distance cumulé de plus de 100km<li> 
+					<li>- Prendre une photo en train de lui faire un bisou, ...</li>  
+				</ul>
+				</div>
+				<input type="text" name="mission" id="mission" value="" style="border: solid 1px #fff;" placeholder="Mission personnelle que vous choisissez, assurez-vous quelle soit réalisable dans le cadre de l'épreuve" maxlength="500" required/>
+				<br>		
+
+				<label for="pic">Une <b>photo de votre objet</b> le code de suivi ne doit pas être visible (<i>sera visible sur le site</i>) : </label>
+				<input type="file" name="pic" id="pic" accept="image/*" required>
+				<br>
+	
+			    <br><input type="submit" value="Enregistrer" name="submit" class="button alt" id="submitButton" title="Clic ici pour donner vie à ton Objet Voyageur" />
+			    <br><br>	
+			    <p>⚠️ Une fois l'objet enregistré vous ne pourrez le modifier qu'en nous contactant, assurez-vous que tout vous convient avant de cliquer sur enregistrer.</p>			
+			</form>  				 
+		</section>
+	</div>
+	<div id="footer">
+		<ul class="icons">
+			<h5>Un problème avec l'enregistement de votre objet ?</h5> <br> Contactez-nous : <li><a href="mailto:geocaching@jeuxdesophia.com" class="fa fa-envelope"><span>Email</span></a></li>
+		</ul>
+	</div>
+</body>
+</html>

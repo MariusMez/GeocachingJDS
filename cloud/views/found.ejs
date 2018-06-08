@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-	<title>FOUND - Geocaching Jeux de Sophia 2017</title>
+	<title>FOUND - Geocaching Jeux de Sophia 2018</title>
 	<% include ./partials/head %>
 </head>
 <body class="homepage">
@@ -14,24 +14,61 @@
 						<li><a href="/">Accueil</a></li>
 					</ul>
 				</nav>
-
 			</div>
 		</div>
-
 	</div>
 
 	<div class="wrapper style3">
 		<section class="container">
 			<header class="major">
-			<h2><%- message %></h2>
+				<h2><%- message %></h2>
 			</header>
-			<a href="/geocache?id=<%= cacheid %>" class="button alt">Retour</a>
 		</section>
-	</div>
 
+		<% if( cat=='TRADI' || cat=='MULTI' || cat=='LETTERBOX' || cat=='EVENT' || cat=='CITO' || cat=='MYSTERY' || cat=='WHERIGO' ) { %>
+			<section>
+			<% if(tbsout.length == 0)  { %>
+				<p class="medium"><b>Il n'y a pas d'objet dans cette cache.</b></p>
+			<% } else { %>
+				<p class="medium"><b>Vous pouvez récupérer un des objets suivants :</b></p>
+				<ul>
+				<% tbsout.forEach(function(obj) { %>
+					<li style="margin-bottom: 8px;">
+						<a href="/tb?id=<%= obj.id %>" style="color:white; font-size: 1.5em; margin-right: 20px;">
+							<img class="image" width="80px;" style="margin-right: 10px;" src="<%= obj.get("Photo").url().replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, ''); %>" />
+							<b><%= obj.get("Name") %></b>
+						</a>
+						<a href="/logtb?action=grab&id=<%= obj.id %>&cacheId=<%= cacheid %>&geocacheurId=<%= geocacheurId %>" class="button small alt">Récuperez le !</a>
+						<br>
+					</li>
+				<% }); %>
+				</ul>
+			<% } %>
+			<br>
+			<% if(tbsin.length == 0)  { %>
+				<p class="medium"><b>Vous ne possédez pas d'objet à déposer dans cette cache.</b></p>
+			<% } else { %>
+				<p class="medium"><b>Vous pouvez y déposer un des objets suivants :</b></p>
+				<ul>
+				<% tbsin.forEach(function(obj) { %>
+					<li>
+						<a href="/tb?id=<%= obj.id %>" style="color:white; font-size: 1.5em; margin-right: 20px;">
+							<img class="image" width="80px;" style="margin-right: 10px;" src="<%= obj.get("Photo").url().replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, ''); %>" />
+							<b><%= obj.get("Name") %></b>
+						</a> 
+						 <a href="/logtb?action=drop&id=<%= obj.id %>&cacheId=<%= cacheid %>&geocacheurId=<%= geocacheurId %>" class="button small alt">Déposez le !</a>
+						 <br>
+					</li>
+				<% }); %>
+				</ul>
+			<% } %>
+			</section>
+			<br><br>
+		<% } %>
+
+		<a href="/geocache?id=<%= cacheid %>" class="button alt">Visualiser la cache</a>
+	</div>
 	<div id="footer">
-
 	</div>
-
 </body>
 </html>

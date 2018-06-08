@@ -1,0 +1,47 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>FLASH IT - Geocaching Jeux de Sophia 2018</title>
+	<% include ./partials/head %>
+</head>
+<body class="homepage">
+	<div class="wrapper style1">
+
+		<div id="header">
+			<div class="container">
+
+				<h1><a href="/" id="logo">LOGBOOK</a></h1>
+
+				<nav id="nav">
+					<ul>
+						<li><a href="/">Accueil</a></li>
+					</ul>
+				</nav>
+
+			</div>
+		</div>
+	</div>
+
+	<div class="wrapper style3">
+		<section class="container">
+			<header class="major">
+				<h2><%= nom %></h2>
+			</header>
+			<form ref="uploadForm" id="uploadForm" method="post" action="/flash">
+				<input type="hidden" name="code" id="code" value="<%= code %>" />
+
+				Votre Email des Jeux de Sophia - <i>Nécessaire pour vous identifier</i>
+				<input type="email" name="email" id="email" value="" style="border: solid 1px #fff;" placeholder="L'email ne sera pas visible sur le site" required/>
+				<br>
+				<br><br><input type="submit" value="Continuer" name="submit" class="button alt" id="submitButton" title="Clic ici pour continuer" />
+				
+			</form>  				 
+		</section>
+	</div>
+	<div id="footer">
+		<ul class="icons">
+			Un problème avec cette cache ? <br> Contactez-nous : <li><a href="mailto:geocaching@jeuxdesophia.com?subject=FlashIt de la cache <%= nom %>" class="fa fa-envelope"><span>Email</span></a></li>
+		</ul>
+	</div>
+</body>
+</html>

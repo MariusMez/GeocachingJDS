@@ -1,23 +1,19 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-	<title>FOUND IT - Geocaching Jeux de Sophia 2017</title>
+	<title>FOUND IT - Geocaching Jeux de Sophia 2018</title>
 	<% include ./partials/head %>
 </head>
 <body class="homepage">
 	<div class="wrapper style1">
-
 		<div id="header">
 			<div class="container">
-
 				<h1><a href="/" id="logo">Géocaching</a></h1>
-
 				<nav id="nav">
 					<ul>
 						<li><a href="/">Accueil</a></li>
 					</ul>
 				</nav>
-
 			</div>
 		</div>
 	</div>
@@ -25,16 +21,14 @@
 	<div class="wrapper style3">
 		<section class="container">
 			<header class="major">
-				<h2><%= nom %></h2>
+				<h2>Créer un log pour la cache "<%= nom %>"</h2>
 			</header>
 			<form ref="uploadForm" id="uploadForm" method="post" action="/found" encType="multipart/form-data">
 				<input type="hidden" name="id" id="<%= id %>" value="<%= id %>" />
 
-				Votre Email des Jeux de Sophia - <i>Nécessaire au classement de l'épreuve</i>
-				<input type="email" name="email" id="email" value="" style="border: solid 1px #fff;" placeholder="L'email ne sera pas visible sur le site" required/>
+				<input type="hidden" type="email" name="email" id="email" value="<%= email %>" style="border: solid 1px #fff;" placeholder="L'email ne sera pas visible sur le site" required/>
 				<br>
-				Votre Pseudo pour l'épreuve Géocaching
-				<input type="text" name="name" id="name" value="" style="border: solid 1px #fff;" placeholder="Ce pseudo sera visible sur le site" required/>
+				<input type="hidden" type="text" name="name" id="name" value="<%= pseudo %>" style="border: solid 1px #fff;" placeholder="Ce pseudo sera visible sur le site" required/>
 				<br>
 				Un petit Message pour partager votre découverte
 				<input type="text" name="message" id="message" value="" style="border: solid 1px #fff;" placeholder="Ce Message sera visible sur le site" maxlength="500" required/>
@@ -48,7 +42,7 @@
 
 				<br>
 				Si vous avez apprécié découvrir cette cache, attribuez lui un point favori en cochant cette case : 
-				<input type="checkbox" name="fav" value="true" />				
+				<input type="checkbox" name="fav" value="true" /> 👍
 
 				<br><br><input type="submit" value="J'ai trouvé !" name="submit" class="button alt" id="submitButton" title="Clic ici pour envoyer la trouvaille" />
 				

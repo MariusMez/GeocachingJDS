@@ -1,0 +1,79 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>FOUND IT TRAVEL BUG - Geocaching Jeux de Sophia 2018</title>
+	<% include ./partials/head %>
+</head>
+<body class="homepage">
+	<div class="wrapper style1">
+		<div id="header">
+			<div class="container">
+				<h1><a href="/" id="logo">Géocaching</a></h1>
+				<nav id="nav">
+					<ul>
+						<li><a href="/tb?id=<%= id %>">Retour</a></li>
+					</ul>
+				</nav>
+			</div>
+		</div>
+	</div>
+
+	<div class="wrapper style3">
+		<section class="container">
+			<header class="major">
+				<h2><%= action %> de l'objet <a href="/tb?id=<%= id %>"> <%= nom %></a></h2>
+				<br>
+				<h4>Mission : <%= mission %></h4>
+			</header>
+			<form ref="uploadForm" id="uploadForm" method="post" action="/foundtb" encType="multipart/form-data">
+				<input type="hidden" name="id" id="<%= id %>" value="<%= id %>" />
+				<select name="action" hidden>
+					<option value="drop" <% if(action=='drop') { %> selected <% } %> >Déposer dans une géocache</option>
+ 					<option value="grab" <% if(action=='grab') { %> selected <% } %> >Prendre d'une géocache</option>
+				</select>
+				<br>
+				Géocache concernée : 
+				<select name="geocache">
+				    <% geocaches.forEach(function(cache) { %>
+				    	<option value="<%= cache.id %>"><%= cache.get("Nom") %></option>
+					<% }); %>
+				</select>
+				<br>
+				<br>
+				Code de suivi de l'Objet Voyageur
+				<input type="text" name="tracking" id="tracking" value="" style="border: solid 1px #fff;" placeholder="Ce numéro est inscrit ou attaché sur l'objet voyageur" size="4" maxlength="4" required/>
+				<br>
+				<% if(action=='drop') { %>
+					Un petit Message pour partager votre découverte avec le propriétaire de cet objet
+					<input type="text" name="message" id="message" value="" style="border: solid 1px #fff;" placeholder="Ce Message sera visible sur le site" maxlength="500" required/>
+					<br>		
+					Une photo souvenir (sera visible sur le site) pour aider à accomplir la mission de l'objet - ⚠️ Le code de suivi ne doit pas être visible
+					<input type="file" name="pic" id="pic" accept="image/*">
+					<br>
+					<br>
+					Si vous avez apprécié découvrir cet objet, attribuez lui un point favori en cochant cette case : 
+					<input type="checkbox" name="fav" value="true" /> 👍
+				<% } %>
+				<br>
+				<% if(email == "" ) { %>
+				Votre Email des Jeux de Sophia - <i>Nécessaire au classement de l'épreuve</i>
+				<% } %>
+				<input <% if(email != "" ) { %>  type="hidden" <% } %>  type="email" name="email" id="email" value="<%= email %>" style="border: solid 1px #fff;" placeholder="L'email ne sera pas visible sur le site" required/>
+				<br>
+				<% if(pseudo == "" ) { %>
+				Votre Pseudo pour l'épreuve Géocaching
+				<% } %>
+				<input <% if(pseudo != "" ) { %>  type="hidden" <% } %> type="text" name="name" id="name" value="<%= pseudo %>" style="border: solid 1px #fff;" placeholder="Ce pseudo sera visible sur le site" required/>
+				<br>
+				<br>
+				<input type="submit" value="Envoyer" name="submit" class="button alt" id="submitButton" title="Clic ici pour envoyer la découverte" />
+			</form>  				 
+		</section>
+	</div>
+	<div id="footer">
+		<ul class="icons">
+			Un problème avec cet objet voyageur ? <br> Contactez-nous : <li><a href="mailto:geocaching@jeuxdesophia.com?subject=FoundIt de l'objet voyageur <%= nom %>" class="fa fa-envelope"><span>Email</span></a></li>
+		</ul>
+	</div>
+</body>
+</html>

@@ -1,173 +1,189 @@
-	<!DOCTYPE HTML>
-	<html>
-	<head>
-		<title>LISTE DES CACHES - Géocaching Jeux de Sophia 2017</title>
-		<% include ./partials/head %>
-		<link rel="stylesheet" href="css/grid.css" />
-	</head>
-	<body>
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>LISTE DES CACHES - Géocaching Jeux de Sophia 2018</title>
+	<% include ./partials/head %>
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" />
+	<script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"></script>
+</head>
+<body>
 
-		<div class="wrapper style1">
+	<div class="wrapper style1">
 
-			<div id="header">
-				<div class="container">
+		<div id="header">
+			<div class="container">
 
-					<h1><a href="/" id="logo">Géocaching</a></h1>
+				<h1><a href="/" id="logo">Géocaching</a></h1>
 
-					<nav id="nav">
-						<ul>
-							<li><a href="/">Accueil</a></li>
-							<li class="active"><a href="/geocaches">Les Caches à trouver</a></li>
-							<li><a href="/geocaching">Règles du jeu</a></li>
-							<li><a href="/tools">Les Outils</a></li>
-							<li><a href="/ranking">Classement</a></li>
-						</ul>
-					</nav>
+				<nav id="nav">
+					<ul>
+						<li><a href="/">Accueil</a></li>
+						<li class="active"><a href="/geocaches">Géocaches</a></li>
+						<li><a href="/tbs">Objets Voyageurs</a></li>
+						<li><a href="/geocaching">Règles du jeu</a></li>
+						<li><a href="/tools">Outils</a></li>
+						<li><a href="/ranking">Classement</a></li>
+					</ul>
+				</nav>
 
-				</div>
 			</div>
 		</div>
+	</div>
 
-		<div id="main" class="wrapper style4">
+	<div id="main" class="wrapper style4">
 
-			<div id="intro" class="container">
-				<section>
-					<header class="major">
-						<h2>La course aux icônes, c'est parti !</h2>
-						<span class="byline">A vous de jouer, les caches sont accessibles 7j/7 et 24h/24 !</span>
-						<br>
-
-						<!-- <script language="JavaScript">
-							TargetDate = "05/29/2017 06:00 PM";
-							BackColor = "none";
-							ForeColor = "none";
-							CountActive = true;
-							CountStepper = -1;
-							LeadingZero = true;
-							DisplayFormat = "Lancement de la course aux icones dans %%D%% Jours, %%H%% Heures, %%M%% Minutes, %%S%% Secondes";
-							FinishMessage = "C'est parti !";
-						</script>
-						<script language="JavaScript" src="public/js/compteur.js"></script>
-
-						-->
-						<img src="public/images/course_aux_icones.jpg" alt="La Course aux Icones">
+		<div id="intro" class="container">
+			<section>
+				<header class="major">
+				<% if (!start) { %>
+					<h2>Entrez dans la Course aux Objets Voyageurs !</h2>
+					<span class="byline">🏁 A vous de jouer, les caches sont accessibles 7j/7 et 24h/24 !</span>
+					<br>
+				<% } else { %>
+					<script language="JavaScript">
+						TargetDate = "06/09/2018 00:00 AM";
+						BackColor = "none";
+						ForeColor = "none";
+						CountActive = true;
+						CountStepper = -1;
+						LeadingZero = true;
+						DisplayFormat = "<h3>🏁 La Course se termine dans %%D%% Jours, %%H%% Heures, %%M%% Minutes, %%S%% Secondes</h3>";
+						FinishMessage = "<h2>C'est fini !</h2>";
+					</script>
+					<script language="JavaScript" src="public/js/compteur.js"></script>
+					<!-- <br><br>
+					<img src="public/images/course_aux_objets_voyageurs.jpg" alt="La Course aux Objets Voyageurs"> -->
 						<!--<br>
 						<h2>Prochaine publication le 7 juin à 22h, soyez prêt ;-)</h2>
-					<div style="position:relative;height:0;padding-bottom:56.25%"><iframe src="https://www.youtube.com/embed/CCql9JInTBc?rel=0&amp;controls=0?ecver=2" width="640" height="360" frameborder="0" style="position:absolute;width:100%;height:100%;left:0" allowfullscreen></iframe></div>
-					<br><br>
--->
-					</header>
+						<div style="position:relative;height:0;padding-bottom:56.25%"><iframe src="https://www.youtube.com/embed/CCql9JInTBc?rel=0&amp;controls=0?ecver=2" width="640" height="360" frameborder="0" style="position:absolute;width:100%;height:100%;left:0" allowfullscreen></iframe></div>
+						<br><br>
+						-->
+				<% } %>
+		</header>
 
-					 <div id="gridsalv" data-columns>
-
-						<% geocaches.forEach(function(geocache) { %>
-
-						<div>
-							<a href="/geocache?id=<%= geocache.id %>"><img width="220px;" class="border" src="<%= geocache.get("Photo").url() %>" /><p class="medium"><img width="40px;" align="left" src="https://www.geocaching-jds.fr/public/images/<%= geocache.get('Category') %>BIG.gif" style="margin-right:10px;"/><%= geocache.get("Nom") %></p>
-							</a>
-						</div>
-						<% }); %>
-
-					</div> 
-					
-				</section>
-				<div><p>Dernière publication pour l'épreuve : le 16 juin 2017. <br>Une Wherigo D5 vous attend : STAR. <br>Bon courage pour cette ultime et dernière étape avant la cache Challenge.</p>
-					<p>Pour en savoir plus sur les différents types de Géocaches : <a href="/geocaching#typesgeocaches">Cliquez ici</a></p></div>
+		<div style="display:flex; flex-wrap:wrap; justify-content:space-evenly; align-items: baseline;" class="clearfix">
+			<% geocaches.forEach(function(geocache) { %>
+				<div style="padding-right: 50px; padding-bottom: 15px;">
+					<a href="/geocache?id=<%= geocache.id %>">
+						<img width="220px;" class="border" src="<%= geocache.get("Photo").url().replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, ''); %>" />
+						<p style="text-align: center; width:210px; padding-top: 8px; font-size: 1.1em;">
+							<img width="40px;" style="margin-right: 10px;" align="left" src="https://www.geocaching-jds.fr/public/images/<%= geocache.get('Category') %>BIG.gif"/><b><%= geocache.get("Nom") %></b>
+						</p>
+					</a>
+				</div>
+			<% }); %>
+		</div> 
+		
+		<!--
+			<div>
+				<p>Dernière publication pour l'épreuve : le 16 juin 2017. <br>Une Wherigo D5 vous attend : STAR. <br>Bon courage pour cette ultime et dernière étape avant la cache Challenge.</p>
 			</div>
+		-->
+		<br>
+		<div>
+			<p>Pour en savoir plus sur les différents types de Géocaches : <a href="/geocaching#typesgeocaches">Cliquez ici</a>
+			<br>
+			Pour découvrir ce qu'est un Objet Voyageur et comment créer le votre : <a href="/geocaching">Cliquez ici</a></p>
 		</div>
+	</section>
 
-		<div class="wrapper style2">
+	</div>
+</div>
 
-			<div id="liste" class="container">
-				<section>
+<div class="wrapper style2">
 
-					<h2>Les derniers logs</h2>
-					<br>
-					<ul>
-						<% logs.forEach(function(log) { %>
+	<div id="liste" class="container">
+		<section>
 
-						<% if(log.get("Geocache").get("Active") == true)  { %>
-						<li><b><a href="/geocache?id=<%= log.get("Geocache").id %>"> <%= log.get("Geocache").get("Nom") %> </a> : <%= moment(log.get("Date")).utcOffset(120).fromNow() %> le <%= moment(log.get("Date")).utcOffset(120).format("LL [à] LT") %> </b>- <%= log.get("Pseudo") %> : <i><%= log.get("Message") %></i></li>
-						<% } %>
-						
-						<% }); %>
-						<li>[...]</li>
-					</ul>
+			<h2>✍️ Les derniers logs</h2>
+			<ul>
+				<% logs.forEach(function(log) { %>
 
-					<p class="medium">L'épreuve se déroule du 29 mai au 22 juin, de nouvelles caches seront publiées au fil des 15 premiers jours de juin.</p>
-					<p class="medium">La plupart de ces caches sont spécifiquement posées pour les Jeux de Sophia et sont donc par conséquent non accessibles, ni même visibles sur le site geocaching.com et les applications officielles Géocaching.com.</p>
-					<p>Des tickets de tombola seront aléatoirement placés par nos soins dans les différentes caches à découvrir.</p>
+				<% if(log.get("Geocache").get("Active") == true)  { %>
+					<li>
+						<b><a href="/geocache?id=<%= log.get("Geocache").id %>"> <%= log.get("Geocache").get("Nom") %> </a> : <%= moment(log.get("Date")).utcOffset(120).fromNow() %> le <%= moment(log.get("Date")).utcOffset(120).format("LL [à] LT") %> </b>- <%= log.get("Pseudo") %> : <i><%= log.get("Message") %></i>
+						<% if(log.get("Fav") == true)  { %> - 👍 <% } %>
+					</li>
+				<% } %>
+				
+				<% }); %>
+				<li>[...]</li>
+			</ul>
 
-				</section>
+			<p class="medium">L'épreuve se déroule du 19 mai au 8 juin, de nouvelles caches seront publiées au fil des jours.</p>
+			<p class="medium">La plupart de ces caches sont spécifiquement posées pour les Jeux de Sophia et sont donc par conséquent non accessibles, ni même visibles sur le site geocaching.com et les applications officielles Géocaching.com.</p>
+			<p>Des tickets de tombola seront aléatoirement placés par nos soins dans les différentes caches à découvrir.</p>
+			
+			<div class="clearfix">
+				<a href="/photoscaches" style="float: left;" align="left" class="button alt">📷 Galerie photos</a>
+				<a href="/ranking" style="float: right;" align="right" class="button alt">🏆 Voir le classement</a>
 			</div>
+		</section>
+	</div>
+</div>
+
+<div class="wrapper style5">
+
+	<div id="carte" class="container">
+
+		<section>
+			<header class="major">
+				<h2>Carte des emplacements</h2>
+				<span class="byline">Les coordonnées des caches de type "Mystery - ?" sont fictives, à vous de les trouver ;-) Pour certains types de géocaches "virtuelles", il n'y a aucune boite physique à trouver, seulement une "action particulière" à réaliser pour valider votre trouvaille.</span>
+			</header>
+
+
+			<div id="map"></div>
+
+			<script type="text/javascript">
+				var map = L.map('map').setView([43.624, 7.052383], 13.5);
+
+				L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+				    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+				}).addTo(map);
+
+				var LeafIcon = L.Icon.extend({
+				    options: {
+				        iconAnchor:   [12, 12],
+				        popupAnchor:  [7, -7]
+				    }
+				});
+
+				var TRADI = new LeafIcon({iconUrl: 'public/images/TRADI.gif'}),
+					MULTI = new LeafIcon({iconUrl: 'public/images/MULTI.gif'}),
+					WHERIGO = new LeafIcon({iconUrl: 'public/images/WHERIGO.gif'}),
+					VIRTUAL = new LeafIcon({iconUrl: 'public/images/VIRTUAL.gif'}),
+					EARTHCACHE = new LeafIcon({iconUrl: 'public/images/EARTHCACHE.gif'}),
+					LETTERBOX = new LeafIcon({iconUrl: 'public/images/LETTERBOX.gif'}),
+					EVENT = new LeafIcon({iconUrl: 'public/images/EVENT.gif'}),
+					SPECIAL = new LeafIcon({iconUrl: 'public/images/SPECIAL.gif'}),
+					MULTI = new LeafIcon({iconUrl: 'public/images/MULTI.gif'}),
+					MYSTERY = new LeafIcon({iconUrl: 'public/images/MYSTERY.gif'});
+
+				var geocaches = [
+					<% geocaches.forEach(function(geocache) { %>
+						new L.LatLng(<%= geocache.get("GPS").latitude %>, <%= geocache.get("GPS").longitude %>),
+					<% }); %>
+				];
+
+				<% geocaches.forEach(function(geocache) { %>
+					L.marker([<%= geocache.get("GPS").latitude %>, <%= geocache.get("GPS").longitude %>], {icon: <%= geocache.get("Category") %>}).addTo(map).bindPopup('<h3 style="color:#83B348;"><a href="/geocache?id=<%= geocache.id %>"><%= geocache.get("Nom") %></a></h3>');
+				<% }); %>
+
+				L.control.scale().addTo(map);
+
+				var bounds = new L.LatLngBounds(geocaches);
+				map.fitBounds(bounds, {padding: [50, 50]});
+
+			</script>
+
+			<br><br>
+			<a href="/ranking" class="button alt">🏆 Voir le classement</a>
+
+			</section>
 		</div>
+	</div>
 
-		<div class="wrapper style5">
-
-			<div id="carte" class="container">
-
-				<section>
-					<header class="major">
-						<h2>Carte des emplacements</h2>
-						<span class="byline">Les coordonnées des caches de type "Mystery - ?" sont fictives, à vous de les trouver ;-) Pour certains types de géocaches "virtuelles", il n'y a aucune boite physique à trouver, seulement une "action particulière" à réaliser pour valider votre trouvaille.</span>
-					</header>
-
-
-					<div id="map"></div>
-
-					<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBfOPPHsPEYs7o8-xdYce1Bdxgmh-4TBAc&callback=initialize"
-					type="text/javascript"></script>
-
-					<script>
-						locations = [
-
-						<% geocaches.forEach(function(geocache) { %>
-							[<%= geocache.get("GPS").latitude %>,<%= geocache.get("GPS").longitude %>, "<%= geocache.get("Nom") %>","<%= geocache.get("Category") %>"],
-							<% }); %>
-							
-
-						//[43.6131,7.06354, "Mystery", "MYSTERY"]
-						];
-
-						function initialize() {
-							map = new google.maps.Map(document.getElementById("map"), {
-								mapTypeId: google.maps.MapTypeId.ROADMAP,
-								center: new google.maps.LatLng(locations[0][0], locations[0][1]),
-								zoom: 10
-							});
-
-							for (var i=0; i<locations.length; i++) {
-								
-								var mytext = 'Infowindow contents in HTML'
-								var myinfowindow = new google.maps.InfoWindow({
-									content: '<h3 style="color:#83B348;">'+locations[i][2]+'</h3>'
-								});
-
-								var marker = new google.maps.Marker({
-									position: new google.maps.LatLng(locations[i][0], locations[i][1]),
-									map: map,
-									title: locations[i][2],
-									infowindow: myinfowindow,
-									icon: 'images/'+locations[i][3]+'.gif'
-								});
-								
-								google.maps.event.addListener(marker, 'click', function () {
-									this.infowindow.open(map, this);
-								});
-							}
-							setBoundsLeftSidebar(locations, 0.9);
-						}
-
-					</script>
-					<br>
-					<br>
-					<a href="/ranking" class="button alt">Voir le classement</a>
-
-				</section>
-			</div>
-		</div>
-
-		<% include ./partials/footer %>
-		<script src="public/js/salvattore.min.js"></script>
-	</body>
-	</html>
+	<% include ./partials/footer %>
+</body>
+</html>

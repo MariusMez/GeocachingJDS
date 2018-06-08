@@ -1,0 +1,91 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>LISTE DES OBJETS - Géocaching Jeux de Sophia 2018</title>
+	<% include ./partials/head %>
+	<link rel="stylesheet" href="public/css/style-table.css" />
+</head>
+<body>
+
+	<div class="wrapper style1">
+		<div id="header">
+			<div class="container">
+				<h1><a href="/" id="logo">Géocaching</a></h1>
+				<nav id="nav">
+					<ul>
+						<li><a href="/">Accueil</a></li>
+						<li><a href="/geocaches">Géocaches</a></li>
+						<li class="active"><a href="/tbs">Objets Voyageurs</a></li>
+						<li><a href="/geocaching">Règles du jeu</a></li>
+						<li><a href="/tools">Outils</a></li>
+						<li><a href="/ranking">Classement</a></li>
+					</ul>
+				</nav>
+			</div>
+		</div>
+	</div>
+
+	<div id="main" class="wrapper style4">
+		<div id="intro" class="container">
+			<% if (missing.length > 0) { %>
+				<section>
+					<div style="position: relative; padding: 0.75rem 1.25rem;margin-bottom: 1rem;border: 1px solid transparent;border-radius: 0.25rem;color: #721c24;background-color: #f8d7da;border-color: #f5c6cb;">
+	  					<strong>Alerte enlèvement !</strong>  Merci de régulariser la situation de <% missing.forEach(function(tb) { %> <a href="/tb?id=<%= tb.id %>"><b style="text-transform: capitalize;"><%= tb.get("Name") %></b></a> <% }); %>
+					</div>
+				</section>
+			<% } %>
+			<section>
+				<img width="120px;" align="left" src="public/images/dwarf-racing.png" style="margin-right:60px;"/>
+				<h2><%= tbs.length %> Objets Voyageurs dans la course !</h2>
+				<span class="byline">
+					Important : <b>les codes de suivi ne doivent pas être visibles sur les photos</b>
+					<br>Pensez à shooter le QR code à chaque action de grab/drop d'un objet
+					<br>Vous pouvez nous envoyer par email les photos de vos missions qui ne sont pas passées
+				</span>
+				<a href="/register" alt="Enregistrer son objet" style="float:right;" class="button small">&raquo; Enregister son objet voyageur 🗿</a>
+				
+				<table class="zebra">
+					<thead>
+						<tr>
+							<th colspan=1><b>Objet Voyageur</b></th>
+							<th colspan=2></th>
+							<th colspan=1><b>Propriétaire</b></th>
+							<th colspan=3><b>Localisation</b></th>
+							<th colspan=1><b>Dernière activité</b></th>
+							<th colspan=1><b>Fav 👍</b></th>
+						</tr>
+					</thead>
+					<tbody>
+						<% tbs.forEach(function(tb) { %>
+						<tr>
+							<td colspan=1 style="vertical-align: middle;">
+								<img width="75px;" class="image" src="<%= tb.get("Photo").url().replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, ''); %>" />
+							</td>
+							<td colspan=2>
+								<a href="/tb?id=<%= tb.id %>"><b style="text-transform: capitalize;"><%= tb.get("Name") %></b></a>
+								<p class="small"><i><%= tb.get("Mission") %></i></p>
+							</td>
+							<td colspan=1 style="text-transform: capitalize;"><%= tb.get("Owner") %></td>
+							<td colspan=3>
+								<% if (tb.get("Holder") != null) { %> Dans les mains de <%= tb.get("Holder") %> <% } %>
+								<% if (tb.get("Holder") == null) { %> <a href="/geocache?id=<%= tb.get('cacheId') %>"><%= tb.get("cacheName") %></a> <% } %>
+							</td>
+							<td colspan=1><%= moment(tb.get("updatedAt")).utcOffset(120).fromNow() %></td>
+							<td colspan=1><%= tb.get("Fav") %></td>
+						</tr>
+						<% }); %>
+					</tbody>
+				</table>
+				<br><br>
+				<div class="clearfix">
+					<a href="/photostbs" class="button small">📷 Galerie photos</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					<a href="/ranking" class="button small">🏆 Voir le classement</a>
+					<a href="/register" alt="Enregistrer son objet" style="float:right;" class="button small">&raquo; Enregister son objet voyageur 🗿</a>
+				</div>
+			</section>
+		</div>
+	</div>
+
+	<% include ./partials/footer %>
+</body>
+</html>

@@ -1,9 +1,11 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-	<title><%= nom %> - Géocaching Jeux de Sophia 2017</title>
+	<title><%= nom %> - Géocaching Jeux de Sophia 2018</title>
 	<% include ./partials/head %>
 	<!-- <script src='https://www.google.com/recaptcha/api.js'></script> -->
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" />
+	<script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"></script>
 </head>
 <body>
 	<div class="wrapper style1">
@@ -16,9 +18,10 @@
 				<nav id="nav">
 					<ul>
 						<li><a href="/">Accueil</a></li>
-						<li class="active"><a href="/geocaches">Les Caches à trouver</a></li>
+						<li class="active"><a href="/geocaches">Géocaches</a></li>
+						<li><a href="/tbs">Objets Voyageurs</a></li>
 						<li><a href="/geocaching">Règles du jeu</a></li>
-						<li><a href="/tools">Les Outils</a></li>
+						<li><a href="/tools">Outils</a></li>
 						<li><a href="/ranking">Classement</a></li>
 					</ul>
 				</nav>
@@ -32,50 +35,36 @@
 		<div id="content" class="container">
 			<section>
 				<header class="major">
-
-					<img width="470px;" align="right" src="<%= photo %>" alt="<%= nom %>" style="margin-bottom:20px;">
-
-					<!-- <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script> -->
-					<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBfOPPHsPEYs7o8-xdYce1Bdxgmh-4TBAc&callback=initialize"
-  type="text/javascript"></script>
-
-					<script>
-						locations = [[<%= gps.latitude %>, <%= gps.longitude %>]];
-
-						function initialize() {
-							map = new google.maps.Map(document.getElementById("map"), {
-								mapTypeId: google.maps.MapTypeId.ROADMAP,
-								center: new google.maps.LatLng(locations[0][0], locations[0][1]),
-								zoom: 17
-							});
-							for (var i=0; i<locations.length; i++) {
-								var marker = new google.maps.Marker({
-									position: new google.maps.LatLng(locations[i][0], locations[i][1]),
-									map: map
-								})
-							}
-							//setBoundsLeftSidebar(locations, 0.3);
-						}
-
-						//google.maps.event.addDomListener(window, 'load', initialize);
-					</script>
-
+					<img width="470px;" align="right" src="<%= photo %>" alt="<%= nom %>" style="margin-bottom:20px; margin-left: 20px;">
 					<% include ./partials/geocachecategory %><h2><%= nom %></h2>
 					<span class="byline"><%= coord %></span>
 					<% include ./partials/rating %>
-					
 				</header>
 
-				<p><%- description %></p>
+				<%- description %>
 
+				<p style="text-align: right;"><i>Cache publiée le <%= moment(publication).utcOffset(120).format("LL [à] LT") %></i></p>
 			</section>
-			<br /><br />
 			
-			<% if( cat=='TRADI' || cat=='MULTI' || cat=='LETTERBOX' || cat=='EARTHCACHE' || cat=='EVENT' || cat=='CITO' || cat=='WHERIGO' ) { %>
+			<% if( cat=='TRADI' || cat=='MULTI' || cat=='LETTERBOX' || cat=='EARTHCACHE' || cat=='EVENT' || cat=='CITO' || cat=='WHERIGO' || cat=='SPECIAL') { %>
 			<section>
-				<h2>Emplacement</h2>
-				<br>
+				<h2>📍 Emplacement</h2>
 				<div id="map"></div>
+
+				<script type="text/javascript">
+					var map = L.map('map').setView([<%= gps.latitude %>, <%= gps.longitude %>], 17);
+
+					L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+					    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+					}).addTo(map);
+
+					L.marker([<%= gps.latitude %>, <%= gps.longitude %>]).addTo(map)
+    									   .bindPopup("<%= nom %>")
+    									   .openPopup();
+
+    				L.control.scale().addTo(map);
+				</script>
+
 			</section>
 			<br /><br />
 			<% } %>
@@ -83,64 +72,102 @@
 
 			<% if(cat=='TRADI' || cat=='MULTI' || cat=='LETTERBOX' || cat=='EARTHCACHE' || cat=='EVENT' || cat=='CITO' || cat=='WHERIGO' || cat=='MYSTERY' || cat=='SPECIAL') { %>
 			<section>
-				<h2>Spoiler</h2>
-				<br>
+				<h2>🃏 Spoiler</h2>
 				<details>
 					<summary>Cliquez pour voir l'indice et l'image Spoiler</summary>
 					<img src="<%= spoiler %>" alt="<%= nom %>"> <br />
 					<p><b>Indice : </b><%- indice %></p>
 				</details>
 			</section>
-			<br /><br />
+			<br />
 			<% } %>
 
-			<% if( cat=='VIRTUAL' || cat=='WEBCAM' || cat=='EARTHCACHE' || cat=='EVENT' || cat=='CITO' ) { %>
+			<% if(cat=='TRADI' || cat=='MULTI' || cat=='LETTERBOX' || cat=='EVENT' || cat=='CITO' || cat=='WHERIGO' || cat=='MYSTERY' || cat=='SPECIAL') { %>
 			<section>
-				<h2>Formulaire pour valider votre trouvaille</h2>
-				<br>
-				<form ref="uploadForm" id="uploadForm" method="post" action="/found" encType="multipart/form-data">
-				<input type="hidden" name="id" id="<%= id %>" value="<%= id %>" />
+				<h2>🗿 Objets Voyageurs</h2>
+				<details>
+					<summary>Cliquez pour voir les objets présents dans cette cache</summary>
+					<ul>
+					<% objets.forEach(function(obj) { %>
+						<li> <a href="/tb?id=<%= obj.id %>"><b> <%= obj.get("Name") %></b></a> 
+					<% }); %>
+					</ul>
+				</details>
+				<details>
+					<summary>Cliquez pour voir les objets ayant deja transité dans cette cache</summary>
+					<ul>
+					<% objetsLogged.forEach(function(obj) { %>
+						<li> <a href="/tb?id=<%= obj.get("TravelbugId") %>"><b> <%= obj.get("TravelbugName") %></b></a>  <b><%= moment(obj.get("Date")).utcOffset(120).fromNow() %> le <%= moment(obj.get("Date")).utcOffset(120).format("LL [à] LT") %> </b>- <%= obj.get("Pseudo") %> : <i><%= obj.get("Message") %></i><% if(obj.get("Photo"))  { %> - <a href="<%= obj.get("Photo").url().replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, '') %>">photo</a><% } %></li>
+					<% }); %>
+					</ul>
 
-				Votre Email des Jeux de Sophia - <i>Nécessaire au classement de l'épreuve</i>
-				<input type="email" name="email" id="email" value="" style="border: solid 1px #82b440;" placeholder="L'email ne sera pas visible sur le site" required/>
-				<br>
-				Votre Pseudo pour l'épreuve Géocaching
-				<input type="text" name="name" id="name" value="" style="border: solid 1px #82b440;" placeholder="Ce pseudo sera visible sur le site" required/>
-				<br>
-				Un petit Message pour partager votre découverte
-				<input type="text" name="message" id="message" value="" style="border: solid 1px #82b440;" placeholder="Ce Message sera visible sur le site" maxlength="500" required/>
-				<br>		
-
-				<% if(cat!='MYSTERY') { %>
-				Une photo souvenir (sera visible sur le site) pour valider votre trouvaille
-				<input type="file" name="pic" id="pic" accept="image/*" <% if(cat=='VIRTUAL' || cat=='WEBCAM') { %>required<% } %>>
-				<br>
-				<% } %>
-
-				<br>
-				Si vous avez apprécié cette cache, attribuez lui un point favori en cochant cette case : 
-				<input type="checkbox" name="fav" value="true" />	
-				<!-- <br><br><div class="g-recaptcha" data-sitekey="6LfXHyMUAAAAALaiZRR7GqvCsxQYXUNpPPKAyCmd"></div>	-->
-
-				<br><br><input type="submit" value="J'ai trouvé !" name="submit" class="button" id="submitButton" title="Clic ici pour envoyer la trouvaille" />
-				
-			</form>  	
+				</details>
 			</section>
-			<br /><br />
+			<br>
+			<% } %>
+
+			<% if( cat=='VIRTUAL' || cat=='WEBCAM' || cat=='EARTHCACHE' || cat=='SPECIAL' ) { %>
+			<section>
+				<h2>👣 Formulaire pour valider votre participation</h2>
+				<form ref="uploadForm" id="uploadForm" method="post" action="/found" encType="multipart/form-data">
+					<input type="hidden" name="id" id="<%= id %>" value="<%= id %>" />
+
+					Votre Email des Jeux de Sophia - <i>Nécessaire au classement de l'épreuve</i>
+					<input type="email" name="email" id="email" value="" style="border: solid 1px #82b440;" placeholder="L'email ne sera pas visible sur le site" required/>
+					<br>
+					Votre Pseudo pour l'épreuve Géocaching
+					<input type="text" name="name" id="name" value="" style="border: solid 1px #82b440;" placeholder="Ce pseudo sera visible sur le site" required/>
+					<br>
+					Un petit Message pour partager votre découverte
+					<input type="text" name="message" id="message" value="" style="border: solid 1px #82b440;" placeholder="Ce Message sera visible sur le site" maxlength="500" required/>
+					<br>		
+
+					<% if( cat!='SPECIAL' ) { %>
+						Une photo souvenir (sera visible sur le site) pour valider votre participation
+						<input type="file" name="pic" id="pic" accept="image/*" <% if(cat=='VIRTUAL' || cat=='WEBCAM') { %>required<% } %>>
+						<br>
+					<% } %>
+
+					<br>
+					Si vous avez apprécié cette cache, attribuez lui un point favori en cochant cette case : 
+					<input type="checkbox" name="fav" value="true" /> 👍
+					<!-- <br><br><div class="g-recaptcha" data-sitekey="6LfXHyMUAAAAALaiZRR7GqvCsxQYXUNpPPKAyCmd"></div>	-->
+
+					<br><br><input type="submit" value="J'ai trouvé !" name="submit" class="button" id="submitButton" title="Clic ici pour envoyer la trouvaille" />
+					
+				</form>  	
+			</section>
+			<br><br>
 			<% } %>
 
 			<section>
-				<h2>Logbook</h2>
-				<br>
+				<h2>📝 <%= logs.length %> inscriptions sur le Logbook</h2>
 				<ul>
 					<% if(logs.length == 0)  { %>
-					<li><p class="medium">Soyez le premier à trouver la cache et annoncer votre découverte !!!</p></li>
+						<li><p class="medium">Soyez le premier à trouver la cache et annoncer votre découverte !!!</p></li>
 					<% } %>
 					<% logs.forEach(function(log) { %>
-					<li> <b><%= moment(log.get("Date")).utcOffset(120).fromNow() %> le <%= moment(log.get("Date")).utcOffset(120).format("LL [à] LT") %> </b>- <%= log.get("Pseudo") %> : <i><%= log.get("Message") %></i><% if(log.get("PhotoUrl"))  { %> - <a href="<%= log.get("PhotoUrl") %>">photo</a><% } %></li>
+						<li>
+							<b><%= moment(log.get("Date")).utcOffset(120).fromNow() %> le <%= moment(log.get("Date")).utcOffset(120).format("LL [à] LT") %></b> - <%= log.get("Pseudo") %> : <i><%= log.get("Message") %></i>
+							<% if(log.get("Photo"))  { %> - <a href="<%= log.get("Photo").url().replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, '') %>">photo</a><% } %>
+							<% if(log.get("Fav") == true)  { %> - 👍 <% } %>
+						</li>
 					<% }); %>
 				</ul>
+			</section>
 
+			<section>
+				<h2>💬 Discussion</h2>
+				<div id="disqus_thread"></div>
+				<script>
+					(function() {
+					var d = document, s = d.createElement('script');
+					s.src = 'https://geocaching-jds.disqus.com/embed.js';
+					s.setAttribute('data-timestamp', +new Date());
+					(d.head || d.body).appendChild(s);
+					})();
+				</script>
+				<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 			</section>
 
 		</div>
