@@ -32,6 +32,9 @@
 					<div style="position: relative; padding: 0.75rem 1.25rem;margin-bottom: 1rem;border: 1px solid transparent;border-radius: 0.25rem;color: #721c24;background-color: #f8d7da;border-color: #f5c6cb;">
 	  					<strong>Alerte enlèvement !</strong>  Merci de régulariser la situation de <% missing.forEach(function(tb) { %> <a href="/tb?id=<%= tb.id %>"><b style="text-transform: capitalize;"><%= tb.get("Name") %></b></a> <% }); %>
 					</div>
+					<div style="position: relative; padding: 0.75rem 1.25rem;margin-bottom: 1rem;border: 1px solid transparent;border-radius: 0.25rem;color: #721c24;background-color: #f8d7da;border-color: #f5c6cb;">
+	  					<strong>Vous pouvez récupérer vos objets</strong> Si vous avez en main un objet qui ne vous appartient pas, déposez-le dans une cache avant le 12 ou à coté de l'urne lors de la soirée de cloture du 14, merci.
+					</div>
 				</section>
 			<% } %>
 			<section>

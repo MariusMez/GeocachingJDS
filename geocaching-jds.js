@@ -401,7 +401,6 @@ var computeScoreForGeocacheur = function(email) {
                     cache.ftf = "Pas dans le top 3";
                 }
 
-                //console.log(cache);
                 scoreCaches.caches.push( cache);
             });
 
@@ -713,7 +712,6 @@ var validateMission = function(missionId, validationScore) {
 function getTbOfGeocacheur(emailString) {
     console.log("getTbOfGeocacheur : " + emailString);
     var promise = new Parse.Promise();
-
     
     var email = emailString.toLowerCase();
     var Travelbug = Parse.Object.extend("Travelbug");
@@ -738,7 +736,6 @@ function getLogsByEmail(emailString) {
     console.log("getLogsByEmail : " + emailString);
     var promise = new Parse.Promise();
 
-    
     var email = emailString.toLowerCase();
     var Logs = Parse.Object.extend("Log");
     var queryCaches = new Parse.Query(Logs);
@@ -776,8 +773,7 @@ function getTbLogsByEmail(emailString) {
     queryTbs.limit(10000);
     queryTbs.equalTo("Email", email);
     queryTbs.include("Travelbug");
-    queryTbs.find( {
-    
+    queryTbs.find({
         success: function(logs) {
             console.log("getTbLogsByEmail trouvés : "+ logs.length);
             promise.resolve(logs);
@@ -802,8 +798,7 @@ function getLogsForTB(tbId) {
     queryTbs.equalTo("TravelbugId", tbId);
     queryTbs.ascending("createdAt");
     queryTbs.include("Travelbug");
-    queryTbs.find( {
-    
+    queryTbs.find({
         success: function(logs) {
             console.log("getLogsForTB : " + tbId + " : " + logs.length);
             promise.resolve(logs);
