@@ -15,10 +15,13 @@
     "express": "^4.16.4",
     "kerberos": "0.0.24",
     "multer": "1.3.0",
+    "npm": "^6.4.1",
     "parse": "~1.11.1",
     "parse-server": "^3.0.0",
     "recaptcha-verify": "0.1.1",
-    "sharp": "0.20.2"
+    "sharp": "0.20.2",
+    "to": "^0.2.9",
+    "update": "^0.7.4"
   },
   "scripts": {
     "start": "node index.js"
