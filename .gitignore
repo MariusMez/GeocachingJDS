@@ -21,3 +21,4 @@ dump_mongodb
 logs
 config
 ecosystem.json
+.env
