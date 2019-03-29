@@ -1,51 +1,41 @@
 var jds = require('../geocaching-jds');
 
-// Use Parse.Cloud.define to define as many cloud functions as you want.
-// For example:
-Parse.Cloud.define("hello", function(request, response) {
-	response.success("Hello world!");
-});
-
-function processPhoto(request, response) {
+async function processPhoto(request) {
 	const sharp = require('sharp');
 	const maxWidth = 1000;
 	const maxHeight = 1000;
 	
 	var photo = request.object.get("Photo");
     if(photo === undefined) {
-        response.success();
+        throw new Error('Photo object is undefined') 
     } else {
     	var url = photo.url();
     }
 
-    Parse.Cloud.httpRequest({ url: url }).then(function(response) {
-   		return response.buffer;
-	}).then(function(image_buffer) {
-		jds.createThumbnail(image_buffer, maxWidth, maxHeight).then(function(thumbnail) {
-		    request.object.set("Photo", thumbnail);
-    		request.object.set("PhotoUrl", thumbnail.url({forceSecure: true}));
-			response.success();
-		    }, function(error) {
-		        console.error("Thumbnail creation error: " + error.message);
-		        response.error();
-		    });
-	});
+    const response = await Parse.Cloud.httpRequest({ url: url });
+    const thumbnail = jds.createThumbnail(response.buffer, maxWidth, maxHeight);
+    if(thumbnail === undefined) {
+        throw new Error('Thumbnail object is undefined') 
+    } else {
+    	request.object.set("Photo", thumbnail);
+    	request.object.set("PhotoUrl", thumbnail.url({forceSecure: true}));
+    }
 }
 
-Parse.Cloud.beforeSave("Log", function(request, response) {
-	if(request.object.isNew()) { processPhoto(request, response); } else { response.success(); }
+Parse.Cloud.beforeSave("Log", (request) => {
+	if(request.object.isNew()) { processPhoto(request); }
 });
 
-Parse.Cloud.beforeSave("Travelbug", function(request, response) {
-	if(request.object.isNew()) { processPhoto(request, response); } else { response.success(); }
+Parse.Cloud.beforeSave("Travelbug", (request) => {
+	if(request.object.isNew()) { processPhoto(request); }
 });
 
-Parse.Cloud.beforeSave("TravelbugLog", function(request, response) {
-	if(request.object.isNew()) { processPhoto(request, response); } else { response.success(); }
+Parse.Cloud.beforeSave("TravelbugLog", (request) => {
+	if(request.object.isNew()) { processPhoto(request); }
 });
 
-Parse.Cloud.job("Resize all PhotoLog", function(request, response) {
-	response.message("I just started");
+Parse.Cloud.job("Resize all PhotoLog", (request) => {
+	request.message("I just started");
 	const sharp = require('sharp');
 
 	var Log = Parse.Object.extend("Log");
@@ -64,16 +54,16 @@ Parse.Cloud.job("Resize all PhotoLog", function(request, response) {
 				log.set("PhotoResized", true);
 				log.save();
 			});
-			response.success("I just finished");
+			request.success("I just finished");
 		},
 		error: function(error) {
-			response.error(error);
+			request.error(error);
 		}
 	});
 });
 
-Parse.Cloud.job("Add Geocacheurs from CSV file", function(request, response) {
-	response.message("I just started");
+Parse.Cloud.job("Add Geocacheurs from CSV file", (request) => {
+	request.message("I just started");
 	var csv = require('csv'); 
 	var obj = csv(); 
 
@@ -125,16 +115,16 @@ Parse.Cloud.job("Add Geocacheurs from CSV file", function(request, response) {
 				},
 				error: function(error) {
 					error.message("Impossible to find Geocacheur - lookup failed");
-					response.error(error);
+					request.error(error);
 				}
 			});
 		});
 	});
-	response.success("I just finished");
+	request.success("I just finished");
 });
 
-Parse.Cloud.job("Add TB Tracking Codes from txt file", function(request, response) {
-	response.message("I just started Add TB Tracking Codes from txt file");
+Parse.Cloud.job("Add TB Tracking Codes from txt file", (request) => {
+	request.message("I just started Add TB Tracking Codes from txt file");
 	
 	var fs = require('fs');
 	var TravelbugCode = Parse.Object.extend("TravelbugCode");
@@ -158,22 +148,22 @@ Parse.Cloud.job("Add TB Tracking Codes from txt file", function(request, respons
 					} else {
 						//results.set("Active", false);
 						results.set("Code", code);
-						results.save(null, { useMasterKey: true }).then(response.success, response.error);
+						results.save(null, { useMasterKey: true }).then(request.success, request.error);
 					}
 				},
 				error: function(error) {
 					error.message("favourites lookup failed");
-					response.error(error);
+					request.error(error);
 				}
 			});
 		});
 	});
-	response.success("I just finished");
+	request.success("I just finished");
 });
 
-Parse.Cloud.job("First - Compute Score Ratio D/T", function(request, status) {
+Parse.Cloud.job("First - Compute Score Ratio D/T", (request) => {
 
-	status.message("I just started Compute Ratio D/T");
+	request.message("I just started Compute Ratio D/T");
 
 	var Logs = Parse.Object.extend("Log");
 	var Ranking = Parse.Object.extend("Ranking");
@@ -208,16 +198,16 @@ Parse.Cloud.job("First - Compute Score Ratio D/T", function(request, status) {
 			});
 		});
 	}).then(function(result) {
-		status.success("I just finished");
+		request.success("I just finished");
 	}, function(error) {
-		status.error(error);
+		request.error(error);
 	});
 });
 
 
-Parse.Cloud.job("Compute Fav Points", function(request, status) {
+Parse.Cloud.job("Compute Fav Points", (request) => {
 
-	status.message("I just started Compute Fav Points");
+	request.message("I just started Compute Fav Points");
 
 	var Logs = Parse.Object.extend("Log");
 	var Geocache = Parse.Object.extend("Geocache");
@@ -239,15 +229,15 @@ Parse.Cloud.job("Compute Fav Points", function(request, status) {
 			});
 		});
 	}).then(function(result) {
-		status.success("I just finished");
+		request.success("I just finished");
 	}, function(error) {
-		status.error(error);
+		request.error(error);
 	});
 });
 
-Parse.Cloud.job("Compute Fav Ratio", function(request, status) {
+Parse.Cloud.job("Compute Fav Ratio", (request) => {
 
-	status.message("I just started Compute Fav Ratio");
+	request.message("I just started Compute Fav Ratio");
 	
 	var Logs = Parse.Object.extend("Log");
 	var Geocache = Parse.Object.extend("Geocache");
@@ -269,15 +259,15 @@ Parse.Cloud.job("Compute Fav Ratio", function(request, status) {
 			});
 		});
 	}).then(function(result) {
-		status.success("I just finished");
+		request.success("I just finished");
 	}, function(error) {
-		status.error(error);
+		request.error(error);
 	});
 });
 
-Parse.Cloud.job("Second - Compute Score TB", function(request, status) {
+Parse.Cloud.job("Second - Compute Score TB", (request) => {
 
-	status.message("I just started Compute Score TB");
+	request.message("I just started Compute Score TB");
 
 	var TravelbugLog = Parse.Object.extend("TravelbugLog");
 	var queryTbs = new Parse.Query(TravelbugLog);
@@ -331,15 +321,15 @@ Parse.Cloud.job("Second - Compute Score TB", function(request, status) {
 			});
 		});
 	}).then(function(result) {
-		status.success("I just finished");
+		request.success("I just finished");
 	}, function(error) {
-		status.error(error);
+		request.error(error);
 	});
 });
 
 
-Parse.Cloud.job("Compute All rankings", function(request, status) {
-  status.message("I just started Compute All Rankings");
+Parse.Cloud.job("Compute All rankings", (request) => {
+  request.message("I just started Compute All Rankings");
 
   var Geocacheur = Parse.Object.extend("Geocacheur");
 
@@ -359,7 +349,7 @@ Parse.Cloud.job("Compute All rankings", function(request, status) {
             counter = counter + 1;
             var email = geocacheur.get("Email");
 
-            status.message("Processing " + email + " " + counter + "/" + geocacheurs.length);
+            request.message("Processing " + email + " " + counter + "/" + geocacheurs.length);
             console.log("Processing " + email + " " + counter + "/" + geocacheurs.length);
 
 
@@ -381,7 +371,7 @@ Parse.Cloud.job("Compute All rankings", function(request, status) {
             counter = counter + 1;
             var email = score.geocacheur.get("Email");
 
-            status.message("Storing " + email + " - " + counter + "/" + scores.length);
+            request.message("Storing " + email + " - " + counter + "/" + scores.length);
             console.log("Storing " + email + " - " + counter + "/" + scores.length);
 
 
@@ -394,16 +384,16 @@ Parse.Cloud.job("Compute All rankings", function(request, status) {
   })
 .then(function(results) {
   console.log("termine with " + results.length);
-  status.success("I just finished");
+  request.success("I just finished");
   }, function(error) {
-  status.error(error);
+  	request.error(error);
   });
 
 });
 
-Parse.Cloud.job("Last - Compute Ranking", function(request, status) {
+Parse.Cloud.job("Last - Compute Ranking", (request) => {
 
-	status.message("I just started Compute Ranking");
+	request.message("I just started Compute Ranking");
 
 	var scoreFoundIt = 20;
 	var scoreFTF = 3;
@@ -434,8 +424,8 @@ Parse.Cloud.job("Last - Compute Ranking", function(request, status) {
 			});
 		});
 	}).then(function(result) {
-		status.success("I just finished");
+		request.success("I just finished");
 	}, function(error) {
-		status.error(error);
+		request.error(error);
 	});
 });

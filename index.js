@@ -1,3 +1,5 @@
+const dotenv = require('dotenv');
+dotenv.config();
 // Since Node 8, have errors
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
@@ -720,7 +722,7 @@ app.post('/foundtb', upload.single('pic'), function (req, res, next) {
     							var promiseTbByEmail = jds.countTravelBugHoldByEmail(email);
     							
 
-							    Parse.Promise.all([promiseFirstTbDropOnGeocache, promiseFirstTbDropByEmail, promiseTbByEmail])
+							    Promise.all([promiseFirstTbDropOnGeocache, promiseFirstTbDropByEmail, promiseTbByEmail])
 							    .then(
 							        function(values) { 
 
@@ -771,8 +773,6 @@ app.post('/foundtb', upload.single('pic'), function (req, res, next) {
 											} else {
 												logEntry.set("Fav", false);
 											}
-
-
 												
 											tb.save();
 											//cache.save();
