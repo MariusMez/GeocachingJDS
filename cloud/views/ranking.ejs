@@ -6,27 +6,7 @@
 	<link rel="stylesheet" href="public/css/style-table.css">
 </head>
 <body>
-	<div class="wrapper style1">
-
-		<div id="header">
-			<div class="container">
-
-				<h1><a href="/" id="logo">Géocaching</a></h1>
-
-				<nav id="nav">
-					<ul>
-						<li><a href="/">Accueil</a></li>
-						<li><a href="/geocaches">Géocaches</a></li>
-						<li><a href="/tbs">Objets Voyageurs</a></li>
-						<li><a href="/geocaching">Règles du jeu</a></li>
-						<li><a href="/tools">Outils</a></li>
-						<li class="active"><a href="/ranking">Classement</a></li>
-					</ul>
-				</nav>
-
-			</div>
-		</div>
-	</div>
+	<% include ./partials/menu %>
 
 	<div id="main" class="wrapper style4">
 
@@ -146,7 +126,11 @@
 				<header class="major">
 					<h2>Classement des éditions précédentes</h2>
 				</header>
-				<a href="/ranking2017"><b>&raquo; Archive du classement et des caches - édition 2017</b></a>
+				
+				<ul>
+					<li><a href="/ranking2018"><b>&raquo; Archive du classement et des caches - édition 2018</b></a></li>
+					<li><a href="/ranking2017"><b>&raquo; Archive du classement et des caches - édition 2017</b></a></li>
+				</ul>
 			</section>
 		</div>
 	</div>

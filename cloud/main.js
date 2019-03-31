@@ -1,68 +1,51 @@
 var jds = require('../geocaching-jds');
 
-async function processPhoto(request) {
-	const sharp = require('sharp');
-	const maxWidth = 1000;
-	const maxHeight = 1000;
-	
-	var photo = request.object.get("Photo");
-    if(photo === undefined) {
-        throw new Error('Photo object is undefined') 
-    } else {
-    	var url = photo.url();
-    }
 
-    const response = await Parse.Cloud.httpRequest({ url: url });
-    const thumbnail = jds.createThumbnail(response.buffer, maxWidth, maxHeight);
-    if(thumbnail === undefined) {
-        throw new Error('Thumbnail object is undefined') 
-    } else {
-    	request.object.set("Photo", thumbnail);
-    	request.object.set("PhotoUrl", thumbnail.url({forceSecure: true}));
-    }
-}
-
-Parse.Cloud.beforeSave("Log", (request) => {
-	if(request.object.isNew()) { processPhoto(request); }
+Parse.Cloud.beforeSave("Log", async (request) => {
+	if(request.object.isNew()) { 
+		var photo = request.object.get("Photo");
+		console.log("PHOTO:" + photo)
+		if(photo) {
+			console.log("IN PHOTO")
+	    	const sharp = require('sharp');
+			const maxWidth = 1000;
+			const maxHeight = 1000;
+		    const response = await Parse.Cloud.httpRequest({ url: photo.url() });
+		    const thumbnail = jds.createThumbnail(response.buffer, maxWidth, maxHeight);
+		    if(thumbnail) {
+		    	console.log("IN THUMBNAIL")
+		    	request.object.set("Photo", thumbnail);
+		    	request.object.set("PhotoUrl", thumbnail.url({forceSecure: true}));
+		    }
+	    } 
+	}
 });
 
-Parse.Cloud.beforeSave("Travelbug", (request) => {
-	if(request.object.isNew()) { processPhoto(request); }
-});
 
-Parse.Cloud.beforeSave("TravelbugLog", (request) => {
-	if(request.object.isNew()) { processPhoto(request); }
-});
-
-Parse.Cloud.job("Resize all PhotoLog", (request) => {
+Parse.Cloud.job("Resize all PhotoLog", async (request) => {
 	request.message("I just started");
 	const sharp = require('sharp');
-
-	var Log = Parse.Object.extend("Log");
-	var queryLog = new Parse.Query(Log);
-	queryLog.lessThanOrEqualTo("createdAt", new Date());
-	queryLog.equalTo("Active", true);
-	queryLog.doesNotExist("PhotoResized");
-	queryLog.limit(10000);
-	queryLog.exists("PhotoUrl");
-	queryLog.find({
-		success: function(logs) {
-			console.log("Processing " + logs.length + " logs...");
-			logs.forEach(function(log) {
-				var photoFile = log.get("Photo");
-				log.set("Photo", photoFile);
-				log.set("PhotoResized", true);
-				log.save();
-			});
-			request.success("I just finished");
-		},
-		error: function(error) {
-			request.error(error);
-		}
+	const Log = Parse.Object.extend("Log");
+	const query = new Parse.Query(Log);
+	query.lessThanOrEqualTo("createdAt", new Date());
+	query.equalTo("Active", true);
+	query.doesNotExist("PhotoResized");
+	query.limit(10000);
+	query.exists("PhotoUrl");
+	const logs = await query.find();
+	console.log("Processing " + logs.length + " logs...");
+	const promises = logs.map(async (log) => {
+		var photoFile = log.get("Photo");
+		log.set("Photo", photoFile);
+		log.set("PhotoResized", true);
+		await log.save(null);
+		request.message('Resized ' + photoFile);
 	});
+	await Promise.all(promises)
+	request.message("I just finished");
 });
 
-Parse.Cloud.job("Add Geocacheurs from CSV file", (request) => {
+Parse.Cloud.job("Add Geocacheurs from CSV file", async (request) => {
 	request.message("I just started");
 	var csv = require('csv'); 
 	var obj = csv(); 
@@ -71,94 +54,47 @@ Parse.Cloud.job("Add Geocacheurs from CSV file", (request) => {
 	var Ranking = Parse.Object.extend("Ranking");
 
 	obj.from.path('Geocacheurs.csv').to.array(function(geocacheurs) {
-		geocacheurs.forEach(function(geocacheur) {
+		geocacheurs.forEach( async (geocacheur) => {
 			var firstname = geocacheur[0];
 			var companyname = geocacheur[1];
 			var email = geocacheur[2].toLowerCase();
 
 			var query = new Parse.Query(Geocacheur);
 			query.equalTo('Email', email);
-			query.first({
-				success: function(result) {
-					//console.log(JSON.stringify(result));
-					if (result === undefined) {
-						var geocacheur = new Geocacheur();
-						geocacheur.save({
-							Email: email,
-							Pseudo: firstname,
-							Company: companyname,
-							Enrollment: "preload",
-							Active: false
-						}, {
-							success: function(user) {
-								var queryRanking = new Parse.Query(Ranking);
-								queryRanking.equalTo('Geocacheur', user);
-								queryRanking.first({
-									success: function(res) {
-										if (res === undefined) {
-											jds.saveRanking(user, false).then(function() { }, function(error) { });
-										} else {
-											// Update ranking ?
-											console.log("Update ranking");
-										}
-									},
-									error: function(error) { console.error(error); }
-								});
-							},
-							error: function(error) { console.error(error); }
-						});						
-					} else {
-						console.log("Geocacheur exist, we do nothing");
-						//results.set("Active", false);
-						//results.save(null, { useMasterKey: true }).then(response.success, response.error);
-					}
-				},
-				error: function(error) {
-					error.message("Impossible to find Geocacheur - lookup failed");
-					request.error(error);
-				}
-			});
+			const result = await query.first();
+
+			if (result === undefined) {
+				var geocacheur = new Geocacheur();
+				geocacheur.save({
+					Email: email,
+					Pseudo: firstname,
+					Company: companyname,
+					Enrollment: "preload",
+					Active: false
+				}).then((user) => {
+					var queryRanking = new Parse.Query(Ranking);
+					queryRanking.equalTo('Geocacheur', user);
+					queryRanking.first().then((res) => {
+						if (res === undefined) {
+							jds.saveRanking(user, false).then(function() { }, function(error) { });
+						} else {
+							// Update ranking ?
+							console.log("Update ranking");
+						}
+					}, (error) => {
+					 	console.error(error); 
+					});
+				}, (error) => { 
+					console.error(error); 
+				});						
+			} else {
+				console.log("Geocacheur exist, we do nothing");
+				//results.set("Active", false);
+				//results.save(null, { useMasterKey: true }).then(response.success, response.error);
+			}
 		});
 	});
-	request.success("I just finished");
-});
-
-Parse.Cloud.job("Add TB Tracking Codes from txt file", (request) => {
-	request.message("I just started Add TB Tracking Codes from txt file");
-	
-	var fs = require('fs');
-	var TravelbugCode = Parse.Object.extend("TravelbugCode");
-
-	fs.readFile('TB_CODES.txt', 'utf8', function(err, data) {
-		if (err) throw err;
-		codes = data.split(/\n/);
-		codes.forEach(function(code) {
-			var query = new Parse.Query("TravelbugCode");
-			query.equalTo('Code', code);
-			query.first({
-				success: function(results) {
-					// console.log(JSON.stringify(results));
-					if (results === undefined) {
-						var tbCode = new TravelbugCode();
-						tbCode.save({ Code: code, Active: false }, 
-						{
-							success: function(code) { },
-							error: function(error) { }
-						});
-					} else {
-						//results.set("Active", false);
-						results.set("Code", code);
-						results.save(null, { useMasterKey: true }).then(request.success, request.error);
-					}
-				},
-				error: function(error) {
-					error.message("favourites lookup failed");
-					request.error(error);
-				}
-			});
-		});
-	});
-	request.success("I just finished");
+	request.message("I just finished");
 });
 
 Parse.Cloud.job("First - Compute Score Ratio D/T", (request) => {
@@ -171,9 +107,8 @@ Parse.Cloud.job("First - Compute Score Ratio D/T", (request) => {
 	var queryRanking = new Parse.Query(Ranking);
 	queryRanking.equalTo("Active", true);
 	queryRanking.limit(1000);
-	queryRanking.find().then(function(ranking) {
-
-		ranking.forEach(function(rank) {
+	queryRanking.find().then((ranking) => {
+		ranking.forEach((rank) => {
 			var query = new Parse.Query(Logs);
 			query.equalTo("Email", rank.get("Email"));
 			query.equalTo("Active", true);
@@ -192,20 +127,20 @@ Parse.Cloud.job("First - Compute Score Ratio D/T", (request) => {
 				});
 				return promise;
 
-			}).then(function(scoreDT) {							    
+			}).then((scoreDT) => {							    
 				rank.set("ScoreDT", scoreDT);
-				rank.save();
+				rank.save(null);
 			});
 		});
-	}).then(function(result) {
-		request.success("I just finished");
-	}, function(error) {
-		request.error(error);
+	}).then((result) => {
+		request.message("I just finished");
+	}, (error) => {
+		console.error(error);
 	});
 });
 
 
-Parse.Cloud.job("Compute Fav Points", (request) => {
+Parse.Cloud.job("Compute Fav Points", async (request) => {
 
 	request.message("I just started Compute Fav Points");
 
@@ -215,27 +150,26 @@ Parse.Cloud.job("Compute Fav Points", (request) => {
 	var queryGeocaches = new Parse.Query(Geocache);
 	queryGeocaches.limit(1000);
 	queryGeocaches.equalTo("Active", true);
-	queryGeocaches.find().then(function(geocaches) {
-
-		geocaches.forEach(function(geocache) {
+	queryGeocaches.find().then(async (geocaches) => {
+		geocaches.forEach(async (geocache) => {
 			var query = new Parse.Query(Logs);
 			query.equalTo("Active", true);
 			query.limit(100000);
 			query.equalTo("Geocache", geocache);
 			query.equalTo("Fav", true);
-			query.count().then(function(counter) { 
+			query.count().then(async (counter) => { 
 				geocache.set("Fav", counter);
-				geocache.save();
+				await geocache.save(null);
 			});
 		});
-	}).then(function(result) {
-		request.success("I just finished");
-	}, function(error) {
-		request.error(error);
+	}).then((result) =>{
+		request.message("I just finished");
+	}, (error) => {
+		console.error(error);
 	});
 });
 
-Parse.Cloud.job("Compute Fav Ratio", (request) => {
+Parse.Cloud.job("Compute Fav Ratio", async (request) => {
 
 	request.message("I just started Compute Fav Ratio");
 	
@@ -244,161 +178,71 @@ Parse.Cloud.job("Compute Fav Ratio", (request) => {
 
 	var queryGeocaches = new Parse.Query(Geocache);
 	queryGeocaches.equalTo("Active", true);
-	queryGeocaches.find().then(function(geocaches) {
-
-		geocaches.forEach(function(geocache) {
+	queryGeocaches.find().then((geocaches) => {
+		geocaches.forEach((geocache) => {
 			var query = new Parse.Query(Logs);
 			query.equalTo("Active", true);
 			query.limit(100000);
 			query.equalTo("Geocache", geocache);
-			query.count().then(function(counter) {
+			query.count().then(async (counter) => {
 				var nbFav = geocache.get("Fav"); 
 				var ratio =  Math.round((nbFav / counter) * 100); 
 				geocache.set("RatioFav", ratio);
-				geocache.save();
+				await geocache.save(null);
 			});
 		});
-	}).then(function(result) {
-		request.success("I just finished");
+	}).then((result) => {
+		request.message("I just finished");
 	}, function(error) {
-		request.error(error);
+		console.error(error);
 	});
 });
-
-Parse.Cloud.job("Second - Compute Score TB", (request) => {
-
-	request.message("I just started Compute Score TB");
-
-	var TravelbugLog = Parse.Object.extend("TravelbugLog");
-	var queryTbs = new Parse.Query(TravelbugLog);
-
-	const nbPointsMission = 5;
-	const nbPointsNewTBDiscover = 10;
-	const nbPointsFirstCacheVisit = 10;
-	const nbPointsTBOwnerByMove = 2;
-	const nbPointsFavTB = 2;
-
-	var Ranking = Parse.Object.extend("Ranking");
-	var queryRanking = new Parse.Query(Ranking);
-	queryRanking.equalTo("Active", true);
-	queryRanking.limit(1000);
-	queryRanking.find().then(function(rankings) {
-		rankings.forEach(function(rank) {
-			queryTbs.equalTo("Active", true);
-			queryTbs.equalTo("Action", "drop");
-			queryTbs.include("Travelbug");
-			queryTbs.limit(10000);
-			queryTbs.find().then(function(mylogs) {
-				var scoreTb = { drop:0, dropTB:0, dropgc:0, missions:0, fav:0, owner:0};
-			
-				var promise = Parse.Promise.as();
-				var email = rank.get("Email");
-				
-		  		mylogs.forEach(function(log) {
-					promise = promise.then(function() {
-						if (log.get("Email") == email) {
-							scoreTb.dropTB = scoreTb.dropTB + nbPointsFirstCacheVisit*log.get("NewCache");
-							scoreTb.dropgc = scoreTb.dropgc + nbPointsNewTBDiscover*log.get("NewTB");
-							if (log.get("Mission") != undefined) {
-				  				scoreTb.missions = scoreTb.missions + nbPointsMission * log.get("Mission");													
-							}
-						}  			
-		  				if (log.get("Travelbug").get("OwnerEmail") == email) {
-			  				scoreTb.fav = scoreTb.fav + log.get("Fav") * nbPointsFavTB; 	  	
-			  				scoreTb.owner = scoreTb.owner + nbPointsTBOwnerByMove;				
-		  				}
-		  				return scoreTb;
-		  			});	
-		  		});		
-				return promise;
-			}).then(function(scoreTb) {
-				if (scoreTb == undefined) {
-					scoreTb = { dropTB:0, dropgc:0, missions:0, fav:0, owner:0};
-				}
-				var scoreTbTotal = scoreTb.dropTB + scoreTb.dropgc + scoreTb.missions + scoreTb.fav + scoreTb.owner;
-				rank.set("ScoreTB", scoreTbTotal);
-				rank.save();
-			});
-		});
-	}).then(function(result) {
-		request.success("I just finished");
-	}, function(error) {
-		request.error(error);
-	});
-});
-
 
 Parse.Cloud.job("Compute All rankings", (request) => {
   request.message("I just started Compute All Rankings");
-
   var Geocacheur = Parse.Object.extend("Geocacheur");
-
   var queryGeocacheurs = new Parse.Query(Geocacheur);
   queryGeocacheurs.equalTo("Active", true);
   queryGeocacheurs.limit(1000);
-  queryGeocacheurs.find()
-    .then(
-      function(geocacheurs) {
-
+  queryGeocacheurs.find().then((geocacheurs) => {
         var promisesScores = [];
         var counter = 0;
-
-        geocacheurs.forEach(
-          function(geocacheur) {
-
+        geocacheurs.forEach((geocacheur) => {
             counter = counter + 1;
             var email = geocacheur.get("Email");
-
             request.message("Processing " + email + " " + counter + "/" + geocacheurs.length);
             console.log("Processing " + email + " " + counter + "/" + geocacheurs.length);
-
-
             promisesScores.push(jds.computeScoreForGeocacheur(email));
-          }
-        );
+        });
 
         return Parse.Promise.all(promisesScores);
-      }
-    )
-.then(
-  function(scores) {
-    console.log("in function with " + scores.length + " scores ");
-    var promisesStore = [];
-    var counter = 0;
-
-    scores.forEach(
-      function(score) {
+    }).then((scores) => {
+	    console.log("in function with " + scores.length + " scores ");
+	    var promisesStore = [];
+	    var counter = 0;
+	    scores.forEach((score) => {
             counter = counter + 1;
-            var email = score.geocacheur.get("Email");
-
+            const email = score.geocacheur.get("Email");
             request.message("Storing " + email + " - " + counter + "/" + scores.length);
             console.log("Storing " + email + " - " + counter + "/" + scores.length);
 
-
             promisesStore.push(jds.saveOrUpdateRanking2(score));
-      }
-    );
-
-    return Parse.Promise.all(promisesStore);
-
-  })
-.then(function(results) {
-  console.log("termine with " + results.length);
-  request.success("I just finished");
-  }, function(error) {
-  	request.error(error);
-  });
-
+	    });
+	    return Parse.Promise.all(promisesStore);
+  	}).then((results) => {
+	  	console.log("termine with " + results.length);
+	  	request.message("I just finished");
+  		}, (error) => {
+  			console.error(error);
+  		});
 });
 
-Parse.Cloud.job("Last - Compute Ranking", (request) => {
-
+Parse.Cloud.job("Last - Compute Ranking", async (request) => {
 	request.message("I just started Compute Ranking");
-
-	var scoreFoundIt = 20;
-	var scoreFTF = 3;
-	var scoreSTF = 2;
-	var scoreTTF = 1;
+	const scoreFoundIt = 20;
+	const scoreFTF = 3;
+	const scoreSTF = 2;
+	const scoreTTF = 1;
 
 	var Logs = Parse.Object.extend("Log");
 	var Ranking = Parse.Object.extend("Ranking");
@@ -406,26 +250,25 @@ Parse.Cloud.job("Last - Compute Ranking", (request) => {
 	var queryRanking = new Parse.Query(Ranking);
 	queryRanking.equalTo("Active", true);
 	queryRanking.limit(1000);
-	queryRanking.find().then(function(rankings) {
-
-		rankings.forEach(function(rank) {
+	queryRanking.find().then((rankings) => {
+		rankings.forEach((rank) => {
 			var query = new Parse.Query(Logs);
 			query.equalTo("Email", rank.get("Email"));
 			query.equalTo("Active", true);
 			query.greaterThanOrEqualTo("createdAt", new Date("2018-05-10"));
 			query.limit(10000);
-			query.count().then(function(counter) { 
+			query.count().then(async (counter) => { 
 				var scoreFTFSTFTTF = rank.get("FTF") * scoreFTF + rank.get("STF") * scoreSTF + rank.get("TTF") * scoreTTF;
 				var score = counter * scoreFoundIt + scoreFTFSTFTTF + rank.get("ScoreDT") + rank.get("ScoreTB");
 				rank.set("Found", counter);
 				rank.set("Score", score);
 				rank.set("ScoreFTF", scoreFTFSTFTTF);
-				rank.save();
+				await rank.save(null);
 			});
 		});
-	}).then(function(result) {
-		request.success("I just finished");
+	}).then((result) => {
+		request.message("I just finished");
 	}, function(error) {
-		request.error(error);
+		console.error(error);
 	});
 });

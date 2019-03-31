@@ -8,27 +8,7 @@
 	<script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"></script>
 </head>
 <body>
-	<div class="wrapper style1">
-
-		<div id="header">
-			<div class="container">
-
-				<h1><a href="/" id="logo">Géocaching</a></h1>
-
-				<nav id="nav">
-					<ul>
-						<li><a href="/">Accueil</a></li>
-						<li class="active"><a href="/geocaches">Géocaches</a></li>
-						<li><a href="/tbs">Objets Voyageurs</a></li>
-						<li><a href="/geocaching">Règles du jeu</a></li>
-						<li><a href="/tools">Outils</a></li>
-						<li><a href="/ranking">Classement</a></li>
-					</ul>
-				</nav>
-
-			</div>
-		</div>
-	</div>
+	<% include ./partials/menu %>
 
 	<div id="main" class="wrapper style4">
 
@@ -80,30 +60,6 @@
 				</details>
 			</section>
 			<br />
-			<% } %>
-
-			<% if(cat=='TRADI' || cat=='MULTI' || cat=='LETTERBOX' || cat=='EVENT' || cat=='CITO' || cat=='WHERIGO' || cat=='MYSTERY' || cat=='SPECIAL') { %>
-			<section>
-				<h2>🗿 Objets Voyageurs</h2>
-				<details>
-					<summary>Cliquez pour voir les objets présents dans cette cache</summary>
-					<ul>
-					<% objets.forEach(function(obj) { %>
-						<li> <a href="/tb?id=<%= obj.id %>"><b> <%= obj.get("Name") %></b></a> 
-					<% }); %>
-					</ul>
-				</details>
-				<details>
-					<summary>Cliquez pour voir les objets ayant deja transité dans cette cache</summary>
-					<ul>
-					<% objetsLogged.forEach(function(obj) { %>
-						<li> <a href="/tb?id=<%= obj.get("TravelbugId") %>"><b> <%= obj.get("TravelbugName") %></b></a>  <b><%= moment(obj.get("Date")).utcOffset(120).fromNow() %> le <%= moment(obj.get("Date")).utcOffset(120).format("LL [à] LT") %> </b>- <%= obj.get("Pseudo") %> : <i><%= obj.get("Message") %></i><% if(obj.get("Photo"))  { %> - <a href="<%= obj.get("Photo").url().replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, '') %>">photo</a><% } %></li>
-					<% }); %>
-					</ul>
-
-				</details>
-			</section>
-			<br>
 			<% } %>
 
 			<% if( cat=='VIRTUAL' || cat=='WEBCAM' || cat=='EARTHCACHE' || cat=='SPECIAL' ) { %>

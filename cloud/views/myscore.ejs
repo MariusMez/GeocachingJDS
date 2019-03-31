@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-	<title>Géocaching Jeux de Sophia 2018</title>
+	<title>Géocaching Jeux de Sophia 2019</title>
 	<% include ./partials/head %>
 	<link rel="stylesheet" href="public/css/style-table.css" />
 </head>
@@ -13,7 +13,7 @@
 		<div id="content" class="container">
 			<section>
 				<header class="major">
-					<h2>Score total de <i><%= pseudo %></i> : <%= scoresCache.total + scoreMyTb.total + scoreTb.total %></h2>
+					<h2>Score total de <i><%= pseudo %></i> : <%= scoresCache.total %></h2>
 				</header>
 
 				<h2>Mes caches trouvées : <%= scoresCache.total  %> </h2>
@@ -46,46 +46,6 @@
 					<li>Score pour caches trouvées (<i>20 points par cache</i>) : <b><%- scoresCache.ScoreFound %></b></li>
 					<li>Score pour des étoiles Difficulté/Terrain : <b><%- scoresCache.ScoreDT %></b></li>
 					<li>Score pour FTF (<i>3 points</i>) / STF (<i>2 points</i>) / TTF (<i>1 point</i>) : <b><%- scoresCache.ScoreFTF %></b></li>
-				</ul>
-
-				<h2>Les objets voyageurs que j'ai déplacés : <%= scoreTb.total  %> </h2>
-				<table class="zebra">
-					<thead>
-						<tr>
-							<th colspan=1><b>Objet</b></th>
-							<th colspan=1><b>Mission</b></th>
-							<th colspan=1><b>Première visite de cache</b></th>
-							<th colspan=3><b>Nombre de drop</b></th>
-						</tr>
-					</thead>
-					<tbody>
-						<% Object.values(scoreTb.tbs).forEach(function(tb) { %>
-						<tr>
-							<td colspan=1 style="vertical-align: middle;">
-								<a href="/tb?id=<%= tb.id %>"><b> <%= tb.name %></b></a>
-							</td>
-							
-							<td colspan=1><%= tb.mission %></td>
-							<td colspan=1><%= tb.newCache %></td>
-							<td colspan=1><%= tb.visites %></td>
-							
-						</tr>
-						<% }); %>
-					</tbody>
-				</table>
-				<ul>
-					<li>Objets uniques deplacés (<i>10 points par objets différents</i>) : <b><%- scoreTb.newTbs * 10 %></b></li>
-					<li>Caches visitées en premier par un objet (<i>10 points par visite de cache par objet</i>) : <b><%- scoreTb.newVisits * 10 %></b></li>
-					<li>Missions satisfaites (<i>5 points par mission</i>) : <b><%- scoreTb.missions * 5 %></b></li>
-				</ul>
-
-				<h2>Mon objet voyageur : <%= scoreMyTb.total  %> </h2>
-				<ul>
-					<li>Mon objet : <a href="/tb?id=<%= mytb.id %>"><b> <%= mytb.name %></b></a></li>
-					<li>Nombre de drop de mon objet : <b><%- scoreMyTb.totalMoves %></b></li>
-					<li>Déplacements de mon objet (<i>2 points par participant différent</i>) : <b><%- scoreMyTb.moves %></b></li>
-					<li>Point favori de mon objet (<i>2 points par favori par participant</i>) : <b><%- scoreMyTb.fav %></b></li>
-					
 				</ul>
 
 				<p class="medium"><b>Note :</b> ce score peut être différent de celui inscrit sur le <a href="/ranking">classement général</a> car il est calculé en temps réel en fonction de l'ordre des logs envoyés. Le classement général est géré en partie manuellement pour prendre en compte les erreurs eventuelle. N'hésitez pas à nous contacter si vous détectez des incohérences.</p>
