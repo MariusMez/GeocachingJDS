@@ -329,14 +329,11 @@ app.post('/found', upload.single('pic'), function (req, res, next) {
 									var filename = photoFile.originalname;
 									var photoFileBase64 = photoFile.buffer.toString('base64');
 									var parseFile = new Parse.File(filename, { base64: photoFileBase64 });
-									parseFile.save(null).then((object) => {
-										var photo_url = parseFile.url({forceSecure: true})
-										console.log("Photo saved : " + photo_url);
-										logEntry.set("PhotoUrl", photo_url);
-										logEntry.set("Photo", parseFile);
-									}, (error) => {
-										console.log("Photofile save error " + error.message);
-									});
+									var photo_url = parseFile.url({forceSecure: true})
+									logEntry.set("PhotoUrl", photo_url);
+									logEntry.set("Photo", parseFile);
+
+									
 								}
 
 					        	// Becarefull with this, not always the case in the field
@@ -357,12 +354,12 @@ app.post('/found', upload.single('pic'), function (req, res, next) {
 								if(fav == "true") {
 									logEntry.set("Fav", true);
 									cache.increment("Fav");
-									cache.save(null);
+									cache.save();
 								} else {
 									logEntry.set("Fav", false);
 								}
 
-								logEntry.save(null).then((object) => {
+								logEntry.save().then((object) => {
 									res.render('found', { cacheid: cache.id, 
 														  cat: cache.get("Category"),
 														  geocacheurId: geocacheur.id, 

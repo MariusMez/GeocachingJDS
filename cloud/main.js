@@ -4,16 +4,12 @@ var jds = require('../geocaching-jds');
 Parse.Cloud.beforeSave("Log", async (request) => {
 	if(request.object.isNew()) { 
 		var photo = request.object.get("Photo");
-		console.log("PHOTO:" + photo)
 		if(photo) {
-			console.log("IN PHOTO")
-	    	const sharp = require('sharp');
 			const maxWidth = 1000;
 			const maxHeight = 1000;
 		    const response = await Parse.Cloud.httpRequest({ url: photo.url() });
-		    const thumbnail = jds.createThumbnail(response.buffer, maxWidth, maxHeight);
+		    const thumbnail = await jds.createThumbnail(response.buffer, maxWidth, maxHeight);
 		    if(thumbnail) {
-		    	console.log("IN THUMBNAIL")
 		    	request.object.set("Photo", thumbnail);
 		    	request.object.set("PhotoUrl", thumbnail.url({forceSecure: true}));
 		    }

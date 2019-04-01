@@ -1,17 +1,13 @@
-const createThumbnail = function createThumbnail(image_buffer, maxWidth, maxHeight) {
+const createThumbnail = async function createThumbnail(image_buffer, maxWidth, maxHeight) {
     const sharp = require('sharp');
-    return sharp(image_buffer).resize(maxWidth, maxHeight)
-                              .max()
-                              .withoutEnlargement()
+    return sharp(image_buffer).resize(maxWidth, maxHeight, { fit: 'inside', withoutEnlargement: true })
                               .toFormat('jpeg')
                               .toBuffer()
-                              .then((buffer_img) => { 
-                                    console.log("Generating Thumbnail...");
+                              .then(async (buffer_img) => { 
                                     var thumb = new Parse.File("thumbnail.jpg", { base64: buffer_img.toString('base64') });
-                                    return thumb.save(null);
-                               }).then((thumbnail) => {
-                                    return thumbnail;
-                                }, (error) => {
+                                    pic = await thumb.save();
+                                    return pic
+                               }, (error) => {
                                     console.log("Thumbnail generation error: " + error.message);
                                     return;
                                });

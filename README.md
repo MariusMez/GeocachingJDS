@@ -25,6 +25,28 @@ cd GeocachingJDS && npm install
 - View logs: ```pm2 logs```
 - Clearing logs: ```pm2 flush```
 
+## Cleaning database files
+
+First delete olds files: `db.fs.files.remove({"uploadDate": {$lt : ISODate("2016-11-10T20:32:13.743Z")}});`
+
+then in a mongo shell: 
+
+```
+function removeChunkIfNoOwner(chunk){
+  //Look for the parent file
+  var parentCount = db.fs.files.find({'_id' : chunk.files_id}).count();
+
+  if (parentCount === 0 ){
+     db.fs.chunks.remove({'_id': chunk._id});
+     print("Removing chunk " + chunk._id);
+  }
+}
+```
+
+Select your database and remove orphaned chunks: `db.fs.chunks.find().forEach(removeChunkIfNoOwner);`
+
+
+
 ## Contribution
 
 Pull requests or other contributions are welcome
