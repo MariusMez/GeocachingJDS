@@ -1,14 +1,14 @@
-var jds = require('../geocaching-jds');
-
+const jds = require('../geocaching-jds');
+const starting_jds_date = "2018-05-10";
 
 Parse.Cloud.beforeSave("Log", async (request) => {
 	if(request.object.isNew()) { 
-		var photo = request.object.get("Photo");
+		const photo = request.object.get("Photo");
 		if(photo) {
 			const maxWidth = 1000;
 			const maxHeight = 1000;
-		    const response = await Parse.Cloud.httpRequest({ url: photo.url() });
-		    const thumbnail = await jds.createThumbnail(response.buffer, maxWidth, maxHeight);
+		    let response = await Parse.Cloud.httpRequest({ url: photo.url() });
+		    let thumbnail = await jds.createThumbnail(response.buffer, maxWidth, maxHeight);
 		    if(thumbnail) {
 		    	request.object.set("Photo", thumbnail);
 		    	request.object.set("PhotoUrl", thumbnail.url({forceSecure: true}));
@@ -20,55 +20,54 @@ Parse.Cloud.beforeSave("Log", async (request) => {
 
 Parse.Cloud.job("Resize all PhotoLog", async (request) => {
 	request.message("I just started");
-	const sharp = require('sharp');
 	const Log = Parse.Object.extend("Log");
-	const query = new Parse.Query(Log);
+	let query = new Parse.Query(Log);
 	query.lessThanOrEqualTo("createdAt", new Date());
 	query.equalTo("Active", true);
 	query.doesNotExist("PhotoResized");
 	query.limit(10000);
 	query.exists("PhotoUrl");
-	const logs = await query.find();
+	let logs = await query.find();
 	console.log("Processing " + logs.length + " logs...");
-	const promises = logs.map(async (log) => {
-		var photoFile = log.get("Photo");
+	let promises = logs.map(async (log) => {
+		const photoFile = log.get("Photo");
 		log.set("Photo", photoFile);
 		log.set("PhotoResized", true);
 		await log.save(null);
 		request.message('Resized ' + photoFile);
 	});
-	await Promise.all(promises)
+	await Promise.all(promises);
 	request.message("I just finished");
 });
 
 Parse.Cloud.job("Add Geocacheurs from CSV file", async (request) => {
 	request.message("I just started");
-	var csv = require('csv'); 
-	var obj = csv(); 
+	const csv = require('csv');
+	let obj = csv();
 
-	var Geocacheur = Parse.Object.extend("Geocacheur");
-	var Ranking = Parse.Object.extend("Ranking");
+	const Geocacheur = Parse.Object.extend("Geocacheur");
+	const Ranking = Parse.Object.extend("Ranking");
 
 	obj.from.path('Geocacheurs.csv').to.array(function(geocacheurs) {
 		geocacheurs.forEach( async (geocacheur) => {
-			var firstname = geocacheur[0];
-			var companyname = geocacheur[1];
-			var email = geocacheur[2].toLowerCase();
+			const firstname = geocacheur[0];
+			const companyname = geocacheur[1];
+			const email = geocacheur[2].toLowerCase();
 
-			var query = new Parse.Query(Geocacheur);
+			let query = new Parse.Query(Geocacheur);
 			query.equalTo('Email', email);
 			const result = await query.first();
 
-			if (result === undefined) {
-				var geocacheur = new Geocacheur();
-				geocacheur.save({
+			if(result === undefined) {
+				let g = new Geocacheur();
+				g.save({
 					Email: email,
 					Pseudo: firstname,
 					Company: companyname,
 					Enrollment: "preload",
 					Active: false
 				}).then((user) => {
-					var queryRanking = new Parse.Query(Ranking);
+					let queryRanking = new Parse.Query(Ranking);
 					queryRanking.equalTo('Geocacheur', user);
 					queryRanking.first().then((res) => {
 						if (res === undefined) {
@@ -94,27 +93,25 @@ Parse.Cloud.job("Add Geocacheurs from CSV file", async (request) => {
 });
 
 Parse.Cloud.job("First - Compute Score Ratio D/T", (request) => {
-
 	request.message("I just started Compute Ratio D/T");
 
-	var Logs = Parse.Object.extend("Log");
-	var Ranking = Parse.Object.extend("Ranking");
+	const Logs = Parse.Object.extend("Log");
+	const Ranking = Parse.Object.extend("Ranking");
 
-	var queryRanking = new Parse.Query(Ranking);
+	let queryRanking = new Parse.Query(Ranking);
 	queryRanking.equalTo("Active", true);
 	queryRanking.limit(1000);
 	queryRanking.find().then((ranking) => {
 		ranking.forEach((rank) => {
-			var query = new Parse.Query(Logs);
+			let query = new Parse.Query(Logs);
 			query.equalTo("Email", rank.get("Email"));
 			query.equalTo("Active", true);
-			query.greaterThanOrEqualTo("createdAt", new Date("2018-05-10"));
+			query.greaterThanOrEqualTo("createdAt", new Date(starting_jds_date));
 			query.limit(100000);
 			query.include('Geocache');
-			query.find().then(function(logs) { 
-
-				var promise = Parse.Promise.as();
-				var scoreDT = 0;
+			query.find().then(function(logs) {
+				let promise = Parse.Promise.as();
+				let scoreDT = 0;
 				logs.forEach(function(log) {
 					promise = promise.then(function() {
 						scoreDT = scoreDT + log.get("Geocache").get("Difficulty") + log.get("Geocache").get("Terrain");
@@ -137,18 +134,17 @@ Parse.Cloud.job("First - Compute Score Ratio D/T", (request) => {
 
 
 Parse.Cloud.job("Compute Fav Points", async (request) => {
-
 	request.message("I just started Compute Fav Points");
 
-	var Logs = Parse.Object.extend("Log");
-	var Geocache = Parse.Object.extend("Geocache");
+	const Logs = Parse.Object.extend("Log");
+	const Geocache = Parse.Object.extend("Geocache");
 
-	var queryGeocaches = new Parse.Query(Geocache);
+	let queryGeocaches = new Parse.Query(Geocache);
 	queryGeocaches.limit(1000);
 	queryGeocaches.equalTo("Active", true);
 	queryGeocaches.find().then(async (geocaches) => {
 		geocaches.forEach(async (geocache) => {
-			var query = new Parse.Query(Logs);
+			let query = new Parse.Query(Logs);
 			query.equalTo("Active", true);
 			query.limit(100000);
 			query.equalTo("Geocache", geocache);
@@ -166,23 +162,22 @@ Parse.Cloud.job("Compute Fav Points", async (request) => {
 });
 
 Parse.Cloud.job("Compute Fav Ratio", async (request) => {
-
 	request.message("I just started Compute Fav Ratio");
 	
-	var Logs = Parse.Object.extend("Log");
-	var Geocache = Parse.Object.extend("Geocache");
+	const Logs = Parse.Object.extend("Log");
+	const Geocache = Parse.Object.extend("Geocache");
 
-	var queryGeocaches = new Parse.Query(Geocache);
+	let queryGeocaches = new Parse.Query(Geocache);
 	queryGeocaches.equalTo("Active", true);
 	queryGeocaches.find().then((geocaches) => {
 		geocaches.forEach((geocache) => {
-			var query = new Parse.Query(Logs);
+			let query = new Parse.Query(Logs);
 			query.equalTo("Active", true);
 			query.limit(100000);
 			query.equalTo("Geocache", geocache);
 			query.count().then(async (counter) => {
-				var nbFav = geocache.get("Fav"); 
-				var ratio =  Math.round((nbFav / counter) * 100); 
+				let nbFav = geocache.get("Fav");
+				let ratio =  Math.round((nbFav / counter) * 100);
 				geocache.set("RatioFav", ratio);
 				await geocache.save(null);
 			});
@@ -196,16 +191,16 @@ Parse.Cloud.job("Compute Fav Ratio", async (request) => {
 
 Parse.Cloud.job("Compute All rankings", (request) => {
   request.message("I just started Compute All Rankings");
-  var Geocacheur = Parse.Object.extend("Geocacheur");
-  var queryGeocacheurs = new Parse.Query(Geocacheur);
+  const Geocacheur = Parse.Object.extend("Geocacheur");
+  let queryGeocacheurs = new Parse.Query(Geocacheur);
   queryGeocacheurs.equalTo("Active", true);
   queryGeocacheurs.limit(1000);
   queryGeocacheurs.find().then((geocacheurs) => {
-        var promisesScores = [];
-        var counter = 0;
+        let promisesScores = [];
+	    let counter = 0;
         geocacheurs.forEach((geocacheur) => {
             counter = counter + 1;
-            var email = geocacheur.get("Email");
+            const email = geocacheur.get("Email");
             request.message("Processing " + email + " " + counter + "/" + geocacheurs.length);
             console.log("Processing " + email + " " + counter + "/" + geocacheurs.length);
             promisesScores.push(jds.computeScoreForGeocacheur(email));
@@ -214,8 +209,8 @@ Parse.Cloud.job("Compute All rankings", (request) => {
         return Parse.Promise.all(promisesScores);
     }).then((scores) => {
 	    console.log("in function with " + scores.length + " scores ");
-	    var promisesStore = [];
-	    var counter = 0;
+	    let promisesStore = [];
+	    let counter = 0;
 	    scores.forEach((score) => {
             counter = counter + 1;
             const email = score.geocacheur.get("Email");
@@ -240,22 +235,22 @@ Parse.Cloud.job("Last - Compute Ranking", async (request) => {
 	const scoreSTF = 2;
 	const scoreTTF = 1;
 
-	var Logs = Parse.Object.extend("Log");
-	var Ranking = Parse.Object.extend("Ranking");
+	const Logs = Parse.Object.extend("Log");
+	const Ranking = Parse.Object.extend("Ranking");
 
-	var queryRanking = new Parse.Query(Ranking);
+	let queryRanking = new Parse.Query(Ranking);
 	queryRanking.equalTo("Active", true);
 	queryRanking.limit(1000);
 	queryRanking.find().then((rankings) => {
 		rankings.forEach((rank) => {
-			var query = new Parse.Query(Logs);
+			let query = new Parse.Query(Logs);
 			query.equalTo("Email", rank.get("Email"));
 			query.equalTo("Active", true);
-			query.greaterThanOrEqualTo("createdAt", new Date("2018-05-10"));
+			query.greaterThanOrEqualTo("createdAt", new Date(starting_jds_date));
 			query.limit(10000);
 			query.count().then(async (counter) => { 
-				var scoreFTFSTFTTF = rank.get("FTF") * scoreFTF + rank.get("STF") * scoreSTF + rank.get("TTF") * scoreTTF;
-				var score = counter * scoreFoundIt + scoreFTFSTFTTF + rank.get("ScoreDT") + rank.get("ScoreTB");
+				let scoreFTFSTFTTF = rank.get("FTF") * scoreFTF + rank.get("STF") * scoreSTF + rank.get("TTF") * scoreTTF;
+				let score = counter * scoreFoundIt + scoreFTFSTFTTF + rank.get("ScoreDT") + rank.get("ScoreTB");
 				rank.set("Found", counter);
 				rank.set("Score", score);
 				rank.set("ScoreFTF", scoreFTFSTFTTF);

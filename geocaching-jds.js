@@ -1,23 +1,24 @@
+const starting_jds_date = "2019-05-10";
+
 const createThumbnail = async function createThumbnail(image_buffer, maxWidth, maxHeight) {
     const sharp = require('sharp');
     return sharp(image_buffer).resize(maxWidth, maxHeight, { fit: 'inside', withoutEnlargement: true })
-                              .toFormat('jpeg')
-                              .toBuffer()
-                              .then(async (buffer_img) => { 
-                                    var thumb = new Parse.File("thumbnail.jpg", { base64: buffer_img.toString('base64') });
-                                    pic = await thumb.save();
-                                    return pic
-                               }, (error) => {
-                                    console.log("Thumbnail generation error: " + error.message);
-                                    return;
-                               });
+        .toFormat('jpeg')
+        .toBuffer()
+        .then(async (buffer_img) => {
+            let thumb = new Parse.File("thumbnail.jpg", { base64: buffer_img.toString('base64') });
+            let pic = await thumb.save();
+            return pic
+        }, (error) => {
+            console.log("Thumbnail generation error: " + error.message);
+            return;
+        });
 };
-
 
 const getGeocache = function(id) {
     return new Promise((resolve, reject) => {
-        var Geocache = Parse.Object.extend("Geocache");
-        var query = new Parse.Query(Geocache);
+        const Geocache = Parse.Object.extend("Geocache");
+        let query = new Parse.Query(Geocache);
         query.get(id).then((result) => {
             if(result) {
                 resolve(result);
@@ -29,12 +30,12 @@ const getGeocache = function(id) {
             reject(error);
         });
     });
-}
+};
 
 const getGeocacheWithCodeId = function(geocacheCodeId) {
     return new Promise((resolve, reject) => {
-        var Geocache = Parse.Object.extend("Geocache");
-    	var query = new Parse.Query(Geocache);
+        const Geocache = Parse.Object.extend("Geocache");
+        let query = new Parse.Query(Geocache);
         query.equalTo("codeId", geocacheCodeId);
         query.first().then((result) => {
             if(result) {
@@ -47,12 +48,12 @@ const getGeocacheWithCodeId = function(geocacheCodeId) {
             reject(error);
         });
     });
-}
+};
 
 const getAllPublishedGeocaches = function(descending) {
     return new Promise((resolve, reject) => {
-        var Geocaches = Parse.Object.extend("Geocache");
-        var query = new Parse.Query(Geocaches);
+        const Geocaches = Parse.Object.extend("Geocache");
+        let query = new Parse.Query(Geocaches);
         query.equalTo("Active",true);
         query.lessThanOrEqualTo("Publication", new Date());
         query.descending(descending);
@@ -68,15 +69,15 @@ const getAllPublishedGeocaches = function(descending) {
             reject(error);
         });
     });
-}
+};
 
 const getLastLogs = function(limit) {
     return new Promise((resolve, reject) => {
-        var Log = Parse.Object.extend("Log");
-        var query = new Parse.Query(Log);
+        const Log = Parse.Object.extend("Log");
+        let query = new Parse.Query(Log);
         query.descending("createdAt");
         query.equalTo("Active", true);
-        query.limit(limit); 
+        query.limit(limit);
         query.include("Geocache");
         query.find().then((results) => {
             if(results) {
@@ -89,12 +90,12 @@ const getLastLogs = function(limit) {
             reject(error);
         });
     });
-}
+};
 
 const getLogWithEmailAndCache = function(email, geocache) {
-    return new Promise((resolve, reject) => {    
-        var Logs = Parse.Object.extend("Log");    
-        var query = new Parse.Query(Logs);
+    return new Promise((resolve, reject) => {
+        const Logs = Parse.Object.extend("Log");
+        let query = new Parse.Query(Logs);
         query.equalTo("Email", email);
         query.equalTo("Geocache", geocache);
         query.equalTo("Active", true);
@@ -112,9 +113,9 @@ const getLogWithEmailAndCache = function(email, geocache) {
 }
 
 const getAllActiveLogWithCache = function(geocache) {
-    return new Promise((resolve, reject) => {    
-        var Logs = Parse.Object.extend("Log");    
-        var query = new Parse.Query(Logs);
+    return new Promise((resolve, reject) => {
+        const Logs = Parse.Object.extend("Log");
+        let query = new Parse.Query(Logs);
         query.descending("createdAt");
         query.equalTo("Active", true);
         query.equalTo("Geocache", geocache);
@@ -129,13 +130,13 @@ const getAllActiveLogWithCache = function(geocache) {
             reject(error);
         });
     });
-}
+};
 
 const getGeocacheurWithEmail = function(email) {
     console.log("getGeocacheurWithEmail " + email);
-    return new Promise((resolve, reject) => {    
-        var Geocacheur = Parse.Object.extend("Geocacheur");    
-        var query = new Parse.Query(Geocacheur);
+    return new Promise((resolve, reject) => {
+        const Geocacheur = Parse.Object.extend("Geocacheur");
+        let query = new Parse.Query(Geocacheur);
         query.equalTo("Email", email);
         query.equalTo("Active", true);
         query.first().then((result) => {
@@ -149,12 +150,12 @@ const getGeocacheurWithEmail = function(email) {
             reject(error);
         });
     });
-}
+};
 
 const hasEmailFoundGeocache = function(email, geocache) {
     return new Promise((resolve, reject) => {
-        var Log = Parse.Object.extend('Log');
-        var query = new Parse.Query(Log);
+        const Log = Parse.Object.extend('Log');
+        let query = new Parse.Query(Log);
         query.equalTo("Email", email);
         query.equalTo("Geocache", geocache);
         query.equalTo("Active", true);
@@ -169,12 +170,12 @@ const hasEmailFoundGeocache = function(email, geocache) {
             reject(error);
         });
     });
-}
+};
 
 const getAllActiveRanking = function(descending) {
     return new Promise((resolve, reject) => {
-        var Ranking = Parse.Object.extend("Ranking");
-        var query = new Parse.Query(Ranking);
+        const Ranking = Parse.Object.extend("Ranking");
+        let query = new Parse.Query(Ranking);
         query.descending(descending);
         query.equalTo("Active", true);
         query.include("Geocacheur");
@@ -189,12 +190,12 @@ const getAllActiveRanking = function(descending) {
             reject(error);
         });
     });
-}
+};
 
 const saveRanking = function(geocacheur, active) {
-    return new Promise((resolve, reject) => {    
-        var Ranking = Parse.Object.extend("Ranking");
-        var ranking = new Ranking();
+    return new Promise((resolve, reject) => {
+        const Ranking = Parse.Object.extend("Ranking");
+        let ranking = new Ranking();
         ranking.set("Geocacheur", geocacheur);
         ranking.set("Email", geocacheur.get("Email"));
         ranking.set("FTF", 0);
@@ -212,7 +213,7 @@ const saveRanking = function(geocacheur, active) {
             reject(error);
         });
     });
-}
+};
 
 const computeScoreForGeocacheur = function(email) {
     console.log("computeScoreForGeocacheur " + email );
@@ -223,18 +224,18 @@ const computeScoreForGeocacheur = function(email) {
         const nbPointsSTF = 2;
         const nbPointsTTF = 1;
 
-        var promiseGeocacheur = getGeocacheurWithEmail(email);
-        var promiseLogs = getLogsByEmail(email);
+        let promiseGeocacheur = getGeocacheurWithEmail(email);
+        let promiseLogs = getLogsByEmail(email);
 
         Promise.all([promiseGeocacheur, promiseLogs]).then((values) => {
-            var geocacheur = values[0];
-            var mylogs = values[1];
+            let geocacheur = values[0];
+            let mylogs = values[1];
 
-            var scoreCaches = { found:0, FTF:0, STF:0, TTF:0, ScoreFTF:0, ScoreDT:0, ScoreFound:0, total:0, caches:[]};
+            let scoreCaches = { found:0, FTF:0, STF:0, TTF:0, ScoreFTF:0, ScoreDT:0, ScoreFound:0, total:0, caches:[]};
 
             // logs caches
             mylogs.forEach((log) => {
-                var cache = {id: log.get("Geocache").id, name: log.get("Geocache").get("Nom"), diff: log.get("Geocache").get("Difficulty"), terrain: log.get("Geocache").get("Terrain") };
+                let cache = {id: log.get("Geocache").id, name: log.get("Geocache").get("Nom"), diff: log.get("Geocache").get("Difficulty"), terrain: log.get("Geocache").get("Terrain") };
                 scoreCaches.ScoreDT = scoreCaches.ScoreDT + log.get("Geocache").get("Difficulty") + log.get("Geocache").get("Terrain");
                 scoreCaches.found = scoreCaches.found + 1;
                 scoreCaches.ScoreFound = scoreCaches.ScoreFound + nbPointsFoundIt;
@@ -259,26 +260,26 @@ const computeScoreForGeocacheur = function(email) {
 
             scoreCaches.total = scoreCaches.ScoreFTF + scoreCaches.ScoreDT + scoreCaches.ScoreFound;
             const result = { geocacheur:geocacheur, scoreCaches:scoreCaches };
-            console.log(result)
+            console.log(result);
             resolve(result);
         }).catch((error) => {
             console.error(error);
             throw error;
         });
     });
-}
+};
 
 const saveOrUpdateRanking2 = function(score) {
     return new Promise((resolve, reject) => {
-        var Ranking = Parse.Object.extend("Ranking");
+        const Ranking = Parse.Object.extend("Ranking");
 
-        var query = new Parse.Query(Ranking);
+        let query = new Parse.Query(Ranking);
         query.equalTo('Email', score.geocacheur.get("Email"));
         query.first().then((ranking) => {
             if(ranking == null) {
                 console.log("New ranking for " + score.geocacheur.get("Email"));
 
-                var ranking = new Ranking();
+                let ranking = new Ranking();
                 ranking.save({
                     Geocacheur: score.geocacheur,
                     Email: score.geocacheur.get("Email"),
@@ -289,7 +290,7 @@ const saveOrUpdateRanking2 = function(score) {
                 resolve(ranking);
             } else {
                 console.log("Ranking found - Updating");
-               
+
                 ranking.set("FTF", score.scoreCaches.FTF);
                 ranking.set("STF", score.scoreCaches.STF);
                 ranking.set("TTF", score.scoreCaches.TTF);
@@ -297,7 +298,7 @@ const saveOrUpdateRanking2 = function(score) {
                 ranking.set("ScoreDT", score.scoreCaches.ScoreDT);
                 ranking.set("Score", score.scoreCaches.total + score.scoreTb.total + score.scoreMyTb.total);
                 ranking.set("Found", score.scoreCaches.found);
-                
+
                 ranking.save(null);
                 resolve(ranking);
             }
@@ -305,15 +306,15 @@ const saveOrUpdateRanking2 = function(score) {
             reject(error);
         });
     });
-}
+};
 
 const saveOrUpdateGeocacheur = function(email, pseudo, active) {
     return new Promise((resolve, reject) => {
-        var Ranking = Parse.Object.extend("Ranking");
-        var queryRanking = new Parse.Query(Ranking);
+        const Ranking = Parse.Object.extend("Ranking");
+        let queryRanking = new Parse.Query(Ranking);
 
-        var Geocacheur = Parse.Object.extend("Geocacheur");
-        var query = new Parse.Query(Geocacheur);
+        const Geocacheur = Parse.Object.extend("Geocacheur");
+        let query = new Parse.Query(Geocacheur);
         query.equalTo('Email', email);
         query.first().then((geocacheur) => {
             if(geocacheur) {
@@ -346,7 +347,7 @@ const saveOrUpdateGeocacheur = function(email, pseudo, active) {
                 });
             } else {
                 console.log("Geocacheur was not found - Saving");
-                var geocacheur = new Geocacheur();
+                const geocacheur = new Geocacheur();
                 geocacheur.save({
                     Email: email,
                     Pseudo: pseudo,
@@ -368,31 +369,29 @@ const saveOrUpdateGeocacheur = function(email, pseudo, active) {
             reject(error);
         });
     });
-}
-
+};
 
 function getLogsByEmail(emailString) {
     console.log("getLogsByEmail : " + emailString);
     return new Promise((resolve, reject) => {
-        var email = emailString.toLowerCase();
-        var Logs = Parse.Object.extend("Log");
-        var query = new Parse.Query(Logs);
+        const email = emailString.toLowerCase();
+        const Logs = Parse.Object.extend("Log");
+        let query = new Parse.Query(Logs);
         query.equalTo("Email", email);
         query.ascending("createdAt");
         query.equalTo("Active", true);
         query.include('Geocache');
-        query.greaterThanOrEqualTo("createdAt", new Date("2019-05-01"));
+        query.greaterThanOrEqualTo("createdAt", new Date(starting_jds_date));
         query.limit(10000);
         query.find().then((logs) => {
             console.log("getLogsByEmail trouvés : " + logs.length);
             resolve(logs);
         }, (error) => {
-            console.log("Erreur pendant recherche logs " + emailString) ;
+            console.log("Erreur pendant recherche logs " + emailString);
             reject(error);
         });
     });
 }
-
 
 module.exports.createThumbnail = createThumbnail;
 module.exports.getGeocache = getGeocache;

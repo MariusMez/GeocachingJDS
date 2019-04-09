@@ -3,25 +3,25 @@ dotenv.config();
 // Since Node 8, have errors
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-var express = require('express');
-var bodyParser = require('body-parser');
-var ParseServer = require('parse-server').ParseServer;
-var path = require('path');
-var multer = require('multer');
+const startingDate = new Date("Sat, 01 May 2019 08:00:00 GMT");
 
-var Recaptcha = require('recaptcha-verify');
-var recaptcha = new Recaptcha({
+let express = require('express');
+const bodyParser = require('body-parser');
+const ParseServer = require('parse-server').ParseServer;
+const path = require('path');
+const multer = require('multer');
+
+const Recaptcha = require('recaptcha-verify');
+let recaptcha = new Recaptcha({
 	secret: process.env.RECAPTCHA_SECRET_KEY,
 	verbose: true
 });
 
-var fs = require('fs');
-const sharp = require('sharp');
 // var ca = [fs.readFileSync("/etc/letsencrypt/live/geocaching-jds.fr/fullchain.pem")];
 
-var jds = require('./geocaching-jds');
+let jds = require('./geocaching-jds');
 
-var api = new ParseServer({
+let api = new ParseServer({
   databaseURI: process.env.MONGODB_ADDON_URI, // Use the MongoDB URI
  // databaseOptions: {
  //     ssl: true,
@@ -38,8 +38,8 @@ var api = new ParseServer({
 // If you wish you require them, you can set them as options in the initialization above:
 // javascriptKey, restAPIKey, dotNetKey, clientKey
 
-var app = express();
-var upload = multer();
+let app = express();
+let upload = multer();
 
 // Global app configuration section
 app.set('views', 'cloud/views');  // Specify the folder to find templates
@@ -48,7 +48,7 @@ app.set('view engine', 'ejs');    // Set the template engine
 app.use('/public', express.static(path.join(__dirname, '/public')));
 
 // Serve the Parse API on the /parse URL prefix
-var mountPath = process.env.PARSE_MOUNT || '/parse';
+const mountPath = process.env.PARSE_MOUNT || '/parse';
 app.use(mountPath, api);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -76,13 +76,7 @@ app.get('/register', function(req, res) {
 	res.render('register');
 });
 
-
 app.get('/ranking', function(req, res) {
-	var Ranking = Parse.Object.extend("Ranking");
-	var queryGeocacheurs = new Parse.Query(Ranking);
-	var Geocache = Parse.Object.extend("Geocache");
-	var queryGeocaches = new Parse.Query(Geocache);
-	
 	jds.getAllActiveRanking("Score, ScoreFTF, ScoreDT").then(function(ranking) {
         jds.getAllPublishedGeocaches("RatioFav, Ratio").then(function(caches) {
         	jds.getAllActiveRanking("ScoreFTF").then(function(rankFTF) {
@@ -103,13 +97,12 @@ app.get('/ranking', function(req, res) {
 
 
 app.get('/geocaches', function(req, res) {
-	var moment = require('./cloud/moment-with-locales.min.js');
+	let moment = require('./cloud/moment-with-locales.min.js');
 	moment.locale('fr');
 	app.locals.moment = moment;
 
-	var startingDate = new Date("Sat, 01 May 2019 08:00:00 GMT");
-	var now = Date.now();
-	var start = false;
+	const now = Date.now();
+	let start = false;
 	if(startingDate < now) {
 		start = true;
 	}
@@ -129,21 +122,21 @@ app.get('/geocaches', function(req, res) {
 
 
 app.get('/photoscaches', async function(req, res) {
-	var page = req.query.page;
+	let page = req.query.page;
 	if (page === undefined) {
 		page = 1;
 	}
-	var max = 12;
+	const max = 12;
 
-	var Log = Parse.Object.extend("Log");
-	var query = new Parse.Query(Log);
+	const Log = Parse.Object.extend("Log");
+	let query = new Parse.Query(Log);
 	query.descending("createdAt");
 	query.equalTo("Active", true);
 	query.exists("PhotoUrl");
 	query.count().then(async (count) => {
-		var skip = 0;
+		let skip = 0;
 		if (count > max) { skip = (page - 1) * max; }
-    	var queryLog = new Parse.Query(Log);
+    	let queryLog = new Parse.Query(Log);
 		queryLog.descending("createdAt");
 		queryLog.equalTo("Active", true);
 		queryLog.exists("PhotoUrl");
@@ -169,15 +162,15 @@ app.get('/geocaching', function(req, res) {
 });
 
 app.get('/geocache', function(req, res) {
-	var moment = require('./cloud/moment-with-locales.min.js');
+	let moment = require('./cloud/moment-with-locales.min.js');
 	moment.locale('fr');
 	
-	var shortDateFormat = "dddd @ HH:mm"; 
+	const shortDateFormat = "dddd @ HH:mm";
 	app.locals.moment = moment; 
 	app.locals.shortDateFormat = shortDateFormat;
 
-	var Geocache = Parse.Object.extend("Geocache");
-	var query = new Parse.Query(Geocache);
+	const Geocache = Parse.Object.extend("Geocache");
+	let query = new Parse.Query(Geocache);
 	query.get(req.query.id).then( async (cache) => {
 		const geocacheName = cache.get("Nom");
 		const geocachePublicationDate = cache.get("Publication");
@@ -195,11 +188,11 @@ app.get('/geocache', function(req, res) {
 		const geocacheId = cache.id;
 
 		const Logs = Parse.Object.extend("Log");
-		const queryLog = new Parse.Query(Logs);
+		let queryLog = new Parse.Query(Logs);
 		queryLog.equalTo("Geocache", cache);
 		queryLog.equalTo("Active", true);
 		queryLog.descending("createdAt");
-		const logs = await queryLog.find();
+		let logs = await queryLog.find();
 		if(logs) {
 			res.render('geocache', { nom:geocacheName, id:geocacheId, 
 									 fav: geocacheFav, d:geocacheDifficulty, 
@@ -216,7 +209,7 @@ app.get('/geocache', function(req, res) {
 });
 
 app.get('/flashit', function(req, res) {
-	var codeId = req.query.id;
+	const codeId = req.query.id;
 	jds.getGeocacheWithCodeId(codeId).then((cache) => {
         if(cache) {
             res.render('flashit', { nom: cache.get("Nom"), 
@@ -232,21 +225,19 @@ app.get('/flashit', function(req, res) {
     });
 });
 
-
-
 app.post('/myscore', function(req, res) {
 	const email = req.body.email.toLowerCase();
 
-	var promiseGeocacheur = jds.getGeocacheurWithEmail(email);
-	var promiseScore = jds.computeScoreForGeocacheur(email);
+	let promiseGeocacheur = jds.getGeocacheurWithEmail(email);
+	let promiseScore = jds.computeScoreForGeocacheur(email);
 	
 	Promise.all([promiseScore, promiseGeocacheur]).then((values) => { 
-        	var score = values[0];
-        	var geocacheur = values[1];
-        	if (geocacheur == undefined) {
+        	let score = values[0];
+        	let geocacheur = values[1];
+        	if (geocacheur === undefined) {
                 throw "Geocacheur " + email + " non trouvé";
             }
-			if (score == undefined) {
+			if (score === undefined) {
 				res.render('error', { message:error });
 			} else {
 				console.log("score not null : " + score);
@@ -316,8 +307,8 @@ app.post('/found', upload.single('pic'), function (req, res, next) {
 								res.render('error', { message: "Géocache déjà trouvée et signée avec l'email : " + email });
 			        		}
 			        		else {
-			        			var Log = Parse.Object.extend("Log");
-							    var logEntry = new Log();
+			        			const Log = Parse.Object.extend("Log");
+							    let logEntry = new Log();
 								logEntry.set("Pseudo", name);
 								logEntry.set("Email", email);
 								logEntry.set("Message", message);
@@ -326,32 +317,30 @@ app.post('/found', upload.single('pic'), function (req, res, next) {
 								logEntry.set("Active", true);
 
 								if(photoFile) {
-									var filename = photoFile.originalname;
-									var photoFileBase64 = photoFile.buffer.toString('base64');
-									var parseFile = new Parse.File(filename, { base64: photoFileBase64 });
-									var photo_url = parseFile.url({forceSecure: true})
+									const filename = photoFile.originalname;
+									const photoFileBase64 = photoFile.buffer.toString('base64');
+									let parseFile = new Parse.File(filename, { base64: photoFileBase64 });
+									const photo_url = parseFile.url({forceSecure: true});
 									logEntry.set("PhotoUrl", photo_url);
-									logEntry.set("Photo", parseFile);
-
-									
+									logEntry.set("Photo", parseFile);			
 								}
 
 					        	// Becarefull with this, not always the case in the field
-					        	var ftfScore = 0;
-					        	var stfScore = 0;
-					        	var ttfScore = 0;
-								if(logs.length == 0) {
+					        	let ftfScore = 0;
+					        	let stfScore = 0;
+					        	let ttfScore = 0;
+								if(logs.length === 0) {
 									ftfScore = 1;
-								} else if(logs.length == 1) {
+								} else if(logs.length === 1) {
 									stfScore = 1;
-								} else if(logs.length == 2) {
+								} else if(logs.length === 2) {
 									ttfScore = 1;
 								}	
 								logEntry.set("FTF", ftfScore);
 								logEntry.set("STF", stfScore);
 								logEntry.set("TTF", ttfScore);
 								
-								if(fav == "true") {
+								if(fav === "true") {
 									logEntry.set("Fav", true);
 									cache.increment("Fav");
 									cache.save();
@@ -398,8 +387,8 @@ app.post('/found', upload.single('pic'), function (req, res, next) {
     });
 });
 
-var port = process.env.PORT || 1337;
-var httpServer = require('http').createServer(app);
+const port = process.env.PORT || 1337;
+const httpServer = require('http').createServer(app);
 httpServer.listen(port, function() {
 	console.log('Geocaching-JDS running on port ' + port + '.');
 });

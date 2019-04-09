@@ -27,7 +27,9 @@ cd GeocachingJDS && npm install
 
 ## Cleaning database files
 
+Connect to Mongo cli : `mongo` then choose your db with: `show dbs` and `use db_name`
 First delete olds files: `db.fs.files.remove({"uploadDate": {$lt : ISODate("2016-11-10T20:32:13.743Z")}});`
+Or delete big files: `db.fs.files.remove({"length": {$gt : 3000000}});`  > 3 Mo
 
 then in a mongo shell: 
 
