@@ -13,7 +13,12 @@ git clone https://github.com/MariusMez/GeocachingJDS.git
 cd GeocachingJDS && npm install
 ```
 
-## Run
+
+## Run with Docker
+
+- `docker-compose up -d --build`
+
+## Run with PM2
 
 - We recommend using PM2 from http://pm2.keymetrics.io 
 - Edit file ```ecosystem.json``` and change settings accordingly to your installation

@@ -12,7 +12,7 @@ services:
         - ALLOW_EMPTY_PASSWORD=yes
         - MONGODB_SYSTEM_LOG_VERBOSITY=1
     volumes:
-      - 'mongodb_data:/bitnami'
+      - ./dump_mongodb:/docker-entrypoint-initdb.d
   parse:
     build: .
     ports:

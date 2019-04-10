@@ -7,11 +7,9 @@ const createThumbnail = async function createThumbnail(image_buffer, maxWidth, m
         .toBuffer()
         .then(async (buffer_img) => {
             let thumb = new Parse.File("thumbnail.jpg", { base64: buffer_img.toString('base64') });
-            let pic = await thumb.save();
-            return pic
+            return await thumb.save();
         }, (error) => {
             console.log("Thumbnail generation error: " + error.message);
-            return;
         });
 };
 
@@ -110,7 +108,7 @@ const getLogWithEmailAndCache = function(email, geocache) {
             reject(error);
         });
     });
-}
+};
 
 const getAllActiveLogWithCache = function(geocache) {
     return new Promise((resolve, reject) => {
