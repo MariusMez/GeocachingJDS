@@ -15,6 +15,7 @@ services:
       - ./dump_mongodb:/docker-entrypoint-initdb.d
   parse:
     build: .
+    command: npm start
     ports:
         - "1337:1337"
     environment:
@@ -29,7 +30,8 @@ services:
         - RECAPTCHA_SECRET_KEY=${RECAPTCHA_SECRET_KEY}
         - RECAPTCHA_SITE_KEY=${RECAPTCHA_SITE_KEY}
     volumes:
-      - 'parse_data:/bitnami'
+      - .:/app:cached
+      - node_modules-vol:/app/node_modules
     depends_on:
         - mongodb
   parse-dashboard:
@@ -49,6 +51,7 @@ services:
     depends_on:
       - parse
 volumes:
+  node_modules-vol:
   mongodb_data:
     driver: local
   parse_data:

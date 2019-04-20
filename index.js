@@ -17,6 +17,9 @@ let recaptcha = new Recaptcha({
     verbose: true
 });
 
+let Coordinates = require('coordinate-parser');
+
+
 // var ca = [fs.readFileSync("/etc/letsencrypt/live/geocaching-jds.fr/fullchain.pem")];
 
 let jds = require('./geocaching-jds');
@@ -74,6 +77,27 @@ app.get('/ranking2018', function(req, res) {
 
 app.get('/register', function(req, res) {
     res.render('register');
+});
+
+app.post('/check_coordinates', function(req, res) {
+    const coords = req.body.coords;
+    let latitude = '0.0';
+    let longitude = '0.0';
+    try {
+        const position = new Coordinates(coords);
+        latitude = position.getLatitude();
+        longitude = position.getLongitude();
+    } catch (error) {
+        console.error("Invalid coordinates : " + coords);
+    }
+
+    res.send({ lat: latitude, lng:longitude});
+});
+
+app.get('/create', function(req, res) {
+    const id_administration = req.body.admin_id;
+    let gps = {latitude:'0.0', longitude:'0.0'};
+    res.render('create', { gps: gps} );
 });
 
 app.get('/ranking', function(req, res) {
