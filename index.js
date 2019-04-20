@@ -5,11 +5,13 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
 const startingDate = new Date("Sat, 01 May 2019 08:00:00 GMT");
 
-let express = require('express');
+const express = require('express');
 const bodyParser = require('body-parser');
 const ParseServer = require('parse-server').ParseServer;
 const path = require('path');
 const multer = require('multer');
+const qrcode = require('qrcode-generator');
+const { createCanvas, loadImage, Image } = require('canvas');
 
 const Recaptcha = require('recaptcha-verify');
 let recaptcha = new Recaptcha({
@@ -18,7 +20,6 @@ let recaptcha = new Recaptcha({
 });
 
 let Coordinates = require('coordinate-parser');
-
 
 // var ca = [fs.readFileSync("/etc/letsencrypt/live/geocaching-jds.fr/fullchain.pem")];
 
@@ -94,10 +95,36 @@ app.post('/check_coordinates', function(req, res) {
     res.send({ lat: latitude, lng:longitude});
 });
 
-app.get('/create', function(req, res) {
+app.get('/create', async function(req, res) {
     const id_administration = req.body.admin_id;
+    const typeNumber = 4;
+    const errorCorrectionLevel = 'L';
+
+    const canvas = createCanvas(650, 350);
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fillRect(0, 0, 650, 350);
+
+    // Write "Awesome!"
+    ctx.font = '30px Impact';
+    ctx.fillStyle = "#000000";
+    ctx.fillText('ÉPREUVE GÉOCACHING 2019', 90, 50);
+    ctx.fillText('Nom de la Géocache!', 30, 320);
+
+    // Draw cat with lime helmet
+    const res_img = await loadImage(__dirname + '/public/images/logo_jds.png');
+    ctx.drawImage(res_img, 0, 50, 400, 200);
+
+    let qr = qrcode(typeNumber, errorCorrectionLevel);
+    console.log(errorCorrectionLevel);
+    qr.addData('CHANGE ME');
+    qr.make();
+    const qrcode_img = new Image();
+    qrcode_img.src = qr.createDataURL();
+    ctx.drawImage(qrcode_img, 420,50, 200, 200);
+
     let gps = {latitude:'0.0', longitude:'0.0'};
-    res.render('create', { gps: gps} );
+    res.render('create', { gps: gps, cache_admin_id: id_administration, qr:canvas.toDataURL()} );
 });
 
 app.get('/ranking', function(req, res) {

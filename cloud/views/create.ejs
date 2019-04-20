@@ -17,7 +17,12 @@
 			border: solid 1px #fff;
 			margin-top: 5px;
 		}
+		.tox-notifications-container {
+			display:none!important;
+		}
 	</style>
+	<script src="https://cloud.tinymce.com/5/tinymce.min.js"></script>
+	<script>tinymce.init({ selector:'textarea' });</script>
 </head>
 <body class="homepage">
 	<% include ./partials/menu %>
@@ -41,102 +46,48 @@
 					<span style="font-size: large">Cache Mystère</span>
 				</label>
 
-				<br>
-
 				<p><b>Nom</b> de votre géocache</p>
 				<input type="text" size="20" maxlength="250" name="name" id="name" value="" style="border: solid 1px #fff;" placeholder="Le nom sera visible sur le site" required/>
 
-
 				<p><label for="coords_geocache"><b>Emplacement</b> de votre géocache</label></p>
-				<span>Entrez les coordonnnées GPS du lieu précis de votre géocache ci-dessous. Forme 'latitude, longitude' ou 'N 43° XX.ABC E 007° YY.DEF'</span>
+				<span>Entrez les coordonnées GPS du lieu précis ou vous avez dissimulé votre géocache ci-dessous. <br>Forme 'latitude, longitude' ou 'N 43° XX.ABC E 007° YY.DEF'</span>
 				<div>
 					<div id="map"></div>
-
 					<a href="#" id="confirm_coordinates" class="button pull-right">&raquo; Confirmer les coordonnées</a>
 					<span class="pull-left" style="padding-top: 10px; font-size: larger;">📍</span>
 					<input type="text" size="20" maxlength="250" name="coords_geocache" id="coords_geocache" value="" class="" style="border: solid 1px #fff; width: 50%; margin-top:10px;" placeholder="ex: N 43° 36.937 E 007° 04.001" required/>
-
 					<input type="hidden" id="geocache_lat" name="geocache_lat" value="<%= gps.latitude %>">
 					<input type="hidden" id="geocache_lng" name="geocache_lng" value="<%= gps.longitude %>">
 				</div>
 
+				<p><label for="pic">Une <b>photo d'illustration</b> </label></p>
+				<span>Cette photo sert pour la vignette d'affichage de votre cache dans la liste de toutes les géocaches</span>
+				<input type="file" name="pic" id="pic" accept="image/*" required>
 
+				<p><label for="description"><b>Description</b> de votre géocache</label></p>
+				<span>Décrivez en détail cette experience Géocaching. La description peut comprendre de l'information au sujet de l'emplacement et de sa signification, le contenant de la cache, le parcours pour s'y rendre, et ainsi de suite.</span>
+				<textarea name="description" rows="25" id="description" style="border: solid 1px #fff; " placeholder="La description sera visible sur le site" maxlength="10000" required></textarea>
 
-				<script type="text/javascript">
-					let map = L.map('map').setView([<%= gps.latitude %>, <%= gps.longitude %>], 15);
-					L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-						attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-					}).addTo(map);
-					L.control.scale().addTo(map);
-					let marker = L.marker([<%= gps.latitude %>, <%= gps.longitude %>]) ;
+				<p><label for="hint"><b>Indice</b> (recommandé)</label></p>
+				<input type="text" size="20" maxlength="1000" name="hint" id="hint" value="" style="border: solid 1px #fff;" placeholder="Si vous ne désirez pas ajouter d'indice pour aider à trouver la cache, laissez ce champ vide."/>
 
-					function update_coords(lat, lng) {
-						marker.setLatLng([lat, lng]).addTo(map);
-						map.setView([lat, lng], 15);
-						document.getElementById('geocache_lat').value = lat;
-						document.getElementById('geocache_lng').value = lng;
-					}
+				<p><label for="owner">Géocache <b>placée par</b></label></p>
+				<span>Vous avez la possibilité de modifier votre pseudo ou mentionner ici les pseudos des personnes qui vous ont assistées dans la création.</span>
+				<input type="text" size="20" maxlength="250" name="owner" id="owner" value="" style="border: solid 1px #fff;" placeholder="Les pseudos seront visibles sur le site"/>
 
-					function check_coords(coords) {
-						$.ajax({
-							url: "/check_coordinates",
-							method: "POST",
-							data: {coords: coords},
-						}).done(function (response) {
-							update_coords(response.lat, response.lng);
-
-						}).fail(function (jqXHR, textStatus) {
-							alert("FAIL");
-						});
-					}
-
-					$('#confirm_coordinates').click(function() {
-						let coords = document.getElementById('coords_geocache').value;
-						check_coords(coords);
-						return false;
-					});
-
-				</script>
-
-
-				<br>
-
-
-
-				<br>
 
 				<label for="code"><b>Code de suivi</b> situé sur le tag en bois à attacher à votre objet, à récupérer <a href="/geocache?id=SAg9v68wGD" style="color: white;">ici</a></label>
 				<input type="text" size="4" maxlength="4" name="code" id="code" value="" style="border: solid 1px #fff;" placeholder="Le code ne sera pas visible sur le site mais il permet d'identifier uniquement l'objet au moment des voyages" required/>
 				<br>
-				
-				<label for="description"><b>Description</b> de votre objet</label>
-				<textarea name="description" id="description" value="" style="border: solid 1px #fff; " placeholder="La description sera visible sur le site" maxlength="1000" required></textarea>
-				<br>
-				
-				<label for="email"><b>Email</b> des Jeux de Sophia - <i>Nécessaire pour vous identifier, ne sera pas visible sur le site</i></label>
-				<input type="email" name="email" id="email" value="" style="border: solid 1px #fff;" placeholder="L'email ne sera pas visible sur le site" required/>
-				<br>
-				<label for="pseudo"><b>Pseudo</b> pour l'épreuve Géocaching - <i>Sera affiché sur le site pour vous représenter</i></label>
-				<input type="text" name="pseudo" id="pseudo" value="" style="border: solid 1px #fff;" placeholder="Ce pseudo sera visible sur le site" required/>
-				<br>
-				<label for="mission"><b>🚀 La mission de votre Objet Voyageur</b></label>
-				<div><i>Veillez à bien choisir la mission pour qu'elle soit réalisable par les participants par le biais de photos. <br>Pensez à quelque chose de faisable et de rigolo pour le plus grand plaisir de tous. Voici quelques exemples : </i><br> 
-				<ul>
-					<li>- Etre pris en photo avec un membre du Staff des JDS</li> 
-					<li>- Parcourir une distance cumulé de plus de 100km<li> 
-					<li>- Prendre une photo en train de lui faire un bisou, ...</li>  
-				</ul>
-				</div>
-				<input type="text" name="mission" id="mission" value="" style="border: solid 1px #fff;" placeholder="Mission personnelle que vous choisissez, assurez-vous quelle soit réalisable dans le cadre de l'épreuve" maxlength="500" required/>
-				<br>		
 
-				<label for="pic">Une <b>photo de votre objet</b> le code de suivi ne doit pas être visible (<i>sera visible sur le site</i>) : </label>
-				<input type="file" name="pic" id="pic" accept="image/*" required>
-				<br>
-	
-			    <br><input type="submit" value="Enregistrer" name="submit" class="button alt" id="submitButton" title="Clic ici pour donner vie à ton Objet Voyageur" />
+				<p><label for="hint"><b>Indice</b> (recommandé)</label></p>
+				<input type="text" size="20" maxlength="1000" name="hint" id="hint" value="" style="border: solid 1px #fff;" placeholder="Si vous ne désirez pas ajouter d'indice pour aider à trouver la cache, laissez ce champ vide."/>
+
+				<img src="<%= qr %>" id="qrCode" />
+
+			    <br><input type="submit" value="Enregistrer" name="submit" class="button alt" id="submitButton" title="Clic ici pour donner vie à ta géocache" />
 			    <br><br>	
-			    <p>⚠️ Une fois l'objet enregistré vous ne pourrez le modifier qu'en nous contactant, assurez-vous que tout vous convient avant de cliquer sur enregistrer.</p>			
+			    <p>⚠️ Une fois la cache enregistrée vous ne pourrez la modifier qu'en nous contactant, assurez-vous que tout vous convient avant de cliquer sur enregistrer.</p>
 			</form>  				 
 		</section>
 	</div>
@@ -145,5 +96,42 @@
 			<h5>Un problème avec l'enregistement de votre objet ?</h5> <br> Contactez-nous : <li><a href="mailto:geocaching@jeuxdesophia.com" class="fa fa-envelope"><span>Email</span></a></li>
 		</ul>
 	</div>
+
+
+	<script type="text/javascript">
+		let map = L.map('map').setView([<%= gps.latitude %>, <%= gps.longitude %>], 15);
+		L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+			attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+		}).addTo(map);
+		L.control.scale().addTo(map);
+		let marker = L.marker([<%= gps.latitude %>, <%= gps.longitude %>]) ;
+
+		function update_coords(lat, lng) {
+			marker.setLatLng([lat, lng]).addTo(map);
+			map.setView([lat, lng], 15);
+			document.getElementById('geocache_lat').value = lat;
+			document.getElementById('geocache_lng').value = lng;
+		}
+
+		function check_coords(coords) {
+			$.ajax({
+				url: "/check_coordinates",
+				method: "POST",
+				data: {coords: coords},
+			}).done(function (response) {
+				update_coords(response.lat, response.lng);
+
+			}).fail(function (jqXHR, textStatus) {
+				alert("FAIL");
+			});
+		}
+
+		$('#confirm_coordinates').click(function() {
+			let coords = document.getElementById('coords_geocache').value;
+			check_coords(coords);
+			return false;
+		});
+	</script>
+
 </body>
 </html>
