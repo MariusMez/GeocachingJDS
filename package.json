@@ -23,6 +23,7 @@
     "qrcode-generator": "^1.4.3",
     "recaptcha-verify": "^0.1.1",
     "sharp": "^0.22.0",
+    "sweetalert2": "^8.8.5",
     "tar": "^4.4.8"
   },
   "scripts": {

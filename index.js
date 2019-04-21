@@ -19,8 +19,6 @@ let recaptcha = new Recaptcha({
     verbose: true
 });
 
-let Coordinates = require('coordinate-parser');
-
 // var ca = [fs.readFileSync("/etc/letsencrypt/live/geocaching-jds.fr/fullchain.pem")];
 
 let jds = require('./geocaching-jds');
@@ -80,23 +78,93 @@ app.get('/register', function(req, res) {
     res.render('register');
 });
 
-app.post('/check_coordinates', function(req, res) {
+app.post('/check_coordinates', async function(req, res) {
     const coords = req.body.coords;
-    let latitude = '0.0';
-    let longitude = '0.0';
-    try {
-        const position = new Coordinates(coords);
-        latitude = position.getLatitude();
-        longitude = position.getLongitude();
-    } catch (error) {
-        console.error("Invalid coordinates : " + coords);
-    }
-
-    res.send({ lat: latitude, lng:longitude});
+    const gps = await jds.checkCoordinates(coords);
+    res.send(gps);
 });
 
-app.post('/save', function(req, res) {
-    res.redirect('/');
+app.post('/save', upload.single('pic'), async function(req, res) {
+    const cache_admin_id = req.body.cache_admin_id;
+    const name = req.body.name;
+    const owner_email = req.body.owner_email;
+    const description = req.body.description;
+    const type_geocache = req.body.type_geocache.toUpperCase();
+    const coords_geocache = req.body.coords_geocache;
+    console.log("coords_geocache");
+    console.log(coords_geocache);
+    const geocache_lat = req.body.geocache_lat;
+    const geocache_lng = req.body.geocache_lng;
+    const photo = req.file;
+    const hint = req.body.hint;
+    const owner = req.body.owner;
+    const cache_size = req.body.cache_size.toUpperCase();
+    const difficulty = req.body.difficulty;
+    const terrain = req.body.terrain;
+    const notes = req.body.notes;
+    const need_review = req.body.need_review;
+    let gps = await jds.checkCoordinates(coords_geocache);
+
+    if(cache_admin_id) {
+        try {
+            const geocache = await jds.getGeocacheWithAdminId(cache_admin_id);
+            if (geocache) {
+                geocache.set("Nom", name);
+                geocache.set("Description", description);
+                geocache.set("Category", type_geocache);
+                geocache.set("GPSBox", gps.dms);
+                if(type_geocache==='TRADI') {
+                    geocache.set("GPSString", gps.dms);
+                } else {
+                    geocache.set("GPSString", 'N 43° XX.XXX E 007° YY.YYY');
+                }
+                let geopoint = null;
+                if(geocache_lat && geocache_lng) {
+                    geopoint = new Parse.GeoPoint({latitude: parseFloat(geocache_lat), longitude: parseFloat(geocache_lng)});
+                } else {
+                    geopoint = new Parse.GeoPoint({latitude: gps.lat, longitude: gps.lng});
+                }
+                geocache.set("GPS", geopoint);
+                geocache.set("Indice", hint);
+                geocache.set("Owner", owner);
+                geocache.set("Size", cache_size);
+                geocache.set("Difficulty", parseInt(difficulty));
+                geocache.set("Terrain", parseInt(terrain));
+                geocache.set("Notes", notes);
+                let need_review_bool = false;
+                if(need_review==='on') {
+                    need_review_bool = true;
+                }
+                geocache.set("NeedReview", need_review_bool);
+
+                if(photo) {
+                    const photo_file = await jds.createThumbnail(photo.buffer, 400, 400);
+                    const filename = photo.originalname;
+                    const photoFileBase64 = photo.buffer.toString('base64');
+                    let parseFile = new Parse.File(filename, { base64: photoFileBase64 });
+                    geocache.set("Photo", photo_file);
+                }
+
+                geocache.save().then((object) => {
+                    const message = "OK";
+                    const result = "success";
+                    res.redirect(`/create?admin_id=${cache_admin_id}&result=${result}&message=${message}`);
+                }, (error) => {
+                    console.error("Error in geocache.save(): " + error);
+                    res.render('error', { message: error.message });
+                });
+            }
+        } catch (e) {
+            const message = e;
+            const result = "error";
+            console.error(e);
+            res.redirect(`/create?admin_id=${cache_admin_id}&result=${result}&message=${message}`);
+        }
+
+    }
+    else {
+        res.redirect('/');
+    }
 });
 
 app.get('/create', async function(req, res) {
@@ -118,38 +186,47 @@ app.get('/create', async function(req, res) {
             const res_img = await loadImage(__dirname + '/public/images/logo_jds.png');
             ctx.drawImage(res_img, 0, 70, 400, 200);
 
-            const typeNumber = 0;
-            const errorCorrectionLevel = 'L';
-            let qr = qrcode(typeNumber, errorCorrectionLevel);
-            console.log(errorCorrectionLevel);
+            let qr = qrcode(0, 'L');
             qr.addData('CHANGE ME');
             qr.make();
             const qrcode_img = new Image();
             qrcode_img.src = qr.createDataURL();
             ctx.drawImage(qrcode_img, 420,70, 200, 200);
 
-            let gps = {latitude:'0.0', longitude:'0.0'};
+            let geopoint = geocache.get("GPS");
+            if(!geopoint) {
+                geopoint = new Parse.GeoPoint({latitude: 0.0, longitude: 0.0});
+            }
+            let photo_url = null;
+            try {
+                photo_url = geocache.get("Photo").url({forceSecure: true}).replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, '');
+            } catch (error) { }
+
             res.render('create', {
-                gps: gps,
+                gps: geopoint,
                 cache_admin_id: id_administration,
-                type:geocache.get("Category"),
-                cache_size:geocache.get("Size"),
-                difficulty:geocache.get("Difficulty"),
-                notes:geocache.get("Notes"),
-                photo:geocache.get("Photo").url({forceSecure: true}).replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, ''),
-                terrain:geocache.get("Terrain"),
-                gps_string:geocache.get("GPSString"),
-                hint:geocache.get("Indice"),
-                nom:geocache.get("Nom"),
+                owner_email: geocache.get("OwnerEmail"),
+                type: geocache.get("Category"),
+                cache_size: geocache.get("Size"),
+                difficulty: geocache.get("Difficulty"),
+                notes: geocache.get("Notes"),
+                photo: photo_url,
+                terrain: geocache.get("Terrain"),
+                gps_string: geocache.get("GPSBox"),
+                hint: geocache.get("Indice"),
+                nom: geocache.get("Nom"),
                 description: geocache.get("Description"),
                 owner: geocache.get("Owner"),
-                qr:canvas.toDataURL()
+                qr: canvas.toDataURL()
             });
+        } else {
+            console.error("Error in call to /create with " + id_administration);
+            res.redirect('/');
         }
+    } else {
+        console.error("Error in call to /create no admin_id");
+        res.redirect('/');
     }
-    console.error("Error in call to /create with " + id_administration);
-    res.redirect('/');
-
 });
 
 app.get('/ranking', function(req, res) {

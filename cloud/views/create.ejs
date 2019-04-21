@@ -125,11 +125,10 @@
 			border-image: linear-gradient(45deg, rgb(255,255,255), rgb(253,253,254)) 1;
 		}
 	</style>
-	<script src="https://cloud.tinymce.com/5/tinymce.min.js"></script>
-	<script>tinymce.init({
+    <script src="https://cloud.tinymce.com/5/tinymce.min.js"></script>
+    <script>tinymce.init({
 			selector:'textarea',
 			plugins: 'print preview emoticons fullpage powerpaste searchreplace autolink directionality advcode visualblocks visualchars fullscreen image link media mediaembed template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount tinymcespellchecker a11ychecker imagetools textpattern help formatpainter permanentpen pageembed tinycomments mentions linkchecker',
-
 			toolbar: 'formatselect | bold italic strikethrough forecolor backcolor permanentpen formatpainter | link image media pageembed | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent | removeformat | addcomment | emoticons',
 		});
 	</script>
@@ -139,18 +138,22 @@
 
 	<div class="wrapper style3">
 		<section class="container">
+
 			<header class="major">
 				<h2 style="text-shadow: 2px 2px 2px #666666;">Création de votre géocache</h2>
 			</header>
-			<form id="uploadForm" method="post" action="/save" encType="multipart/form-data">
+			<form id="uploadForm" method="POST" action="/save" encType="multipart/form-data">
+
+                <input type="hidden" id="owner_email" name="owner_email" value="<%= owner_email %>">
+                <input type="hidden" id="cache_admin_id" name="cache_admin_id" value="<%= cache_admin_id %>">
 
 				<p><b>🧩 Type</b> de votre géocache</p>
-				<input id="type_geocache_tradi" type="radio" value="TRADI" name="type_geocache" <% if( type=='TRADI' ) { %>checked <% }%>/>
+				<input id="type_geocache_tradi" type="radio" value="TRADI" name="type_geocache" <% if( type=='TRADI' ) { %>checked <% }%> required/>
 				<label for="type_geocache_tradi">
 					<img width="60" alt="TRADI" src="/public/images/TRADIBIG.gif" style="margin-left:5px;"/>
 					<span style="margin-right:50px; font-size: large">Cache Traditionnelle</span>
 				</label>
-				<input id="type_geocache_mystery" type="radio" value="MYSTERY" name="type_geocache" <% if( type=='MYSTERY' ) { %>checked <% }%>/>
+				<input id="type_geocache_mystery" type="radio" value="MYSTERY" name="type_geocache" <% if( type=='MYSTERY' ) { %>checked <% }%> required/>
 				<label for="type_geocache_mystery">
 					<img width="60" alt="MYSTERY" src="/public/images/MYSTERYBIG.gif" style="margin-left:5px;"/>
 					<span style="font-size: large">Cache Mystère</span>
@@ -165,7 +168,7 @@
 					<div id="map"></div>
 					<a href="#" id="confirm_coordinates" class="button pull-right">&raquo; Confirmer les coordonnées</a>
 					<span class="pull-left" style="padding-top: 10px; font-size: larger;">📍</span>
-					<input type="text" size="20" maxlength="250" name="coords_geocache" id="coords_geocache" value="<%= gps_string %>" class="" style="border: solid 1px #fff; width: 50%; margin-top:10px;" placeholder="ex: N 43° 36.937 E 007° 04.001" required/>
+					<input type="text" size="20" maxlength="250" name="coords_geocache" id="coords_geocache" <% if(gps_string) {%>value="<%= gps_string %>"<%}%> class="" style="border: solid 1px #fff; width: 50%; margin-top:10px;" placeholder="ex: N 43° 36.937 E 007° 04.001" required/>
 					<input type="hidden" id="geocache_lat" name="geocache_lat" value="<%= gps.latitude %>">
 					<input type="hidden" id="geocache_lng" name="geocache_lng" value="<%= gps.longitude %>">
 				</div>
@@ -173,11 +176,11 @@
 				<p><label for="pic"><b>🖼️ Photo d'illustration</b></label></p>
 				<img width="470px;" src="<%= photo %>" alt="<%= nom %>" class="img-border" style="margin-bottom:20px; margin-left: 20px;"><br>
 				<span>Cette photo sert pour la vignette d'affichage de votre cache dans la liste de toutes les géocaches</span>
-				<input type="file" name="pic" id="pic" accept="image/*" required>
+				<input type="file" name="pic" id="pic" accept="image/*">
 
 				<p><label for="description"><b>📝 Description</b></label></p>
 				<span>Décrivez en détail cette experience Géocaching. La description peut comprendre de l'information au sujet de l'emplacement et de sa signification, le contenant de la cache, le parcours pour s'y rendre, et ainsi de suite.</span>
-				<textarea name="description" rows="25" id="description" style="border: solid 1px #fff; " placeholder="La description sera visible sur le site" maxlength="10000" required><%= description %></textarea>
+				<textarea name="description" rows="25" id="description" style="border: solid 1px #fff; " placeholder="La description sera visible sur le site"><%= description %></textarea>
 
 				<p><label for="hint"><b>🙊 Indice</b> (recommandé)</label></p>
 				<input type="text" size="20" maxlength="1000" name="hint" id="hint" value="<%= hint %>" style="border: solid 1px #fff;" placeholder="Si vous ne désirez pas ajouter d'indice pour aider à trouver la cache, laissez ce champ vide."/>
@@ -189,15 +192,15 @@
 
 				<p><b>🎁 Taille</b></p>
 				<div class="geocache-size-selector">
-					<input id="other" type="radio" name="size" value="other" <% if( cache_size=='OTHER' ) { %>checked <% }%>/>
+					<input id="other" type="radio" name="cache_size" value="OTHER" <% if( cache_size=='OTHER' ) { %>checked <% }%> required/>
 					<label class="card-cc other" for="other"></label>
-					<input id="micro" type="radio" name="size" value="micro" <% if( cache_size=='MICRO' ) { %>checked <% }%>/>
+					<input id="micro" type="radio" name="cache_size" value="MICRO" <% if( cache_size=='MICRO' ) { %>checked <% }%> required/>
 					<label class="card-cc micro" for="micro"></label>
-					<input id="small" type="radio" name="size" value="small" <% if( cache_size=='SMALL' ) { %>checked <% }%>/>
+					<input id="small" type="radio" name="cache_size" value="SMALL" <% if( cache_size=='SMALL' ) { %>checked <% }%> required/>
 					<label class="card-cc small" for="small"></label>
-					<input id="regular" type="radio" name="size" value="regular" <% if( cache_size=='REGULAR' ) { %>checked <% }%>/>
+					<input id="regular" type="radio" name="cache_size" value="REGULAR" <% if( cache_size=='REGULAR' ) { %>checked <% }%> required/>
 					<label class="card-cc regular" for="regular"></label>
-					<input id="large" type="radio" name="size" value="large" <% if( cache_size=='LARGE' ) { %>checked <% }%>/>
+					<input id="large" type="radio" name="cache_size" value="LARGE" <% if( cache_size=='LARGE' ) { %>checked <% }%> required/>
 					<label class="card-cc large" for="large"></label>
 				</div>
 
@@ -206,7 +209,7 @@
 				<div class="txt-center">
 					<div class="rating">
 						<b>Difficulté</b>
-						<input id="d5" name="difficulty" type="radio" value="5" class="radio-btn hide" <% if( difficulty=='5' ) { %>checked <% }%> />
+						<input id="d5" name="difficulty" type="radio" value="5" class="radio-btn hide" <% if( difficulty=='5' ) { %>checked <% }%>/>
 						<label for="d5">☆</label>
 						<input id="d4" name="difficulty" type="radio" value="4" class="radio-btn hide" <% if( difficulty=='4' ) { %>checked <% }%>/>
 						<label for="d4">☆</label>
@@ -244,8 +247,8 @@
 				<input type="text" size="20" maxlength="1000" name="notes" id="notes" value="<%= notes %>" style="border: solid 1px #fff;" placeholder="ex: Merci de publier ma cache le 23 mai à 18h00"/>
 				<br>
 				<span>🚨 Cochez la case suivante si tout est en place, sinon vous pouvez simplement enregistrer vos modifications et continuer plus tard</span>
-				<br><input type="checkbox" id="ready" name="ready">
-				<label for="ready" style="font-size: large">Tout est OK, la cache est posée sur le terrain, vous pouvez la publier sur le site.</label>
+				<br><input type="checkbox" id="need_review" name="need_review">
+				<label for="need_review" style="font-size: large">Tout est OK, la cache est posée sur le terrain, vous pouvez la publier sur le site.</label>
 
 				<br><br><input type="submit" value="Enregistrer" name="submit" class="button alt" id="submitButton" title="Clic ici pour donner vie à ta géocache" />
 
@@ -270,10 +273,8 @@
 			</script>
 			<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 		</section>
-
-		<ul class="icons">
-			<h5>Un problème avec la création de votre géocache ou l'usage de la zone de discussion privée ?</h5> <br> Contactez-nous par email : <li><a href="mailto:geocaching@jeuxdesophia.com" class="fa fa-envelope"><span>Email</span></a></li>
-		</ul>
+        <hr>
+        <h5>Un problème avec la création de votre géocache ou l'usage de la zone de discussion privée ?</h5> <br> Contactez-nous par email : <a href="mailto:geocaching@jeuxdesophia.com" class="fa fa-envelope"> <span>geocaching@jeuxdesophia.fr</span></a>
 
 	</div>
 
@@ -284,13 +285,15 @@
 			attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 		}).addTo(map);
 		L.control.scale().addTo(map);
-		let marker = L.marker([<%= gps.latitude %>, <%= gps.longitude %>]) ;
+		let marker = L.marker([<%= gps.latitude.toString() %>, <%= gps.longitude.toString() %>]);
+		marker.setLatLng([<%= gps.latitude.toString() %>, <%= gps.longitude.toString() %>]).addTo(map);
 
-		function update_coords(lat, lng) {
+		function update_coords(lat, lng, dms) {
 			marker.setLatLng([lat, lng]).addTo(map);
 			map.setView([lat, lng], 15);
 			document.getElementById('geocache_lat').value = lat;
 			document.getElementById('geocache_lng').value = lng;
+			document.getElementById("coords_geocache").value = dms;
 		}
 
 		function check_coords(coords) {
@@ -299,10 +302,9 @@
 				method: "POST",
 				data: {coords: coords},
 			}).done(function (response) {
-				update_coords(response.lat, response.lng);
-
+				update_coords(response.lat, response.lng, response.dms);
 			}).fail(function (jqXHR, textStatus) {
-				alert("FAIL");
+				alert("Vos coordonnées GPS semblent incorrectes. Merci de les vérifier.");
 			});
 		}
 
@@ -312,6 +314,27 @@
 			return false;
 		});
 	</script>
-
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@8"></script>
+	<script>
+		let url = new URL(window.location);
+		let message = url.searchParams.get("message");
+		let result = url.searchParams.get("result");
+		if(result === 'success') {
+			Swal.fire({
+				title: "Votre géocache est enregistrée.",
+				text:"Vous pouvez continuer à modifier le contenu, puis cocher la case de publication quand tout est en place.",
+				type: 'success',
+				confirmButtonText: 'Ok'
+			});
+		}
+		if(result === 'error') {
+			Swal.fire({
+				title: message,
+				text: "Si le problème semble du coté des organisateurs : geocaching@jeuxdesophia.fr",
+				type: 'error',
+				confirmButtonText: 'Ok'
+			});
+		}
+	</script>
 </body>
 </html>

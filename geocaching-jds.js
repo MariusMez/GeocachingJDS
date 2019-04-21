@@ -1,4 +1,58 @@
 const starting_jds_date = "2019-05-10";
+const Coordinates = require('coordinate-parser');
+
+
+// This function returns the coordinate
+// conversion string in DD to DMS.
+function ddToDm(latitude, longitude) {
+
+    let lat = parseFloat(latitude);
+    let lng = parseFloat(longitude);
+
+    let latResult = (lat >= 0)? 'N ' : 'S ';
+
+    // Call to getDm(lat) function for the coordinates of Latitude in DMS.
+    // The result is stored in latResult variable.
+    latResult += getDm(lat);
+
+    let lngResult = (lng >= 0)? 'E ' : 'W ';
+
+    // Call to getDm(lng) function for the coordinates of Longitude in DMS.
+    // The result is stored in lngResult variable.
+    lngResult += getDm(lng);
+
+    // Joining both variables and separate them with a space.
+    let dmResult = latResult + ' ' + lngResult;
+
+    // Return the resultant string
+    return dmResult;
+}
+
+function getDm(valeur) {
+    let val = Math.abs(valeur);
+
+    let valDeg = Math.floor(val);
+    let result = valDeg + "° ";
+
+    let valMin = Math.round(((val - valDeg) * 60) * 1000) / 1000;
+    result += valMin + "'";
+
+    return result;
+}
+
+const checkCoordinates = async function checkCoordinates(coords) {
+    let latitude = 0.0;
+    let longitude = 0.0;
+    try {
+        const position = new Coordinates(coords);
+        latitude = position.getLatitude();
+        longitude = position.getLongitude();
+    } catch (error) {
+        console.error("Invalid coordinates : " + coords);
+    }
+    return { lat: latitude, lng:longitude, dms: ddToDm(latitude, longitude) }
+};
+
 
 const createThumbnail = async function createThumbnail(image_buffer, maxWidth, maxHeight) {
     const sharp = require('sharp');
@@ -425,3 +479,4 @@ module.exports.getAllActiveRanking = getAllActiveRanking;
 module.exports.getLogsByEmail = getLogsByEmail;
 module.exports.saveOrUpdateRanking2 = saveOrUpdateRanking2;
 module.exports.computeScoreForGeocacheur = computeScoreForGeocacheur;
+module.exports.checkCoordinates = checkCoordinates;
