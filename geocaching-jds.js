@@ -48,6 +48,24 @@ const getGeocacheWithCodeId = function(geocacheCodeId) {
     });
 };
 
+const getGeocacheWithAdminId = function(adminId) {
+    return new Promise((resolve, reject) => {
+        const Geocache = Parse.Object.extend("Geocache");
+        let query = new Parse.Query(Geocache);
+        query.equalTo("adminId", adminId);
+        query.first().then((result) => {
+            if(result) {
+                resolve(result);
+            } else {
+                resolve(null);
+            }
+        }, (error) => {
+            console.error("Error searching for Geocache with adminId: " + adminId + " Error: " + error);
+            reject(error);
+        });
+    });
+};
+
 const getAllPublishedGeocaches = function(descending) {
     return new Promise((resolve, reject) => {
         const Geocaches = Parse.Object.extend("Geocache");
@@ -394,6 +412,7 @@ function getLogsByEmail(emailString) {
 module.exports.createThumbnail = createThumbnail;
 module.exports.getGeocache = getGeocache;
 module.exports.getGeocacheWithCodeId = getGeocacheWithCodeId;
+module.exports.getGeocacheWithAdminId = getGeocacheWithAdminId;
 module.exports.getLogWithEmailAndCache = getLogWithEmailAndCache;
 module.exports.getAllActiveLogWithCache = getAllActiveLogWithCache;
 module.exports.getGeocacheurWithEmail = getGeocacheurWithEmail;

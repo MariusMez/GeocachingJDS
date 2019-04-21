@@ -10,6 +10,10 @@
 		p, ul, ol, dl, table, blockquote {
 			margin: 1.5em 0 0 0;
 		}
+		input {
+			font-size: larger;
+			font-weight: normal;
+		}
 		.button {
 			color: #82b440;
 			font-size: medium;
@@ -20,9 +24,115 @@
 		.tox-notifications-container {
 			display:none!important;
 		}
+
+		.geocache-size-selector input{
+			position:absolute;
+			z-index:999;
+		}
+
+		.other{background-image:url(/public/images/other.jpg); box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);}
+		.micro{background-image:url(/public/images/micro.jpg); box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);}
+		.small{background-image:url(/public/images/small.jpg); box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);}
+		.regular{background-image:url(/public/images/regular.jpg); box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);}
+		.large{background-image:url(/public/images/large.jpg); box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);}
+
+		.geocache-size-selector input:active +.card-cc, .cc-selector input:active +.card-cc{opacity: .9;}
+		.geocache-size-selector input:checked +.card-cc, .cc-selector input:checked +.card-cc{
+			-webkit-filter: none;
+			-moz-filter: none;
+			filter: none;
+		}
+		.card-cc{
+			cursor:pointer;
+			background-size:contain;
+			background-repeat:no-repeat;
+			display:inline-block;
+			width:118px;height:145px;
+			-webkit-transition: all 100ms ease-in;
+			-moz-transition: all 100ms ease-in;
+			transition: all 100ms ease-in;
+			-webkit-filter: brightness(1.2) grayscale(1) opacity(.7);
+			-moz-filter: brightness(1.2) grayscale(1) opacity(.7);
+			filter: brightness(1.2) grayscale(1) opacity(.7);
+		}
+		.card-cc:hover{
+			-webkit-filter: brightness(1) grayscale(.3) opacity(.9);
+			-moz-filter: brightness(1) grayscale(.3) opacity(.9);
+			filter: brightness(1) grayscale(.3) opacity(.9);
+		}
+
+		.txt-center {
+			text-align: left;
+		}
+		.hide {
+			display: none;
+		}
+		.clear {
+			float: none;
+			clear: both;
+		}
+		.rating {
+			margin-left: 30%;
+			font-size: 1.5em;
+			width: 50%;
+			unicode-bidi: bidi-override;
+			direction: rtl;
+			text-align: left;
+			position: relative;
+		}
+		.rating b {
+			width: 100%;
+			unicode-bidi: bidi-override;
+			direction: ltr;
+			text-align: right;
+		}
+
+		.rating > label {
+			float: right;
+			display: inline;
+			padding: 0;
+			margin: 0;
+			position: relative;
+			width: 1.1em;
+			cursor: pointer;
+			color: #FFFFFF;
+		}
+
+		b {
+			text-shadow: 2px 2px 4px #777777;
+		}
+		.rating > label:hover,
+		.rating > label:hover ~ label,
+		.rating > input.radio-btn:checked ~ label {
+			color: transparent;
+		}
+
+		.rating > label:hover:before,
+		.rating > label:hover ~ label:before,
+		.rating > input.radio-btn:checked ~ label:before,
+		.rating > input.radio-btn:checked ~ label:before {
+			content: "\2605";
+			position: absolute;
+			left: 0;
+			color: #FFFFFF;
+		}
+
+		.img-border {
+			border: 10px solid;
+			border-color: #cccccc;
+			box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+			margin-top: 20px;
+			border-image: linear-gradient(45deg, rgb(255,255,255), rgb(253,253,254)) 1;
+		}
 	</style>
 	<script src="https://cloud.tinymce.com/5/tinymce.min.js"></script>
-	<script>tinymce.init({ selector:'textarea' });</script>
+	<script>tinymce.init({
+			selector:'textarea',
+			plugins: 'print preview emoticons fullpage powerpaste searchreplace autolink directionality advcode visualblocks visualchars fullscreen image link media mediaembed template codesample table charmap hr pagebreak nonbreaking anchor toc insertdatetime advlist lists wordcount tinymcespellchecker a11ychecker imagetools textpattern help formatpainter permanentpen pageembed tinycomments mentions linkchecker',
+
+			toolbar: 'formatselect | bold italic strikethrough forecolor backcolor permanentpen formatpainter | link image media pageembed | alignleft aligncenter alignright alignjustify  | numlist bullist outdent indent | removeformat | addcomment | emoticons',
+		});
+	</script>
 </head>
 <body class="homepage">
 	<% include ./partials/menu %>
@@ -30,71 +140,141 @@
 	<div class="wrapper style3">
 		<section class="container">
 			<header class="major">
-				<h2>Création de votre géocache</h2>
+				<h2 style="text-shadow: 2px 2px 2px #666666;">Création de votre géocache</h2>
 			</header>
-			<form id="uploadForm" method="post" action="/create_geocache" encType="multipart/form-data">
+			<form id="uploadForm" method="post" action="/save" encType="multipart/form-data">
 
-				<p><b>Type</b> de votre géocache</p>
-				<input id="type_geocache_tradi" type="radio" value="TRADI" name="type_geocache" checked/>
+				<p><b>🧩 Type</b> de votre géocache</p>
+				<input id="type_geocache_tradi" type="radio" value="TRADI" name="type_geocache" <% if( type=='TRADI' ) { %>checked <% }%>/>
 				<label for="type_geocache_tradi">
 					<img width="60" alt="TRADI" src="/public/images/TRADIBIG.gif" style="margin-left:5px;"/>
 					<span style="margin-right:50px; font-size: large">Cache Traditionnelle</span>
 				</label>
-				<input id="type_geocache_mystery" type="radio" value="MYSTERY" name="type_geocache"/>
+				<input id="type_geocache_mystery" type="radio" value="MYSTERY" name="type_geocache" <% if( type=='MYSTERY' ) { %>checked <% }%>/>
 				<label for="type_geocache_mystery">
 					<img width="60" alt="MYSTERY" src="/public/images/MYSTERYBIG.gif" style="margin-left:5px;"/>
 					<span style="font-size: large">Cache Mystère</span>
 				</label>
 
-				<p><b>Nom</b> de votre géocache</p>
-				<input type="text" size="20" maxlength="250" name="name" id="name" value="" style="border: solid 1px #fff;" placeholder="Le nom sera visible sur le site" required/>
+				<p><label for="name"><b>✨ Nom</b> de votre géocache</label></p>
+				<input type="text" size="20" maxlength="250" name="name" id="name" value="<%= nom %>" style="border: solid 1px #fff;" placeholder="Le nom sera visible sur le site" required/>
 
-				<p><label for="coords_geocache"><b>Emplacement</b> de votre géocache</label></p>
+				<p><label for="coords_geocache"><b>🗺️ Emplacement</b></label></p>
 				<span>Entrez les coordonnées GPS du lieu précis ou vous avez dissimulé votre géocache ci-dessous. <br>Forme 'latitude, longitude' ou 'N 43° XX.ABC E 007° YY.DEF'</span>
 				<div>
 					<div id="map"></div>
 					<a href="#" id="confirm_coordinates" class="button pull-right">&raquo; Confirmer les coordonnées</a>
 					<span class="pull-left" style="padding-top: 10px; font-size: larger;">📍</span>
-					<input type="text" size="20" maxlength="250" name="coords_geocache" id="coords_geocache" value="" class="" style="border: solid 1px #fff; width: 50%; margin-top:10px;" placeholder="ex: N 43° 36.937 E 007° 04.001" required/>
+					<input type="text" size="20" maxlength="250" name="coords_geocache" id="coords_geocache" value="<%= gps_string %>" class="" style="border: solid 1px #fff; width: 50%; margin-top:10px;" placeholder="ex: N 43° 36.937 E 007° 04.001" required/>
 					<input type="hidden" id="geocache_lat" name="geocache_lat" value="<%= gps.latitude %>">
 					<input type="hidden" id="geocache_lng" name="geocache_lng" value="<%= gps.longitude %>">
 				</div>
 
-				<p><label for="pic">Une <b>photo d'illustration</b> </label></p>
+				<p><label for="pic"><b>🖼️ Photo d'illustration</b></label></p>
+				<img width="470px;" src="<%= photo %>" alt="<%= nom %>" class="img-border" style="margin-bottom:20px; margin-left: 20px;"><br>
 				<span>Cette photo sert pour la vignette d'affichage de votre cache dans la liste de toutes les géocaches</span>
 				<input type="file" name="pic" id="pic" accept="image/*" required>
 
-				<p><label for="description"><b>Description</b> de votre géocache</label></p>
+				<p><label for="description"><b>📝 Description</b></label></p>
 				<span>Décrivez en détail cette experience Géocaching. La description peut comprendre de l'information au sujet de l'emplacement et de sa signification, le contenant de la cache, le parcours pour s'y rendre, et ainsi de suite.</span>
-				<textarea name="description" rows="25" id="description" style="border: solid 1px #fff; " placeholder="La description sera visible sur le site" maxlength="10000" required></textarea>
+				<textarea name="description" rows="25" id="description" style="border: solid 1px #fff; " placeholder="La description sera visible sur le site" maxlength="10000" required><%= description %></textarea>
 
-				<p><label for="hint"><b>Indice</b> (recommandé)</label></p>
-				<input type="text" size="20" maxlength="1000" name="hint" id="hint" value="" style="border: solid 1px #fff;" placeholder="Si vous ne désirez pas ajouter d'indice pour aider à trouver la cache, laissez ce champ vide."/>
+				<p><label for="hint"><b>🙊 Indice</b> (recommandé)</label></p>
+				<input type="text" size="20" maxlength="1000" name="hint" id="hint" value="<%= hint %>" style="border: solid 1px #fff;" placeholder="Si vous ne désirez pas ajouter d'indice pour aider à trouver la cache, laissez ce champ vide."/>
 
-				<p><label for="owner">Géocache <b>placée par</b></label></p>
+				<p><label for="owner"><b>🙏 Placée par</b></label></p>
 				<span>Vous avez la possibilité de modifier votre pseudo ou mentionner ici les pseudos des personnes qui vous ont assistées dans la création.</span>
-				<input type="text" size="20" maxlength="250" name="owner" id="owner" value="" style="border: solid 1px #fff;" placeholder="Les pseudos seront visibles sur le site"/>
+				<input type="text" size="20" maxlength="250" name="owner" id="owner" value="<%= owner %>" style="border: solid 1px #fff;" placeholder="Les pseudos seront visibles sur le site" required />
 
 
-				<label for="code"><b>Code de suivi</b> situé sur le tag en bois à attacher à votre objet, à récupérer <a href="/geocache?id=SAg9v68wGD" style="color: white;">ici</a></label>
-				<input type="text" size="4" maxlength="4" name="code" id="code" value="" style="border: solid 1px #fff;" placeholder="Le code ne sera pas visible sur le site mais il permet d'identifier uniquement l'objet au moment des voyages" required/>
+				<p><b>🎁 Taille</b></p>
+				<div class="geocache-size-selector">
+					<input id="other" type="radio" name="size" value="other" <% if( cache_size=='OTHER' ) { %>checked <% }%>/>
+					<label class="card-cc other" for="other"></label>
+					<input id="micro" type="radio" name="size" value="micro" <% if( cache_size=='MICRO' ) { %>checked <% }%>/>
+					<label class="card-cc micro" for="micro"></label>
+					<input id="small" type="radio" name="size" value="small" <% if( cache_size=='SMALL' ) { %>checked <% }%>/>
+					<label class="card-cc small" for="small"></label>
+					<input id="regular" type="radio" name="size" value="regular" <% if( cache_size=='REGULAR' ) { %>checked <% }%>/>
+					<label class="card-cc regular" for="regular"></label>
+					<input id="large" type="radio" name="size" value="large" <% if( cache_size=='LARGE' ) { %>checked <% }%>/>
+					<label class="card-cc large" for="large"></label>
+				</div>
+
+				<p><b>🧠 Difficulté</b> et <b>🥾 Terrain</b></p>
+				<span> Nous vous recommandons d'utiliser <a href="http://support.groundspeak.com/index.php?pg=kb.page&id=82" style="color: #FFFFFF;">ce système</a> pour évaluer votre cache. </span>
+				<div class="txt-center">
+					<div class="rating">
+						<b>Difficulté</b>
+						<input id="d5" name="difficulty" type="radio" value="5" class="radio-btn hide" <% if( difficulty=='5' ) { %>checked <% }%> />
+						<label for="d5">☆</label>
+						<input id="d4" name="difficulty" type="radio" value="4" class="radio-btn hide" <% if( difficulty=='4' ) { %>checked <% }%>/>
+						<label for="d4">☆</label>
+						<input id="d3" name="difficulty" type="radio" value="3" class="radio-btn hide" <% if( difficulty=='3' ) { %>checked <% }%>/>
+						<label for="d3">☆</label>
+						<input id="d2" name="difficulty" type="radio" value="2" class="radio-btn hide" <% if( difficulty=='2' ) { %>checked <% }%>/>
+						<label for="d2">☆</label>
+						<input id="d1" name="difficulty" type="radio" value="1" class="radio-btn hide" <% if( difficulty=='1' ) { %>checked <% }%>/>
+						<label for="d1">☆</label>
+						<div class="clear"></div>
+					</div>
+					<div class="rating">
+						<b>Terrain</b>
+						<input id="t5" name="terrain" type="radio" value="5" class="radio-btn hide" <% if( terrain=='5' ) { %>checked <% }%>/>
+						<label for="t5">☆</label>
+						<input id="t4" name="terrain" type="radio" value="4" class="radio-btn hide" <% if( terrain=='4' ) { %>checked <% }%>/>
+						<label for="t4">☆</label>
+						<input id="t3" name="terrain" type="radio" value="3" class="radio-btn hide" <% if( terrain=='3' ) { %>checked <% }%>/>
+						<label for="t3">☆</label>
+						<input id="t2" name="terrain" type="radio" value="2" class="radio-btn hide" <% if( terrain=='2' ) { %>checked <% }%>/>
+						<label for="t2">☆</label>
+						<input id="t1" name="terrain" type="radio" value="1" class="radio-btn hide" <% if( terrain=='1' ) { %>checked <% }%>/>
+						<label for="t1">☆</label>
+						<div class="clear"></div>
+					</div>
+				</div>
+
+				<p><b>📃 Logbook - Image à imprimer</b></p>
+				<span>Il est nécessaire de placer le QRcode ci-dessous dans votre géocache avec un logbook papier pour permettre aux participant de signer leur trouvaille.</span>
+				<img class="img-border" alt="A imprimer et placer dans la géocache" src="<%= qr %>" id="logbook" />
+
+
+			    <p><b>📢 Informations de publication</b></p>
+				<label for="notes">Vous pouvez mentionner ci-dessous des informations particulières pour l'organisateur qui validera votre cache (cela restera privé)</label>
+				<input type="text" size="20" maxlength="1000" name="notes" id="notes" value="<%= notes %>" style="border: solid 1px #fff;" placeholder="ex: Merci de publier ma cache le 23 mai à 18h00"/>
 				<br>
+				<span>🚨 Cochez la case suivante si tout est en place, sinon vous pouvez simplement enregistrer vos modifications et continuer plus tard</span>
+				<br><input type="checkbox" id="ready" name="ready">
+				<label for="ready" style="font-size: large">Tout est OK, la cache est posée sur le terrain, vous pouvez la publier sur le site.</label>
 
-				<p><label for="hint"><b>Indice</b> (recommandé)</label></p>
-				<input type="text" size="20" maxlength="1000" name="hint" id="hint" value="" style="border: solid 1px #fff;" placeholder="Si vous ne désirez pas ajouter d'indice pour aider à trouver la cache, laissez ce champ vide."/>
+				<br><br><input type="submit" value="Enregistrer" name="submit" class="button alt" id="submitButton" title="Clic ici pour donner vie à ta géocache" />
 
-				<img src="<%= qr %>" id="qrCode" />
+				<p style="font-size: medium">⚠️ Une fois la cache publiée sur le site (<i>après vérification par nos soins</i>), vous ne pourrez la modifier qu'en nous contactant directement. Assurez-vous que tout vous convient avant de cocher la case de publication. Pour modifier le contenu et y revenir plus tard, il vous suffit de cliquer sur enregistrer sans cocher la case publication.</p>
 
-			    <br><input type="submit" value="Enregistrer" name="submit" class="button alt" id="submitButton" title="Clic ici pour donner vie à ta géocache" />
-			    <br><br>	
-			    <p>⚠️ Une fois la cache enregistrée vous ne pourrez la modifier qu'en nous contactant, assurez-vous que tout vous convient avant de cliquer sur enregistrer.</p>
 			</form>  				 
 		</section>
+
 	</div>
 	<div id="footer">
+		<section  class="container">
+			<h2>💬 Zone de discussion privée</h2>
+			<span>Ce fil de discussion privé vous permet d'échanger avec les organisateurs pour la conception de votre géocache, n'hésitez pas à y poser vos questions, remarques, ...</span>
+			<div id="disqus_thread"></div>
+			<script>
+				(function() {
+					var d = document, s = d.createElement('script');
+					s.src = 'https://geocaching-jds.disqus.com/embed.js';
+					s.setAttribute('data-timestamp', +new Date());
+					(d.head || d.body).appendChild(s);
+				})();
+			</script>
+			<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+		</section>
+
 		<ul class="icons">
-			<h5>Un problème avec l'enregistement de votre objet ?</h5> <br> Contactez-nous : <li><a href="mailto:geocaching@jeuxdesophia.com" class="fa fa-envelope"><span>Email</span></a></li>
+			<h5>Un problème avec la création de votre géocache ou l'usage de la zone de discussion privée ?</h5> <br> Contactez-nous par email : <li><a href="mailto:geocaching@jeuxdesophia.com" class="fa fa-envelope"><span>Email</span></a></li>
 		</ul>
+
 	</div>
 
 

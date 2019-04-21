@@ -95,36 +95,61 @@ app.post('/check_coordinates', function(req, res) {
     res.send({ lat: latitude, lng:longitude});
 });
 
+app.post('/save', function(req, res) {
+    res.redirect('/');
+});
+
 app.get('/create', async function(req, res) {
-    const id_administration = req.body.admin_id;
-    const typeNumber = 4;
-    const errorCorrectionLevel = 'L';
+    const id_administration = req.query.admin_id;
+    if(id_administration) {
+        const geocache = await jds.getGeocacheWithAdminId(id_administration);
+        if(geocache) {
+            const canvas = createCanvas(650, 320);
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = "#FFFFFF";
+            ctx.fillRect(0, 0, 650, 320);
 
-    const canvas = createCanvas(650, 350);
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = "#FFFFFF";
-    ctx.fillRect(0, 0, 650, 350);
+            // Write "Awesome!"
+            ctx.font = '30px Impact';
+            ctx.fillStyle = "#000000";
+            ctx.fillText('ÉPREUVE GÉOCACHING 2019', 100, 50);
 
-    // Write "Awesome!"
-    ctx.font = '30px Impact';
-    ctx.fillStyle = "#000000";
-    ctx.fillText('ÉPREUVE GÉOCACHING 2019', 90, 50);
-    ctx.fillText('Nom de la Géocache!', 30, 320);
+            // Draw cat with lime helmet
+            const res_img = await loadImage(__dirname + '/public/images/logo_jds.png');
+            ctx.drawImage(res_img, 0, 70, 400, 200);
 
-    // Draw cat with lime helmet
-    const res_img = await loadImage(__dirname + '/public/images/logo_jds.png');
-    ctx.drawImage(res_img, 0, 50, 400, 200);
+            const typeNumber = 0;
+            const errorCorrectionLevel = 'L';
+            let qr = qrcode(typeNumber, errorCorrectionLevel);
+            console.log(errorCorrectionLevel);
+            qr.addData('CHANGE ME');
+            qr.make();
+            const qrcode_img = new Image();
+            qrcode_img.src = qr.createDataURL();
+            ctx.drawImage(qrcode_img, 420,70, 200, 200);
 
-    let qr = qrcode(typeNumber, errorCorrectionLevel);
-    console.log(errorCorrectionLevel);
-    qr.addData('CHANGE ME');
-    qr.make();
-    const qrcode_img = new Image();
-    qrcode_img.src = qr.createDataURL();
-    ctx.drawImage(qrcode_img, 420,50, 200, 200);
+            let gps = {latitude:'0.0', longitude:'0.0'};
+            res.render('create', {
+                gps: gps,
+                cache_admin_id: id_administration,
+                type:geocache.get("Category"),
+                cache_size:geocache.get("Size"),
+                difficulty:geocache.get("Difficulty"),
+                notes:geocache.get("Notes"),
+                photo:geocache.get("Photo").url({forceSecure: true}).replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, ''),
+                terrain:geocache.get("Terrain"),
+                gps_string:geocache.get("GPSString"),
+                hint:geocache.get("Indice"),
+                nom:geocache.get("Nom"),
+                description: geocache.get("Description"),
+                owner: geocache.get("Owner"),
+                qr:canvas.toDataURL()
+            });
+        }
+    }
+    console.error("Error in call to /create with " + id_administration);
+    res.redirect('/');
 
-    let gps = {latitude:'0.0', longitude:'0.0'};
-    res.render('create', { gps: gps, cache_admin_id: id_administration, qr:canvas.toDataURL()} );
 });
 
 app.get('/ranking', function(req, res) {
