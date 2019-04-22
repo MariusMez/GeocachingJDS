@@ -146,11 +146,11 @@ app.post('/save', cpUpload, async function(req, res) {
                 geocache.set("NeedReview", need_review_bool);
 
                 if(photo) {
-                    const photo_file = await jds.createThumbnail(photo.buffer, 1000, 1000);
+                    const photo_file = await jds.createThumbnail(photo.buffer, 1000, 1000, 'png');
                     geocache.set("Photo", photo_file);
                 }
                 if(spoiler) {
-                    const spoiler_file = await jds.createThumbnail(spoiler.buffer, 1000, 1000);
+                    const spoiler_file = await jds.createThumbnail(spoiler.buffer, 1000, 1000, 'png');
                     geocache.set("Spoiler", spoiler_file);
                 }
 

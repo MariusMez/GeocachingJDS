@@ -10,7 +10,7 @@ Parse.Cloud.beforeSave("Log", async (request) => {
             const maxWidth = 1000;
             const maxHeight = 1000;
             let response = await Parse.Cloud.httpRequest({ url: photo.url() });
-            let thumbnail = await jds.createThumbnail(response.buffer, maxWidth, maxHeight);
+            let thumbnail = await jds.createThumbnail(response.buffer, maxWidth, maxHeight, 'jpeg');
             if(thumbnail) {
                 request.object.set("Photo", thumbnail);
                 request.object.set("PhotoUrl", thumbnail.url({forceSecure: true}));

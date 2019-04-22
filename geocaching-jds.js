@@ -73,13 +73,13 @@ const generateQRCode = async function generateQRCode(text) {
     return canvas.toDataURL();
 };
 
-const createThumbnail = async function createThumbnail(image_buffer, maxWidth, maxHeight) {
+const createThumbnail = async function createThumbnail(image_buffer, maxWidth, maxHeight, format) {
     const sharp = require('sharp');
     return sharp(image_buffer).resize(maxWidth, maxHeight, { fit: 'inside', withoutEnlargement: true })
-        .toFormat('png')
+        .toFormat(format)
         .toBuffer()
         .then(async (buffer_img) => {
-            let thumb = new Parse.File("thumbnail.png", { base64: buffer_img.toString('base64') });
+            let thumb = new Parse.File(`thumbnail.${format}`, { base64: buffer_img.toString('base64') });
             return await thumb.save();
         }, (error) => {
             console.log("Thumbnail generation error: " + error.message);
