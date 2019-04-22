@@ -1,5 +1,7 @@
 const jds = require('../geocaching-jds');
 const starting_jds_date = "2018-05-10";
+const csv = require('csv');
+const fs = require('fs');
 
 Parse.Cloud.beforeSave("Log", async (request) => {
     if(request.object.isNew()) {
@@ -17,40 +19,24 @@ Parse.Cloud.beforeSave("Log", async (request) => {
     }
 });
 
+async function base64_encode(file) {
+    let bitmap = fs.readFileSync(file);
+    return new Buffer.from(bitmap).toString('base64');
+}
 
-Parse.Cloud.job("Resize all PhotoLog", async (request) => {
+Parse.Cloud.job("Import participants 2019 from CSV file", async (request) => {
     request.message("I just started");
-    const Log = Parse.Object.extend("Log");
-    let query = new Parse.Query(Log);
-    query.lessThanOrEqualTo("createdAt", new Date());
-    query.equalTo("Active", true);
-    query.doesNotExist("PhotoResized");
-    query.limit(10000);
-    query.exists("PhotoUrl");
-    let logs = await query.find();
-    console.log("Processing " + logs.length + " logs...");
-    let promises = logs.map(async (log) => {
-        const photoFile = log.get("Photo");
-        log.set("Photo", photoFile);
-        log.set("PhotoResized", true);
-        await log.save(null);
-        request.message('Resized ' + photoFile);
-    });
-    await Promise.all(promises);
-    request.message("I just finished");
-});
-
-Parse.Cloud.job("Add Geocacheurs from CSV file", async (request) => {
-    request.message("I just started");
-    const csv = require('csv');
-    let obj = csv();
-
+    const obj = csv();
     const Geocacheur = Parse.Object.extend("Geocacheur");
+    const Geocache = Parse.Object.extend("Geocache");
     const Ranking = Parse.Object.extend("Ranking");
 
-    obj.from.path('Geocacheurs.csv').to.array(function(geocacheurs) {
+    const spoiler_img = new Parse.File("nospoiler.png", { base64: await base64_encode(__dirname + '/../public/images/nospoiler.png') });
+    const photo_img = new Parse.File("logo_jds.png", { base64: await base64_encode(__dirname + '/../public/images/logo_jds.png') });
+
+    obj.from.path('Geocacheurs2019.csv').to.array(function(geocacheurs) {
         geocacheurs.forEach( async (geocacheur) => {
-            const firstname = geocacheur[0];
+            const pseudo = geocacheur[0];
             const companyname = geocacheur[1];
             const email = geocacheur[2].toLowerCase();
 
@@ -62,35 +48,59 @@ Parse.Cloud.job("Add Geocacheurs from CSV file", async (request) => {
                 let g = new Geocacheur();
                 g.save({
                     Email: email,
-                    Pseudo: firstname,
+                    Pseudo: pseudo,
                     Company: companyname,
                     Enrollment: "preload",
-                    Active: false
-                }).then((user) => {
-                    let queryRanking = new Parse.Query(Ranking);
-                    queryRanking.equalTo('Geocacheur', user);
-                    queryRanking.first().then((res) => {
-                        if (res === undefined) {
-                            jds.saveRanking(user, false).then(function() { }, function(error) { });
-                        } else {
-                            // Update ranking ?
-                            console.log("Update ranking");
-                        }
-                    }, (error) => {
-                        console.error(error);
-                    });
+                    Active: true
+                }).then(async (user) => {
+                    const email = user.get("Email");
+                    let query = new Parse.Query(Geocache);
+                    query.equalTo('OwnerEmail', email);
+                    const result = await query.first();
+
+                    if(result === undefined) {
+                        let geocache = new Geocache();
+                        geocache.set("Owner", pseudo);
+                        geocache.set("OwnerEmail", email);
+                        geocache.set("Active", false);
+                        geocache.set("Fav", 0);
+                        geocache.set("RatioFav", 0);
+                        geocache.set("codeId", await jds.generateCodeId());
+                        geocache.set("adminId", await jds.generateAdminId());
+                        geocache.set("Spoiler", spoiler_img);
+                        geocache.set("Photo", photo_img);
+                        geocache.save().then((geocache) => {
+                            console.log(`Geocache created for user ${email}`);
+                            let queryRanking = new Parse.Query(Ranking);
+                            queryRanking.equalTo('Geocacheur', user);
+                            queryRanking.first().then((res) => {
+                                if (res === undefined) {
+                                    jds.saveRanking(user, true).then(function() { }, function(error) { });
+                                } else {
+                                    // Update ranking ?
+                                    console.log("Update ranking");
+                                }
+                            }, (error) => {
+                                console.error(error);
+                            });
+
+                        }, (error) => {
+                            console.error(error);
+                        });
+                    } else {
+                        console.log(`Geocache exist for user ${email}, we do nothing`);
+                    }
                 }, (error) => {
                     console.error(error);
                 });
             } else {
-                console.log("Geocacheur exist, we do nothing");
-                //results.set("Active", false);
-                //results.save(null, { useMasterKey: true }).then(response.success, response.error);
+                console.log(`Geocacheur ${email} exist, we do nothing`);
             }
         });
     });
     request.message("I just finished");
 });
+
 
 Parse.Cloud.job("First - Compute Score Ratio D/T", (request) => {
     request.message("I just started Compute Ratio D/T");
@@ -250,7 +260,7 @@ Parse.Cloud.job("Last - Compute Ranking", async (request) => {
             query.limit(10000);
             query.count().then(async (counter) => {
                 let scoreFTFSTFTTF = rank.get("FTF") * scoreFTF + rank.get("STF") * scoreSTF + rank.get("TTF") * scoreTTF;
-                let score = counter * scoreFoundIt + scoreFTFSTFTTF + rank.get("ScoreDT") + rank.get("ScoreTB");
+                let score = counter * scoreFoundIt + scoreFTFSTFTTF + rank.get("ScoreDT") + rank.get("ScoreCache");
                 rank.set("Found", counter);
                 rank.set("Score", score);
                 rank.set("ScoreFTF", scoreFTFSTFTTF);

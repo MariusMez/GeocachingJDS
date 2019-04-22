@@ -43,21 +43,13 @@
 								<b>🥉 TTF</b>
 							</th>
 							<th>
-								<b>🗿 Nb TB</b>
-							</th>
-							<th>
-								<b>✅ Missions</b>
-							</th>
-							<th>
-								<b>⛪ Visites TB</b>
+								<b>🗿 Cache FAV</b>
 							</th>
 						</tr>
 					</thead>
 
 					<tfoot>
 						<tr>
-							<td></td>
-							<td></td>
 							<td></td>
 							<td></td>
 							<td></td>
@@ -79,9 +71,7 @@
 							<td><%= rank.get("FTF") %></td>
 							<td><%= rank.get("STF") %></td>
 							<td><%= rank.get("TTF") %></td>
-							<td><%= rank.get("NbTB") %></td>
-							<td><%= rank.get("Missions") %></td>
-							<td><%= rank.get("TbNewCaches") %></td>
+							<td><%= rank.get("ScoreCache") %></td>
 
 						</tr>
 						<% }); %>
@@ -103,7 +93,7 @@
 				<h2>❤️ Classement des Caches préférées</h2>
 				<ul style="list-style-type:decimal; margin-left:30px;">
 					<% geocaches.forEach(function(geocache) { %>
-					<li><b><%= geocache.get("Fav") %></b> 👍 (<%= geocache.get("RatioFav") %> % des visites) pour <b><a href="/geocache?id=<%= geocache.id %>"> <%= geocache.get("Nom") %> </a> </b></li>
+					<li><b><%= geocache.get("Fav") %></b> 👍 (<%= geocache.get("RatioFav") %> % des visites) pour <b><a href="/geocache?id=<%= geocache.id %>"> <%= geocache.get("Nom") %> </a> posée par <%= geocache.get("Owner") %> </b></li>
 
 					<% }); %>
 				</ul>

@@ -76,14 +76,29 @@ const generateQRCode = async function generateQRCode(text) {
 const createThumbnail = async function createThumbnail(image_buffer, maxWidth, maxHeight) {
     const sharp = require('sharp');
     return sharp(image_buffer).resize(maxWidth, maxHeight, { fit: 'inside', withoutEnlargement: true })
-        .toFormat('jpeg')
+        .toFormat('png')
         .toBuffer()
         .then(async (buffer_img) => {
-            let thumb = new Parse.File("thumbnail.jpg", { base64: buffer_img.toString('base64') });
+            let thumb = new Parse.File("thumbnail.png", { base64: buffer_img.toString('base64') });
             return await thumb.save();
         }, (error) => {
             console.log("Thumbnail generation error: " + error.message);
         });
+};
+
+
+function randomString(length, chars) {
+    let result = '';
+    for (let i = length; i > 0; --i) result += chars[Math.round(Math.random() * (chars.length - 1))];
+    return result;
+}
+
+const generateCodeId = function generateCodeId() {
+    return randomString(8, '123456789ABCDEFGHJKMNPQRTVWXYZ')
+};
+
+const generateAdminId = function generateAdminId() {
+    return randomString(32, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
 };
 
 const getGeocache = function(id) {
@@ -143,7 +158,7 @@ const getAllPublishedGeocaches = function(descending) {
     return new Promise((resolve, reject) => {
         const Geocaches = Parse.Object.extend("Geocache");
         let query = new Parse.Query(Geocaches);
-        query.equalTo("Active",true);
+        query.equalTo("Active", true);
         query.lessThanOrEqualTo("Publication", new Date());
         query.descending(descending);
         query.limit(1000);
@@ -292,6 +307,7 @@ const saveRanking = function(geocacheur, active) {
         ranking.set("TTF", 0);
         ranking.set("ScoreFTF", 0);
         ranking.set("ScoreTB", 0);
+        ranking.set("ScoreCache", 0);
         ranking.set("ScoreDT", 0);
         ranking.set("Score", 0);
         ranking.set("Found", 0);
@@ -482,6 +498,8 @@ function getLogsByEmail(emailString) {
     });
 }
 
+module.exports.generateCodeId = generateCodeId;
+module.exports.generateAdminId = generateAdminId;
 module.exports.createThumbnail = createThumbnail;
 module.exports.generateQRCode = generateQRCode;
 module.exports.getGeocache = getGeocache;

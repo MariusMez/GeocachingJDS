@@ -163,7 +163,7 @@
 				<input type="text" size="20" maxlength="250" name="name" id="name" value="<%= nom %>" style="border: solid 1px #fff;" placeholder="Le nom sera visible sur le site" required/>
 
 				<p><label for="coords_geocache"><b>🗺️ Emplacement</b></label></p>
-				<span>Entrez les coordonnées GPS du lieu précis ou vous avez dissimulé votre géocache ci-dessous. <br>Forme 'latitude, longitude' ou 'N 43° XX.ABC E 007° YY.DEF'</span>
+				<span>Entrez les coordonnées GPS du lieu précis ou vous avez dissimulé votre géocache ci-dessous. <br>Forme 'latitude ; longitude' ou 'N 43° XX.ABC E 007° YY.DEF'</span>
 				<div>
 					<div id="map"></div>
 					<a href="#" id="confirm_coordinates" class="button pull-right">&raquo; Confirmer les coordonnées</a>
@@ -174,12 +174,12 @@
 				</div>
 
 				<p><label for="pic"><b>🖼️ Photo d'illustration</b></label></p>
-				<img width="470px;" src="<%= photo %>" alt="<%= nom %>" class="img-border" style="margin-bottom:20px; margin-left: 20px;"><br>
+				<img id="pic_img" width="470px;" src="<%= photo %>" alt="<%= nom %>" class="img-border" style="margin-bottom:20px; margin-left: 20px;"><br>
 				<span>Cette photo sert pour la vignette d'affichage de votre cache dans la liste de toutes les géocaches</span>
 				<input type="file" name="pic" id="pic" accept="image/*">
 
                 <p><label for="spoiler"><b>🃏 Photo Spoiler</b> (recommandé)</label></p>
-                <img width="470px;" src="<%= spoiler %>" alt="Spoiler" class="img-border" style="margin-bottom:20px; margin-left: 20px;"><br>
+                <img id="spoiler_img" width="470px;" src="<%= spoiler %>" alt="Spoiler" class="img-border" style="margin-bottom:20px; margin-left: 20px;"><br>
                 <span>Cette photo spoiler permet d'aider à trouver l'emplacement de la géocache.</span>
                 <input type="file" name="spoiler" id="spoiler" accept="image/*">
 
@@ -326,6 +326,21 @@
 			check_coords(coords);
 			return false;
 		});
+
+        document.getElementById("pic").onchange = function () {
+            let reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById("pic_img").src = e.target.result;
+            };
+            reader.readAsDataURL(this.files[0]);
+        };
+        document.getElementById("spoiler").onchange = function () {
+            let reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById("spoiler_img").src = e.target.result;
+            };
+            reader.readAsDataURL(this.files[0]);
+        };
 	</script>
 	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@8"></script>
 	<script>
