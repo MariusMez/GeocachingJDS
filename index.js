@@ -417,7 +417,7 @@ app.post('/flash', function(req, res) {
 
     jds.getGeocacheWithCodeId(codeId).then((cache) => {
         if(cache) {
-            if(cache.get("Email").toLowerCase() === email) {
+            if(cache.get("OwnerEmail").toLowerCase() === email) {
                 console.log(`${email} essaye de logguer sa propre géocache !`);
                 res.render('error', { message: "Hum, il semblerait que vous êtes propriétaire de cette géocache 🤔"});
                 return;
@@ -467,7 +467,7 @@ app.post('/found', upload.single('pic'), function (req, res, next) {
         if(geocacheur) {
             jds.getGeocache(cacheId).then((cache) => {
                 if(cache) {
-                    if(cache.get("Email").toLowerCase() === email) {
+                    if(cache.get("OwnerEmail").toLowerCase() === email) {
                         console.log(`${email} essaye de logguer sa propre géocache dans /found le fourbe !`);
                         res.render('error', { message: "Hum, il semblerait que vous êtes propriétaire de cette géocache 🤔"});
                         return;
