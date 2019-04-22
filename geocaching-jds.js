@@ -1,6 +1,7 @@
 const starting_jds_date = "2019-05-10";
 const Coordinates = require('coordinate-parser');
-
+const qrcode = require('qrcode-generator');
+const { createCanvas, loadImage, Image } = require('canvas');
 
 // This function returns the coordinate
 // conversion string in DD to DMS.
@@ -53,6 +54,24 @@ const checkCoordinates = async function checkCoordinates(coords) {
     return { lat: latitude, lng:longitude, dms: ddToDm(latitude, longitude) }
 };
 
+const generateQRCode = async function generateQRCode(text) {
+    const canvas = createCanvas(650, 320);
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fillRect(0, 0, 650, 320);
+    ctx.font = '30px Impact';
+    ctx.fillStyle = "#000000";
+    ctx.fillText('ÉPREUVE GÉOCACHING 2019', 100, 50);
+    const res_img = await loadImage(__dirname + '/public/images/logo_jds.png');
+    ctx.drawImage(res_img, 0, 70, 400, 200);
+    let qr = qrcode(0, 'L');
+    qr.addData(text);
+    qr.make();
+    const qrcode_img = new Image();
+    qrcode_img.src = qr.createDataURL();
+    ctx.drawImage(qrcode_img, 420,70, 200, 200);
+    return canvas.toDataURL();
+};
 
 const createThumbnail = async function createThumbnail(image_buffer, maxWidth, maxHeight) {
     const sharp = require('sharp');
@@ -464,6 +483,7 @@ function getLogsByEmail(emailString) {
 }
 
 module.exports.createThumbnail = createThumbnail;
+module.exports.generateQRCode = generateQRCode;
 module.exports.getGeocache = getGeocache;
 module.exports.getGeocacheWithCodeId = getGeocacheWithCodeId;
 module.exports.getGeocacheWithAdminId = getGeocacheWithAdminId;

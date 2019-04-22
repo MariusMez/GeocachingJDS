@@ -1,15 +1,15 @@
 
-<div class="rating">
+<div class="rating" style="line-height: 1.8em;">
 	<div id="difficulte"></div>
 	<div id="terrain"></div>
-	<div id="size">Taille : <img src="/public/images/<%= size %>.gif" style="margin-left:10px;"/></div>
+	<div id="size">Taille &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp;<img src="/public/images/<%= size %>.gif" style="margin-left:10px;"/></div>
 	<div><%= fav %> 👍</div>
 </div>
 
 <script type="text/javascript">
 	var pas;
-	var chaint = 'Terrain :    ';
-	var chaind = 'Difficulté : ';
+	var chaint = 'Terrain &nbsp;&nbsp;&nbsp&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp;';
+	var chaind = 'Difficulté &nbsp;&nbsp;&nbsp;&nbsp';
 
 	for (pas = 0; pas < <%= t %>; pas++) {
 		chaint += '<span>★</span>';

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
-<html>
+<html lang="fr">
 <head>
-	<title><%= nom %> - Géocaching Jeux de Sophia 2018</title>
+	<title><%= nom %> - Géocaching Jeux de Sophia 2019</title>
 	<% include ./partials/head %>
 	<!-- <script src='https://www.google.com/recaptcha/api.js'></script> -->
 	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" />
@@ -16,8 +16,10 @@
 			<section>
 				<header class="major">
 					<img width="470px;" align="right" src="<%= photo %>" alt="<%= nom %>" style="margin-bottom:20px; margin-left: 20px;">
-					<% include ./partials/geocachecategory %><h2><%= nom %></h2>
-					<span class="byline"><%= coord %></span>
+					<% include ./partials/geocachecategory %>
+					<h2><%= nom %></h2>
+					<span class="byline">Une cache par <%= owner %></span>
+					<h3 class="byline"><%= coord %></h3>
 					<% include ./partials/rating %>
 				</header>
 

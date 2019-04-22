@@ -10,8 +10,6 @@ const bodyParser = require('body-parser');
 const ParseServer = require('parse-server').ParseServer;
 const path = require('path');
 const multer = require('multer');
-const qrcode = require('qrcode-generator');
-const { createCanvas, loadImage, Image } = require('canvas');
 
 const Recaptcha = require('recaptcha-verify');
 let recaptcha = new Recaptcha({
@@ -84,18 +82,20 @@ app.post('/check_coordinates', async function(req, res) {
     res.send(gps);
 });
 
-app.post('/save', upload.single('pic'), async function(req, res) {
+let cpUpload = upload.fields([{ name: 'pic', maxCount: 1 }, { name: 'spoiler', maxCount: 1 }]);
+app.post('/save', cpUpload, async function(req, res) {
     const cache_admin_id = req.body.cache_admin_id;
     const name = req.body.name;
     const owner_email = req.body.owner_email;
     const description = req.body.description;
     const type_geocache = req.body.type_geocache.toUpperCase();
     const coords_geocache = req.body.coords_geocache;
-    console.log("coords_geocache");
-    console.log(coords_geocache);
     const geocache_lat = req.body.geocache_lat;
     const geocache_lng = req.body.geocache_lng;
-    const photo = req.file;
+    let photo = null;
+    try { photo = req.files['pic'][0]; } catch (e) {}
+    let spoiler = null;
+    try { spoiler = req.files['spoiler'][0]; } catch (e) {}
     const hint = req.body.hint;
     const owner = req.body.owner;
     const cache_size = req.body.cache_size.toUpperCase();
@@ -109,6 +109,14 @@ app.post('/save', upload.single('pic'), async function(req, res) {
         try {
             const geocache = await jds.getGeocacheWithAdminId(cache_admin_id);
             if (geocache) {
+                // Redirection si la cache est déjà activée pour publication
+                if(geocache.get("Active") === true) {
+                    const message = "La cache est déjà publiée ou va l'être prochainement, les modifications sont désactivées.<br>Contactez-nous directement.";
+                    const result = "error";
+                    res.redirect(`/create?admin_id=${cache_admin_id}&result=${result}&message=${message}`);
+                    return;
+                }
+
                 geocache.set("Nom", name);
                 geocache.set("Description", description);
                 geocache.set("Category", type_geocache);
@@ -139,10 +147,11 @@ app.post('/save', upload.single('pic'), async function(req, res) {
 
                 if(photo) {
                     const photo_file = await jds.createThumbnail(photo.buffer, 400, 400);
-                    const filename = photo.originalname;
-                    const photoFileBase64 = photo.buffer.toString('base64');
-                    let parseFile = new Parse.File(filename, { base64: photoFileBase64 });
                     geocache.set("Photo", photo_file);
+                }
+                if(spoiler) {
+                    const spoiler_file = await jds.createThumbnail(spoiler.buffer, 400, 400);
+                    geocache.set("Spoiler", spoiler_file);
                 }
 
                 geocache.save().then((object) => {
@@ -172,52 +181,44 @@ app.get('/create', async function(req, res) {
     if(id_administration) {
         const geocache = await jds.getGeocacheWithAdminId(id_administration);
         if(geocache) {
-            const canvas = createCanvas(650, 320);
-            const ctx = canvas.getContext('2d');
-            ctx.fillStyle = "#FFFFFF";
-            ctx.fillRect(0, 0, 650, 320);
 
-            // Write "Awesome!"
-            ctx.font = '30px Impact';
-            ctx.fillStyle = "#000000";
-            ctx.fillText('ÉPREUVE GÉOCACHING 2019', 100, 50);
-
-            // Draw cat with lime helmet
-            const res_img = await loadImage(__dirname + '/public/images/logo_jds.png');
-            ctx.drawImage(res_img, 0, 70, 400, 200);
-
-            let qr = qrcode(0, 'L');
-            qr.addData('CHANGE ME');
-            qr.make();
-            const qrcode_img = new Image();
-            qrcode_img.src = qr.createDataURL();
-            ctx.drawImage(qrcode_img, 420,70, 200, 200);
+            const qr_code_text = `https://geocaching-jds.fr/flashit?id=${geocache.get("codeId")}`;
+            const qr_data_url = await jds.generateQRCode(qr_code_text);
 
             let geopoint = geocache.get("GPS");
             if(!geopoint) {
                 geopoint = new Parse.GeoPoint({latitude: 0.0, longitude: 0.0});
             }
-            let photo_url = null;
+            let photo_url = "/public/images/logo_jds.png";
             try {
                 photo_url = geocache.get("Photo").url({forceSecure: true}).replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, '');
+            } catch (error) { }
+            let spoiler_url = "/public/images/nospoiler.png";
+            try {
+                spoiler_url = geocache.get("Spoiler").url({forceSecure: true}).replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, '');
             } catch (error) { }
 
             res.render('create', {
                 gps: geopoint,
                 cache_admin_id: id_administration,
+                cache_active: geocache.get("Active"),
+                publication_date: geocache.get("Publication"),
+                cacheId: geocache.id,
                 owner_email: geocache.get("OwnerEmail"),
                 type: geocache.get("Category"),
                 cache_size: geocache.get("Size"),
                 difficulty: geocache.get("Difficulty"),
                 notes: geocache.get("Notes"),
                 photo: photo_url,
+                spoiler: spoiler_url,
                 terrain: geocache.get("Terrain"),
                 gps_string: geocache.get("GPSBox"),
                 hint: geocache.get("Indice"),
                 nom: geocache.get("Nom"),
                 description: geocache.get("Description"),
                 owner: geocache.get("Owner"),
-                qr: canvas.toDataURL()
+                need_review: geocache.get("NeedReview"),
+                qr: qr_data_url
             });
         } else {
             console.error("Error in call to /create with " + id_administration);
@@ -325,19 +326,26 @@ app.get('/geocache', function(req, res) {
     const Geocache = Parse.Object.extend("Geocache");
     let query = new Parse.Query(Geocache);
     query.get(req.query.id).then( async (cache) => {
-        const geocacheName = cache.get("Nom");
-        const geocachePublicationDate = cache.get("Publication");
-        const geocacheDifficulty = cache.get("Difficulty");
-        const geocacheTerrain = cache.get("Terrain");
-        const geocacheSize = cache.get("Size");
-        const geocacheCategory = cache.get("Category");
-        const geocachePhotoUrl = cache.get("Photo").url({forceSecure: true}).replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, '');
-        const geocacheDescription = cache.get("Description");
-        const geocacheIndice = cache.get("Indice");
-        const geocacheSpoiler = cache.get("Spoiler").url({forceSecure: true}).replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, '');
-        const geocacheGPS = cache.get("GPS");
-        const geocacheCoordString = cache.get("GPSString");
-        const geocacheFav = cache.get("Fav");
+        const nom = cache.get("Nom");
+        const publicationDate = cache.get("Publication");
+        const difficulty = cache.get("Difficulty");
+        const terrain = cache.get("Terrain");
+        const size = cache.get("Size");
+        const category = cache.get("Category");
+        let photoUrl = "https://geocaching-jds.fr/public/images/logo_jds.png";
+        try {
+            photoUrl = cache.get("Photo").url({forceSecure: true}).replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, '');
+        } catch (error) { }
+        let spoiler = "https://geocaching-jds.fr/public/images/nospoiler.png";
+        try {
+            spoiler = cache.get("Spoiler").url({forceSecure: true}).replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, '');
+        } catch (error) { }
+        const description = cache.get("Description");
+        const indice = cache.get("Indice");
+        const gps = cache.get("GPS");
+        const coordString = cache.get("GPSString");
+        const fav = cache.get("Fav");
+        const owner = cache.get("Owner");
         const geocacheId = cache.id;
 
         const Logs = Parse.Object.extend("Log");
@@ -347,14 +355,14 @@ app.get('/geocache', function(req, res) {
         queryLog.descending("createdAt");
         let logs = await queryLog.find();
         if(logs) {
-            res.render('geocache', { nom:geocacheName, id:geocacheId,
-                fav: geocacheFav, d:geocacheDifficulty,
-                t:geocacheTerrain, cat:geocacheCategory,
-                size:geocacheSize, coord:geocacheCoordString,
-                gps:geocacheGPS, description:geocacheDescription,
-                indice:geocacheIndice, photo:geocachePhotoUrl,
-                spoiler:geocacheSpoiler, logs:logs,
-                publication:geocachePublicationDate });
+            res.render('geocache', { nom:nom, id:geocacheId,
+                fav: fav, d:difficulty, owner: owner,
+                t:terrain, cat:category,
+                size:size, coord:coordString,
+                gps:gps, description:description,
+                indice:indice, photo:photoUrl,
+                spoiler:spoiler, logs:logs,
+                publication:publicationDate });
         }
     }, (error) => {
         res.redirect('/geocaches');

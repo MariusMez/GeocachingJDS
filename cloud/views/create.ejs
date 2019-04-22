@@ -178,6 +178,11 @@
 				<span>Cette photo sert pour la vignette d'affichage de votre cache dans la liste de toutes les géocaches</span>
 				<input type="file" name="pic" id="pic" accept="image/*">
 
+                <p><label for="spoiler"><b>🃏 Photo Spoiler</b> (recommandé)</label></p>
+                <img width="470px;" src="<%= spoiler %>" alt="Spoiler" class="img-border" style="margin-bottom:20px; margin-left: 20px;"><br>
+                <span>Cette photo spoiler permet d'aider à trouver l'emplacement de la géocache.</span>
+                <input type="file" name="spoiler" id="spoiler" accept="image/*">
+
 				<p><label for="description"><b>📝 Description</b></label></p>
 				<span>Décrivez en détail cette experience Géocaching. La description peut comprendre de l'information au sujet de l'emplacement et de sa signification, le contenant de la cache, le parcours pour s'y rendre, et ainsi de suite.</span>
 				<textarea name="description" rows="25" id="description" style="border: solid 1px #fff; " placeholder="La description sera visible sur le site"><%= description %></textarea>
@@ -247,14 +252,22 @@
 				<input type="text" size="20" maxlength="1000" name="notes" id="notes" value="<%= notes %>" style="border: solid 1px #fff;" placeholder="ex: Merci de publier ma cache le 23 mai à 18h00"/>
 				<br>
 				<span>🚨 Cochez la case suivante si tout est en place, sinon vous pouvez simplement enregistrer vos modifications et continuer plus tard</span>
-				<br><input type="checkbox" id="need_review" name="need_review">
+				<br><input type="checkbox" id="need_review" name="need_review" <% if( need_review==true ) { %>checked <% }%>>
 				<label for="need_review" style="font-size: large">Tout est OK, la cache est posée sur le terrain, vous pouvez la publier sur le site.</label>
 
-				<br><br><input type="submit" value="Enregistrer" name="submit" class="button alt" id="submitButton" title="Clic ici pour donner vie à ta géocache" />
+
+                <br><br>
+                <% if( cache_active==true ) { %>
+                    <p>Cache validée, publication prévue le : <br> <%= publication_date %></p>
+                <% } else { %>
+                    <input type="submit" value="Enregistrer" name="submit" class="button alt" id="submitButton" title="Clic ici pour donner vie à ta géocache" />
+                <% } %>
 
 				<p style="font-size: medium">⚠️ Une fois la cache publiée sur le site (<i>après vérification par nos soins</i>), vous ne pourrez la modifier qu'en nous contactant directement. Assurez-vous que tout vous convient avant de cocher la case de publication. Pour modifier le contenu et y revenir plus tard, il vous suffit de cliquer sur enregistrer sans cocher la case publication.</p>
 
-			</form>  				 
+                <p><a href="/geocache?id=<%= cacheId %>" class="" style="font-size: large; color: #FFFFFF">👀 Prévisualiser la page de la cache</a></p>
+
+            </form>
 		</section>
 
 	</div>
@@ -274,7 +287,7 @@
 			<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 		</section>
         <hr>
-        <h5>Un problème avec la création de votre géocache ou l'usage de la zone de discussion privée ?</h5> <br> Contactez-nous par email : <a href="mailto:geocaching@jeuxdesophia.com" class="fa fa-envelope"> <span>geocaching@jeuxdesophia.fr</span></a>
+        <h5>Un problème avec la création de votre géocache ou l'usage de la zone de discussion privée ?</h5> <br> Contactez-nous par email : <a href="mailto:geocaching@jeuxdesophia.com" class="fa fa-envelope"> <span>geocaching@jeuxdesophia.com</span></a>
 
 	</div>
 
