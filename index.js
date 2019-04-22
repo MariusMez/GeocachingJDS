@@ -3,7 +3,7 @@ dotenv.config();
 // Since Node 8, have errors
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
-const startingDate = new Date("Sat, 01 May 2019 08:00:00 GMT");
+const startingDate = new Date("Sat, 20 May 2019 08:00:00 GMT");
 
 const express = require('express');
 const bodyParser = require('body-parser');
