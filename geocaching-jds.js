@@ -123,6 +123,7 @@ const getGeocacheWithCodeId = function(geocacheCodeId) {
         const Geocache = Parse.Object.extend("Geocache");
         let query = new Parse.Query(Geocache);
         query.equalTo("codeId", geocacheCodeId);
+        query.equalTo("Active", true);
         query.first().then((result) => {
             if(result) {
                 resolve(result);
