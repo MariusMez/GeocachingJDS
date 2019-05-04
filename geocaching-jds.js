@@ -2,6 +2,24 @@ const starting_jds_date = "2019-05-10";
 const Coordinates = require('coordinate-parser');
 const qrcode = require('qrcode-generator');
 const { createCanvas, loadImage, Image } = require('canvas');
+const { WebClient } = require('@slack/web-api');
+
+const slack = new WebClient(process.env.SLACK_TOKEN);
+
+function sendToSlack(channel, message) {
+    (async () => {
+  // Use the `auth.test` method to find information about the installing user
+  const res = await slack.auth.test()
+
+  // Use the `chat.postMessage` method to send a message from this app
+  await slack.chat.postMessage({
+    channel: channel,
+    text: message,
+  });
+
+  console.log('Message posted!');
+})();
+}
 
 // This function returns the coordinate
 // conversion string in DD to DMS.
@@ -519,3 +537,4 @@ module.exports.getLogsByEmail = getLogsByEmail;
 module.exports.saveOrUpdateRanking2 = saveOrUpdateRanking2;
 module.exports.computeScoreForGeocacheur = computeScoreForGeocacheur;
 module.exports.checkCoordinates = checkCoordinates;
+module.exports.sendToSlack = sendToSlack;

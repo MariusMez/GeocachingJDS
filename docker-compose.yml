@@ -29,6 +29,7 @@ services:
         - SERVER_URL=${SERVER_URL}
         - RECAPTCHA_SECRET_KEY=${RECAPTCHA_SECRET_KEY}
         - RECAPTCHA_SITE_KEY=${RECAPTCHA_SITE_KEY}
+        - SLACK_TOKEN=${SLACK_TOKEN}
     volumes:
       - .:/app:cached
       - node_modules-vol:/app/node_modules
