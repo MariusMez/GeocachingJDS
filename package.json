@@ -9,6 +9,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@slack/web-api": "^5.0.1",
     "body-parser": "^1.18.3",
     "canvas": "^2.4.1",
     "coordinate-parser": "^1.0.2",

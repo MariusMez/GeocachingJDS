@@ -157,6 +157,8 @@ app.post('/save', cpUpload, async function(req, res) {
                 geocache.save().then((object) => {
                     const message = "OK";
                     const result = "success";
+                    urlCache = "https://geocaching-jds.fr/geocache?id=" + geocache.id;
+                    jds.sendToSlack("CJ2R50ULB", "Nouvelle cache ou nouvelle modif de " +urlCache );
                     res.redirect(`/create?admin_id=${cache_admin_id}&result=${result}&message=${message}`);
                 }, (error) => {
                     console.error("Error in geocache.save(): " + error);
@@ -197,7 +199,7 @@ app.get('/create', async function(req, res) {
             try {
                 spoiler_url = geocache.get("Spoiler").url({forceSecure: true}).replace(/^[a-zA-Z]{3,5}\:\/{2}[a-zA-Z0-9_.:-]+\//, '');
             } catch (error) { }
-
+            
             res.render('create', {
                 gps: geopoint,
                 cache_admin_id: id_administration,
@@ -520,6 +522,9 @@ app.post('/found', upload.single('pic'), function (req, res, next) {
                                 }
 
                                 logEntry.save().then((object) => {
+                                    urlCache = "https://geocaching-jds.fr/geocache?id=" + cache.id;
+                                    jds.sendToSlack("CJG45C81M", "Nouveau log de " + geocacheur.get("Email") + " sur " + urlCache);
+                            
                                     res.render('found', { cacheid: cache.id,
                                         cat: cache.get("Category"),
                                         geocacheurId: geocacheur.id,
