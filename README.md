@@ -14,18 +14,19 @@ cd GeocachingJDS && npm install
 ```
 
 
-## Run with Docker
+## DEV - Run with Docker
 
 First copy your dump folder named 'geocaching_jds_prd' (wich contain bsons and .gz files) inside the folder dump_mongodb.
 The database will be automatically populated.
 
-install with : `docker-compose run --rm parse npm install`
-then just go with: `docker-compose up -d --build`
+Install with : `docker-compose run --rm parse npm install`
 
-## Run with PM2
+Then just go with: `docker-compose up -d --build`
+
+## PRODUCTION - Run with PM2
 
 - We recommend using PM2 from http://pm2.keymetrics.io 
-- Edit file ```ecosystem.json``` and change settings accordingly to your installation
+- Edit file ```ecosystem.json``` and change settings accordingly to your installation (contact me for the missing file, or read the PM2 documentation)
 - Run  ```pm2 start ecosystem.json —watch```
 
 ## Monitor
@@ -37,10 +38,12 @@ then just go with: `docker-compose up -d --build`
 ## Cleaning database files
 
 Connect to Mongo cli : `mongo` then choose your db with: `show dbs` then `use db_name` and connect with `db.auth('user', 'password');`
+
 First delete olds files: `db.fs.files.remove({"uploadDate": {$lt : ISODate("2017-11-10T20:32:13.743Z")}});`
+
 Or delete big files: `db.fs.files.remove({"length": {$gt : 3000000}});`  > 3 Mo
 
-then in a mongo shell: 
+Then in a mongo shell: 
 
 ```
 function removeChunkIfNoOwner(chunk){
@@ -55,6 +58,7 @@ function removeChunkIfNoOwner(chunk){
 ```
 
 Select your database and remove orphaned chunks: `db.fs.chunks.find().forEach(removeChunkIfNoOwner);`
+
 
 ## Backuping Database
 
