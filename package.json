@@ -1,6 +1,6 @@
 {
   "name": "geocaching-jds-parse-server",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Parse Server for the JDS Geocaching Website",
   "main": "index.js",
   "repository": {
@@ -10,21 +10,21 @@
   "license": "MIT",
   "dependencies": {
     "@slack/web-api": "^5.0.1",
-    "body-parser": "^1.18.3",
-    "canvas": "^2.4.1",
+    "body-parser": "^1.19.0",
+    "canvas": "^2.5.0",
     "coordinate-parser": "^1.0.2",
     "csv": "0.3.7",
-    "dotenv": "^7.0.0",
+    "dotenv": "^8.0.0",
     "ejs": "^2.6.1",
     "express": "^4.16.4",
     "multer": "^1.4.1",
     "npm": "^6.9.0",
-    "parse": "^2.3.2",
-    "parse-server": "^3.2.3",
+    "parse": "^2.4.0",
+    "parse-server": "^3.3.0",
     "qrcode-generator": "^1.4.3",
     "recaptcha-verify": "^0.1.1",
-    "sharp": "^0.22.0",
-    "sweetalert2": "^8.8.5",
+    "sharp": "^0.22.1",
+    "sweetalert2": "^8.10.2",
     "tar": "^4.4.8"
   },
   "scripts": {

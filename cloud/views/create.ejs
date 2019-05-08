@@ -148,16 +148,20 @@
                 <input type="hidden" id="cache_admin_id" name="cache_admin_id" value="<%= cache_admin_id %>">
 
 				<p><b>🧩 Type</b> de votre géocache</p>
-				<input id="type_geocache_tradi" type="radio" value="TRADI" name="type_geocache" <% if( type=='TRADI' ) { %>checked <% }%> required/>
-				<label for="type_geocache_tradi">
-					<img width="60" alt="TRADI" src="/public/images/TRADIBIG.gif" style="margin-left:5px;"/>
-					<span style="margin-right:50px; font-size: large">Cache Traditionnelle</span>
-				</label>
-				<input id="type_geocache_mystery" type="radio" value="MYSTERY" name="type_geocache" <% if( type=='MYSTERY' ) { %>checked <% }%> required/>
-				<label for="type_geocache_mystery">
-					<img width="60" alt="MYSTERY" src="/public/images/MYSTERYBIG.gif" style="margin-left:5px;"/>
-					<span style="font-size: large">Cache Mystère</span>
-				</label>
+				<div>
+					<input id="type_geocache_tradi" type="radio" value="TRADI" name="type_geocache" <% if( type=='TRADI' ) { %>checked <% }%> required/>
+					<label for="type_geocache_tradi">
+						<img width="60" alt="TRADI" src="/public/images/TRADIBIG.gif" style="margin-left:5px;"/>
+						<span style="margin-right:50px; font-size: large">Cache Traditionnelle</span>
+					</label>
+					<input id="type_geocache_mystery" type="radio" value="MYSTERY" name="type_geocache" <% if( type=='MYSTERY' ) { %>checked <% }%> required/>
+					<label for="type_geocache_mystery">
+						<img width="60" alt="MYSTERY" src="/public/images/MYSTERYBIG.gif" style="margin-left:5px;"/>
+						<span style="font-size: large">Cache Mystère</span>
+					</label>
+				</div>
+				<span style="font-style: italic"><br>Vous êtes un géocacheur averti et souhaitez créer d'autres types de géocaches (Wherigo, Multi, Cito, ...), &raquo; <a href="mailto:geocaching@jeuxdesophia.com" style="color: #FFFFFF;" class="fa fa-envelope"> contactez-nous</a></span>
+
 
 				<p><label for="name"><b>✨ Nom</b> de votre géocache</label></p>
 				<input type="text" size="20" maxlength="250" name="name" id="name" value="<%= nom %>" style="border: solid 1px #fff;" placeholder="Le nom sera visible sur le site" required/>
@@ -243,7 +247,7 @@
 				</div>
 
 				<p><b>📃 Logbook - Image à imprimer</b></p>
-				<span>Il est nécessaire de placer le QRcode ci-dessous dans votre géocache avec un logbook papier pour permettre aux participant de signer leur trouvaille.</span>
+				<span>Il est nécessaire de placer le QRcode ci-dessous dans votre géocache avec un logbook papier pour permettre aux participants de signer leur trouvaille.</span>
 				<img class="img-border" alt="A imprimer et placer dans la géocache" src="<%= qr %>" id="logbook" />
 
 

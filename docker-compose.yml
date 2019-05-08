@@ -50,7 +50,7 @@ services:
     volumes:
       - 'parse_dashboard_data:/bitnami'
     depends_on:
-      - parse
+      - mongodb
 volumes:
   node_modules-vol:
   mongodb_data:

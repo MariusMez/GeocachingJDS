@@ -36,8 +36,8 @@ then just go with: `docker-compose up -d --build`
 
 ## Cleaning database files
 
-Connect to Mongo cli : `mongo` then choose your db with: `show dbs` and `use db_name`
-First delete olds files: `db.fs.files.remove({"uploadDate": {$lt : ISODate("2016-11-10T20:32:13.743Z")}});`
+Connect to Mongo cli : `mongo` then choose your db with: `show dbs` then `use db_name` and connect with `db.auth('user', 'password');`
+First delete olds files: `db.fs.files.remove({"uploadDate": {$lt : ISODate("2017-11-10T20:32:13.743Z")}});`
 Or delete big files: `db.fs.files.remove({"length": {$gt : 3000000}});`  > 3 Mo
 
 then in a mongo shell: 
@@ -56,7 +56,9 @@ function removeChunkIfNoOwner(chunk){
 
 Select your database and remove orphaned chunks: `db.fs.chunks.find().forEach(removeChunkIfNoOwner);`
 
+## Backuping Database
 
+``` mongodump --username 'user' --password 'password' --db geocaching_jds_prd --gzip```
 
 ## Contribution
 
