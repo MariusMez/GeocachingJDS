@@ -19,7 +19,7 @@ cd GeocachingJDS && npm install
 First copy your dump folder named 'geocaching_jds_prd' (wich contain bsons and .gz files) inside the folder dump_mongodb.
 The database will be automatically populated.
 
-Install with : `docker-compose run --rm parse npm install`
+Install with : `docker-compose run --rm parse npm install` when you update package.json you need to re-run this command.
 
 Then just go with: `docker-compose up -d --build`
 

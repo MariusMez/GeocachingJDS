@@ -34,6 +34,8 @@ services:
         - EMAIL_PORT=${EMAIL_PORT}
         - EMAIL_USER=${EMAIL_USER}
         - EMAIL_PASS=${EMAIL_PASS}
+        - EMAIL_FROM=${EMAIL_FROM}
+        - EMAIL_SECURE_SSL=${EMAIL_SECURE_SSL}
     volumes:
       - .:/app:cached
       - node_modules-vol:/app/node_modules

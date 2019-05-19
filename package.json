@@ -16,7 +16,7 @@
     "csv": "0.3.7",
     "dotenv": "^8.0.0",
     "ejs": "^2.6.1",
-    "express": "^4.16.4",
+    "express": "^4.17.0",
     "multer": "^1.4.1",
     "npm": "^6.9.0",
     "parse": "^2.4.0",
@@ -24,7 +24,7 @@
     "qrcode-generator": "^1.4.3",
     "recaptcha-verify": "^0.1.1",
     "sharp": "^0.22.1",
-    "sweetalert2": "^8.10.2",
+    "sweetalert2": "^8.11.1",
     "tar": "^4.4.8",
     "nodemailer": "^6.1.1"
   },
