@@ -21,3 +21,4 @@ logs
 config
 ecosystem.json
 .env
+/nbproject/private/

@@ -30,6 +30,10 @@ services:
         - RECAPTCHA_SECRET_KEY=${RECAPTCHA_SECRET_KEY}
         - RECAPTCHA_SITE_KEY=${RECAPTCHA_SITE_KEY}
         - SLACK_TOKEN=${SLACK_TOKEN}
+        - EMAIL_HOST=${EMAIL_HOST}
+        - EMAIL_PORT=${EMAIL_PORT}
+        - EMAIL_USER=${EMAIL_USER}
+        - EMAIL_PASS=${EMAIL_PASS}
     volumes:
       - .:/app:cached
       - node_modules-vol:/app/node_modules

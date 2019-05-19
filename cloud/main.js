@@ -2,6 +2,7 @@ const jds = require('../geocaching-jds');
 const starting_jds_date = "2018-05-10";
 const csv = require('csv');
 const fs = require('fs');
+const mailer = require('nodemailer');
 
 Parse.Cloud.beforeSave("Log", async (request) => {
     if(request.object.isNew()) {
@@ -270,6 +271,74 @@ Parse.Cloud.job("Last - Compute Ranking", async (request) => {
     }).then((result) => {
         request.message("I just finished");
     }, function(error) {
+        console.error(error);
+    });
+});
+
+/**
+ * Sending 2019 launch email campaign
+ * 
+ * You will have to deactivate some restrictions from your Google account in order to use Gmail :
+ * - https://accounts.google.com/b/0/DisplayUnlockCaptcha
+ * - https://myaccount.google.com/lesssecureapps
+ * 
+ * @todo Better management of the promises / error cases
+ */
+Parse.Cloud.job("Send launch emails to participants 2019", (request) => {
+    request.message("I just started sending the emails");
+    
+    var sTemplate = fs.readFileSync('cloud/views/mails/launch2019.html', 'utf8');
+    let oTransportConfig = {
+        host: process.env.EMAIL_HOST,
+        port: parseInt(process.env.EMAIL_PORT, 10),
+        secure: true,
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS
+        }
+    }
+    var oTransporter = mailer.createTransport(oTransportConfig);
+    //console.log(oTransportConfig);
+
+    const Geocache = Parse.Object.extend("Geocache");
+    let queryGeocaches = new Parse.Query(Geocache);
+    queryGeocaches.notEqualTo("adminId", null);
+    queryGeocaches.notEqualTo("adminId", "");
+    //queryGeocaches.equalTo("OwnerEmail", "testmail@gmail.com");
+    queryGeocaches.greaterThanOrEqualTo("createdAt", new Date("2019-01-01"));
+    queryGeocaches.limit(1000);
+    queryGeocaches.find().then((geocaches) => {
+        let counter = 0;
+        geocaches.forEach((geocache) => {
+            counter = counter + 1;
+            const email = geocache.get("OwnerEmail");
+            const adminLink = "https://www.geocaching-jds.fr/create?admin_id=" + geocache.get("adminId");
+            
+            request.message("Processing " + email + " " + counter + "/" + geocaches.length);
+            console.log("Processing " + email + " (" + counter + "/" + geocaches.length + ")");
+            
+            var oMailOptions = {
+                from: process.env.EMAIL_USER,
+                to: email,
+                subject: "Lancement épreuve Géocaching JDS2019",
+                html: sTemplate.replace(/{ADMIN_LINK}/g, adminLink)
+            };
+            oTransporter.sendMail(oMailOptions, function(error, info){
+                if (error) {
+                    console.log("Sending email to " + email + " FAILED !!! (retry manually)");
+                    console.log(error);
+
+                } else {
+                    console.log("Email sent to " + email + " (" + info.response + ")");
+                }
+            });
+        });
+        
+    }).then((results) => {
+        console.log("Mailing campaign sent (returned: " + results + ")");
+        request.message("I just finished");
+
+    }, (error) => {
         console.error(error);
     });
 });

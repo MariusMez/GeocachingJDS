@@ -25,7 +25,8 @@
     "recaptcha-verify": "^0.1.1",
     "sharp": "^0.22.1",
     "sweetalert2": "^8.10.2",
-    "tar": "^4.4.8"
+    "tar": "^4.4.8",
+    "nodemailer": "^6.1.1"
   },
   "scripts": {
     "start": "node index.js"
