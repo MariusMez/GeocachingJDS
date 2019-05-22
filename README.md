@@ -23,6 +23,11 @@ Install with : `docker-compose run --rm parse npm install` when you update packa
 
 Then just go with: `docker-compose up -d --build`
 
+The website is running at http://localhost:1337
+
+The parse dashboard at http://localhost:4040
+
+
 ## PRODUCTION - Run with PM2
 
 - We recommend using PM2 from http://pm2.keymetrics.io 
