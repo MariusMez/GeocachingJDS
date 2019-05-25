@@ -44,7 +44,7 @@ The parse dashboard at http://localhost:4040
 
 Connect to Mongo cli : `mongo` then choose your db with: `show dbs` then `use db_name` and connect with `db.auth('user', 'password');`
 
-First delete olds files: `db.fs.files.remove({"uploadDate": {$lt : ISODate("2017-11-10T20:32:13.743Z")}});`
+First delete olds files: `db.fs.files.remove({"uploadDate": {$lt : ISODate("2018-06-06T20:32:13.743Z")}});`
 
 Or delete big files: `db.fs.files.remove({"length": {$gt : 3000000}});`  > 3 Mo
 
