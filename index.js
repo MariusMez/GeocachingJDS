@@ -532,12 +532,6 @@ app.post('/found', upload.single('pic'), function (req, res, next) {
                                         geocacheur.set("Pseudo", name);
                                         geocacheur.save();
                                     }
-                                    res.render('foundit', { nom: cache.get("Nom"),
-                                    firstfound: firstfound,
-                                    id: cache.id,
-                                    email: geocacheur.get("Email"),
-                                    pseudo: geocacheur.get("Pseudo"),
-                                    cat: cache.get("Category") });
                                 });
 
                                 logEntry.save().then((object) => {
