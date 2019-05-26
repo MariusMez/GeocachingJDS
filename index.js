@@ -432,11 +432,16 @@ app.post('/flash', function(req, res) {
                     console.log("Log with email: " + email + " was not found - Looking for a Geocacheur to prepare a new Log");
                     jds.getGeocacheurWithEmail(email).then((geocacheur) => {
                         if(geocacheur) {
-                            res.render('foundit', { nom: cache.get("Nom"),
+                            jds.getLogsByEmail(email).then((logs) => {
+                                console.log(logs.length + " Logs with email : " + email);
+                                var firstfound = logs.length == 0 ? true : false;
+                                res.render('foundit', { nom: cache.get("Nom"),
+                                firstfound: firstfound,
                                 id: cache.id,
                                 email: geocacheur.get("Email"),
                                 pseudo: geocacheur.get("Pseudo"),
                                 cat: cache.get("Category") });
+                            });
                         } else {
                             res.render('error', { message: "Geocacheur non trouvé avec l'email : " + email });
                         }
@@ -520,6 +525,14 @@ app.post('/found', upload.single('pic'), function (req, res, next) {
                                 } else {
                                     logEntry.set("Fav", false);
                                 }
+
+                                jds.getLogsByEmail(email).then((logs) => {
+                                    // if this log is the first one from the geocacheur his nickname must be updated
+                                    if (logs.length == 0) {
+                                        geocacheur.set("Pseudo", name);
+                                        geocacheur.save();
+                                    }
+                                });
 
                                 logEntry.save().then((object) => {
                                     urlCache = "https://geocaching-jds.fr/geocache?id=" + cache.id;

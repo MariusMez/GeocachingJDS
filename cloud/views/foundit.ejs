@@ -28,7 +28,12 @@
 
 				<input type="hidden" type="email" name="email" id="email" value="<%= email %>" style="border: solid 1px #fff;" placeholder="L'email ne sera pas visible sur le site" required/>
 				<br>
+				<% if(firstfound==true) {%>
+				Bravo, vous avez trouvé votre première cache. Sous quel pseudo voulez-vous la logger ?
+				<input type="text" name="name" id="name" style="border: solid 1px #fff;" placeholder="Ce pseudo sera visible sur le site" required/>
+				<% } else {%>
 				<input type="hidden" type="text" name="name" id="name" value="<%= pseudo %>" style="border: solid 1px #fff;" placeholder="Ce pseudo sera visible sur le site" required/>
+				<% } %>
 				<br>
 				Un petit Message pour partager votre découverte
 				<input type="text" name="message" id="message" value="" style="border: solid 1px #fff;" placeholder="Ce Message sera visible sur le site" maxlength="500" required/>
