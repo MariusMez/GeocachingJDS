@@ -433,7 +433,7 @@ const saveOrUpdateRanking2 = function (score) {
                 ranking.set("TTF", score.scoreCaches.TTF);
                 ranking.set("ScoreFTF", score.scoreCaches.ScoreFTF);
                 ranking.set("ScoreDT", score.scoreCaches.ScoreDT);
-                ranking.set("Score", score.scoreCaches.total + score.scoreTb.total + score.scoreMyTb.total);
+                ranking.set("Score", score.scoreCaches.total);
                 ranking.set("Found", score.scoreCaches.found);
 
                 ranking.save(null);
