@@ -122,7 +122,7 @@ Parse.Cloud.job("First - Compute Score Ratio D/T", (request) => {
             query.limit(100000);
             query.include('Geocache');
             query.find().then(function(logs) {
-                let promise = Parse.Promise.as();
+                let promise = Promise.resolve();
                 let scoreDT = 0;
                 logs.forEach(function(log) {
                     promise = promise.then(function() {
@@ -201,16 +201,16 @@ Parse.Cloud.job("Compute Fav Ratio", async (request) => {
     });
 });
 
-Parse.Cloud.job("Compute All rankings", (request) => {
+Parse.Cloud.job("Compute All rankings", async (request) => {
     request.message("I just started Compute All Rankings");
     const Geocacheur = Parse.Object.extend("Geocacheur");
     let queryGeocacheurs = new Parse.Query(Geocacheur);
     queryGeocacheurs.equalTo("Active", true);
     queryGeocacheurs.limit(1000);
-    queryGeocacheurs.find().then((geocacheurs) => {
+    queryGeocacheurs.find().then(async (geocacheurs) => {
         let promisesScores = [];
         let counter = 0;
-        geocacheurs.forEach((geocacheur) => {
+        geocacheurs.forEach(async (geocacheur) => {
             counter = counter + 1;
             const email = geocacheur.get("Email");
             request.message("Processing " + email + " " + counter + "/" + geocacheurs.length);
@@ -218,12 +218,12 @@ Parse.Cloud.job("Compute All rankings", (request) => {
             promisesScores.push(jds.computeScoreForGeocacheur(email));
         });
 
-        return Parse.Promise.all(promisesScores);
-    }).then((scores) => {
+        return await Promise.all(promisesScores);
+    }).then(async (scores) => {
         console.log("in function with " + scores.length + " scores ");
         let promisesStore = [];
         let counter = 0;
-        scores.forEach((score) => {
+        scores.forEach(async (score) => {
             counter = counter + 1;
             const email = score.geocacheur.get("Email");
             request.message("Storing " + email + " - " + counter + "/" + scores.length);
@@ -231,7 +231,7 @@ Parse.Cloud.job("Compute All rankings", (request) => {
 
             promisesStore.push(jds.saveOrUpdateRanking2(score));
         });
-        return Parse.Promise.all(promisesStore);
+        return await Promise.all(promisesStore);
     }).then((results) => {
         console.log("termine with " + results.length);
         request.message("I just finished");
