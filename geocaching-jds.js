@@ -464,7 +464,7 @@ const saveOrUpdateRanking = function (score) {
                 ranking.set("TTF", score.scoreCaches.TTF);
                 ranking.set("ScoreFTF", score.scoreCaches.ScoreFTF);
                 ranking.set("ScoreDT", score.scoreCaches.ScoreDT);
-                ranking.set("ScoreDT", score.scoreCaches.ScoreCache);
+                ranking.set("ScoreCache", score.scoreCaches.ScoreCache);
                 ranking.set("Score", score.scoreCaches.total);
                 ranking.set("Found", score.scoreCaches.found);
 
