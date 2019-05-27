@@ -337,6 +337,27 @@ const saveRanking = function (geocacheur, active) {
     });
 };
 
+const getGeocachesByOwnerEmail = function (email) {
+    return new Promise((resolve, reject) => {
+        const Geocaches = Parse.Object.extend("Geocache");
+        let query = new Parse.Query(Geocaches);
+        query.equalTo("OwnerEmail", email);
+        query.equalTo("Active", true);
+        query.lessThanOrEqualTo("Publication", new Date());
+        query.limit(1000);
+        query.find().then((results) => {
+            if (results) {
+                resolve(results);
+            } else {
+                resolve(null);
+            }
+        }, (error) => {
+            console.error("Error searching for Geocaches owner - Error: " + error);
+            reject(error);
+        });
+    });
+};
+
 const computeScoreForGeocacheur = function (email) {
     console.log("computeScoreForGeocacheur " + email);
     return new Promise((resolve, reject) => {
@@ -345,13 +366,16 @@ const computeScoreForGeocacheur = function (email) {
         const nbPointsFTF = 3;
         const nbPointsSTF = 2;
         const nbPointsTTF = 1;
+        const nbPointsFavOwner = 1;
 
         let promiseGeocacheur = getGeocacheurWithEmail(email);
         let promiseLogs = getLogsByEmail(email);
+        let promiseCaches = getGeocachesByOwnerEmail(email);
 
-        Promise.all([promiseGeocacheur, promiseLogs]).then((values) => {
+        Promise.all([promiseGeocacheur, promiseLogs, promiseCaches]).then((values) => {
             let geocacheur = values[0];
             let mylogs = values[1];
+            let myCaches = values[2];
 
             let scoreCaches = {
                 found: 0,
@@ -361,9 +385,16 @@ const computeScoreForGeocacheur = function (email) {
                 ScoreFTF: 0,
                 ScoreDT: 0,
                 ScoreFound: 0,
+                ScoreCache: 0,
                 total: 0,
                 caches: []
             };
+
+            // Fav for cache owner
+            myCaches.forEach( (cache) => {
+                let nbPointsFav = cache.get("Fav");
+                scoreCaches.ScoreCache = scoreCaches.ScoreCache + (nbPointsFav * nbPointsFavOwner);
+            });
 
             // logs caches
             mylogs.forEach((log) => {
@@ -395,7 +426,7 @@ const computeScoreForGeocacheur = function (email) {
                 scoreCaches.caches.push(cache);
             });
 
-            scoreCaches.total = scoreCaches.ScoreFTF + scoreCaches.ScoreDT + scoreCaches.ScoreFound;
+            scoreCaches.total = scoreCaches.ScoreFTF + scoreCaches.ScoreDT + scoreCaches.ScoreFound + scoreCaches.ScoreCache;
             const result = {geocacheur: geocacheur, scoreCaches: scoreCaches};
             console.log(result);
             resolve(result);
@@ -406,7 +437,7 @@ const computeScoreForGeocacheur = function (email) {
     });
 };
 
-const saveOrUpdateRanking2 = function (score) {
+const saveOrUpdateRanking = function (score) {
     return new Promise((resolve, reject) => {
         const Ranking = Parse.Object.extend("Ranking");
 
@@ -433,6 +464,7 @@ const saveOrUpdateRanking2 = function (score) {
                 ranking.set("TTF", score.scoreCaches.TTF);
                 ranking.set("ScoreFTF", score.scoreCaches.ScoreFTF);
                 ranking.set("ScoreDT", score.scoreCaches.ScoreDT);
+                ranking.set("ScoreDT", score.scoreCaches.ScoreCache);
                 ranking.set("Score", score.scoreCaches.total);
                 ranking.set("Found", score.scoreCaches.found);
 
@@ -544,10 +576,11 @@ module.exports.hasEmailFoundGeocache = hasEmailFoundGeocache;
 module.exports.saveOrUpdateGeocacheur = saveOrUpdateGeocacheur;
 module.exports.getLastLogs = getLastLogs;
 module.exports.getAllPublishedGeocaches = getAllPublishedGeocaches;
+module.exports.getGeocachesByOwnerEmail = getGeocachesByOwnerEmail;
 module.exports.saveRanking = saveRanking;
 module.exports.getAllActiveRanking = getAllActiveRanking;
 module.exports.getLogsByEmail = getLogsByEmail;
-module.exports.saveOrUpdateRanking2 = saveOrUpdateRanking2;
+module.exports.saveOrUpdateRanking2 = saveOrUpdateRanking;
 module.exports.computeScoreForGeocacheur = computeScoreForGeocacheur;
 module.exports.checkCoordinates = checkCoordinates;
 module.exports.sendToSlack = sendToSlack;

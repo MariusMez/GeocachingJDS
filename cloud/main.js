@@ -103,49 +103,7 @@ Parse.Cloud.job("Import participants 2019 from CSV file", async (request) => {
     request.message("I just finished");
 });
 
-
-Parse.Cloud.job("First - Compute Score Ratio D/T", (request) => {
-    request.message("I just started Compute Ratio D/T");
-
-    const Logs = Parse.Object.extend("Log");
-    const Ranking = Parse.Object.extend("Ranking");
-
-    let queryRanking = new Parse.Query(Ranking);
-    queryRanking.equalTo("Active", true);
-    queryRanking.limit(1000);
-    queryRanking.find().then((ranking) => {
-        ranking.forEach((rank) => {
-            let query = new Parse.Query(Logs);
-            query.equalTo("Email", rank.get("Email"));
-            query.equalTo("Active", true);
-            query.greaterThanOrEqualTo("createdAt", new Date(starting_jds_date));
-            query.limit(100000);
-            query.include('Geocache');
-            query.find().then(function(logs) {
-                let promise = Promise.resolve();
-                let scoreDT = 0;
-                logs.forEach(function(log) {
-                    promise = promise.then(function() {
-                        scoreDT = scoreDT + log.get("Geocache").get("Difficulty") + log.get("Geocache").get("Terrain");
-                        return scoreDT;
-                    });
-                });
-                return promise;
-
-            }).then((scoreDT) => {
-                rank.set("ScoreDT", scoreDT);
-                rank.save(null);
-            });
-        });
-    }).then((result) => {
-        request.message("I just finished");
-    }, (error) => {
-        console.error(error);
-    });
-});
-
-
-Parse.Cloud.job("Compute Fav Points", async (request) => {
+Parse.Cloud.job("1 - Compute Fav Points", async (request) => {
     request.message("I just started Compute Fav Points");
 
     const Logs = Parse.Object.extend("Log");
@@ -158,7 +116,7 @@ Parse.Cloud.job("Compute Fav Points", async (request) => {
         geocaches.forEach(async (geocache) => {
             let query = new Parse.Query(Logs);
             query.equalTo("Active", true);
-            query.limit(100000);
+            query.limit(1000);
             query.equalTo("Geocache", geocache);
             query.equalTo("Fav", true);
             query.count().then(async (counter) => {
@@ -173,7 +131,7 @@ Parse.Cloud.job("Compute Fav Points", async (request) => {
     });
 });
 
-Parse.Cloud.job("Compute Fav Ratio", async (request) => {
+Parse.Cloud.job("2 - Compute Fav Ratio", async (request) => {
     request.message("I just started Compute Fav Ratio");
 
     const Logs = Parse.Object.extend("Log");
@@ -185,7 +143,7 @@ Parse.Cloud.job("Compute Fav Ratio", async (request) => {
         geocaches.forEach((geocache) => {
             let query = new Parse.Query(Logs);
             query.equalTo("Active", true);
-            query.limit(100000);
+            query.limit(1000);
             query.equalTo("Geocache", geocache);
             query.count().then(async (counter) => {
                 let nbFav = geocache.get("Fav");
@@ -201,7 +159,7 @@ Parse.Cloud.job("Compute Fav Ratio", async (request) => {
     });
 });
 
-Parse.Cloud.job("Compute All rankings", async (request) => {
+Parse.Cloud.job("NEW 2019 - Compute All Rankings", async (request) => {
     request.message("I just started Compute All Rankings");
     const Geocacheur = Parse.Object.extend("Geocacheur");
     let queryGeocacheurs = new Parse.Query(Geocacheur);
@@ -229,7 +187,7 @@ Parse.Cloud.job("Compute All rankings", async (request) => {
             request.message("Storing " + email + " - " + counter + "/" + scores.length);
             console.log("Storing " + email + " - " + counter + "/" + scores.length);
 
-            promisesStore.push(jds.saveOrUpdateRanking2(score));
+            promisesStore.push(jds.saveOrUpdateRanking(score));
         });
         return await Promise.all(promisesStore);
     }).then((results) => {
@@ -240,41 +198,7 @@ Parse.Cloud.job("Compute All rankings", async (request) => {
     });
 });
 
-Parse.Cloud.job("Last - Compute Ranking", async (request) => {
-    request.message("I just started Compute Ranking");
-    const scoreFoundIt = 20;
-    const scoreFTF = 3;
-    const scoreSTF = 2;
-    const scoreTTF = 1;
 
-    const Logs = Parse.Object.extend("Log");
-    const Ranking = Parse.Object.extend("Ranking");
-
-    let queryRanking = new Parse.Query(Ranking);
-    queryRanking.equalTo("Active", true);
-    queryRanking.limit(1000);
-    queryRanking.find().then((rankings) => {
-        rankings.forEach((rank) => {
-            let query = new Parse.Query(Logs);
-            query.equalTo("Email", rank.get("Email"));
-            query.equalTo("Active", true);
-            query.greaterThanOrEqualTo("createdAt", new Date(starting_jds_date));
-            query.limit(10000);
-            query.count().then(async (counter) => {
-                let scoreFTFSTFTTF = rank.get("FTF") * scoreFTF + rank.get("STF") * scoreSTF + rank.get("TTF") * scoreTTF;
-                let score = counter * scoreFoundIt + scoreFTFSTFTTF + rank.get("ScoreDT") + rank.get("ScoreCache");
-                rank.set("Found", counter);
-                rank.set("Score", score);
-                rank.set("ScoreFTF", scoreFTFSTFTTF);
-                await rank.save(null);
-            });
-        });
-    }).then((result) => {
-        request.message("I just finished");
-    }, function(error) {
-        console.error(error);
-    });
-});
 
 /**
  * Sending 2019 launch email campaign
