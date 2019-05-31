@@ -366,7 +366,7 @@ const computeScoreForGeocacheur = function (email) {
         const nbPointsFTF = 3;
         const nbPointsSTF = 2;
         const nbPointsTTF = 1;
-        const nbPointsFavOwner = 1;
+        const nbPointsFavOwner = 5;
 
         let promiseGeocacheur = getGeocacheurWithEmail(email);
         let promiseLogs = getLogsByEmail(email);
@@ -393,7 +393,8 @@ const computeScoreForGeocacheur = function (email) {
             // Fav for cache owner
             myCaches.forEach( (cache) => {
                 let nbPointsFav = cache.get("Fav");
-                scoreCaches.ScoreCache = scoreCaches.ScoreCache + (nbPointsFav * nbPointsFavOwner);
+                let scoreRatio = cache.get("RatioFav");
+                scoreCaches.ScoreCache = scoreCaches.ScoreCache + scoreRatio + (nbPointsFav * nbPointsFavOwner);
             });
 
             // logs caches
