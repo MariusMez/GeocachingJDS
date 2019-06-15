@@ -263,6 +263,9 @@ app.get('/geocaches', function(req, res) {
         start = true;
     }
 
+    // TODO remove at launch
+    start = false;
+
     jds.getAllPublishedGeocaches("Publication").then(function(geocaches) {
         jds.getLastLogs(5).then(function(logs) {
             res.render('geocaches', { geocaches:geocaches, logs:logs, start:start });
